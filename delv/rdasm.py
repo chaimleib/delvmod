@@ -59,7 +59,11 @@ INT_SYM = '(integer|symbol):%s'
 ATO_SYM = '(atom|symbol):%s'
 EXPR_CODE = "'(' ws expression_item*:%s ws ')'"
 STAT_CODE = "'(' ws function_item*:%s ws ')'"
-import inspect # forgive me, I just need to get this done
+# forgive me, I just need to get this done
+try:
+    from inspect import getfullargspec as get_args
+except ImportError:
+    from inspect import getargspec as get_args
 class Opcode(object):
     def __init__(self, ctx, **kwargs):
         self.ctx = ctx
@@ -74,13 +78,17 @@ class Opcode(object):
             base += self.match()
         return base + ' -> %s(asm, %s)'%(self.true_name, self.parameterization())
     def match(self):
-        argname, _, _, argclass = inspect.getargspec(self.generate)
+        argspec = get_args(self.generate)
+        argname = argspec.args
+        argclass = argspec.defaults
         if not argclass: return ''
         p = ' space '.join([rule%binding for binding,rule in zip(argname[-len(argclass):],argclass)])
         return (' space ' if argclass[0].strip()[0] == "'" else ' required_space ')+p if p else p
 
     def parameterization(self):
-        argname, _, _, argclass = inspect.getargspec(self.generate)
+        argspec = get_args(self.generate)
+        argname = argspec.args
+        argclass = argspec.defaults
         if not argclass: return ''
         p = ', '.join(['%s=%s'%(binding,binding) for binding,rule in zip(
                              argname[-len(argclass):],argclass)])
