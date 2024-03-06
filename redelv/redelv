@@ -16,9 +16,10 @@
 #
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or
 # Ambrosia Software, Inc.
+from __future__ import print_function
 import redelvlib
-print """redelv %s (C) 2016 Bryce Schroeder. Licensed under the GPL3."""%(
-    redelvlib.version)
+print("""redelv %s (C) 2016 Bryce Schroeder. Licensed under the GPL3."""%(
+    redelvlib.version))
 
 r = redelvlib.ReDelv()
 r.main()
