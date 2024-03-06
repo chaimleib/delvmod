@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -15,8 +15,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 import pygtk
 pygtk.require('2.0')
 import gtk, os, sys
@@ -37,7 +37,7 @@ _EDITORS_BY_NAME = {
     "Landscale": graphics_editors.LandscapeEditor,
     "Portrait": graphics_editors.PortraitEditor,
     "Icon": graphics_editors.IconEditor,
-    "TileSheet": graphics_editors.TileSheetEditor, 
+    "TileSheet": graphics_editors.TileSheetEditor,
     "ScheduleEditor": schedule_editor.ScheduleEditor,
     "Sized": graphics_editors.SizedEditor,
     "Sound": sound_editors.SoundEditor,
@@ -70,7 +70,7 @@ def editor_for_name(name):
 def editor_for_subindex(subindex):
     return _EDITORS_FOR_SUBINDEX.get(subindex, generic_editors.HexEditor)
 def editor_for_resource(resid):
-    return _EDITORS_FOR_RESOURCE.get(resid, 
+    return _EDITORS_FOR_RESOURCE.get(resid,
            _EDITORS_FOR_SUBINDEX.get((resid>>8)-1, generic_editors.HexEditor))
 
 class Receiver(gtk.Window):
@@ -87,7 +87,7 @@ class FileInfo(Receiver):
         #self.redelv.subindexchange.append(self)
         self.redelv.resourcechange.append(self)
         self.connect("delete_event", (lambda *x: self.hide() or True))
-        
+
         pbox = gtk.VBox(False, 5)
 
         hrow = gtk.HBox(False, 0)
@@ -106,7 +106,7 @@ class FileInfo(Receiver):
         pbox.pack_start(hrow,True,True,0)
 
         hrow = gtk.HBox(False, 0)
-        hrow.pack_start(gtk.Label("Size"),False,True,0)        
+        hrow.pack_start(gtk.Label("Size"),False,True,0)
         self.size = gtk.Entry()
         self.size.set_editable(False)
         hrow.pack_start(self.size,True,True,0)
@@ -129,7 +129,7 @@ class FileInfo(Receiver):
 
 
         self.add(pbox)
-        
+
         self.signal_resourcechange(None)
     def signal_filechange(self,d=None):
         self.signal_resourcechange(d)
@@ -147,7 +147,7 @@ class FileInfo(Receiver):
             self.offset.set_text("0x%08X"%res.offset)
             self.encrypted.set_active(bool(res.canon_encryption))
             self.changed.set_active(bool(res.loaded))
-            
+
         else:
             self.set_title("Information")
             for field in [self.n,self.subindex,self.resource_id,
@@ -226,8 +226,8 @@ class FileMetadata(Receiver):
     def signal_filechange(self, d=None):
         if not self.redelv.archive:
             for box in [self.scenario_title,self.unknown_40,self.unknown_42,
-                        self.unknown_48,self.master_index_length, 
-                        self.master_index_offset,self.player_name]: 
+                        self.unknown_48,self.master_index_length,
+                        self.master_index_offset,self.player_name]:
                 box.set_text("")
                 box.set_editable(False)
             self.source_string.set_text("[No File Opened]")

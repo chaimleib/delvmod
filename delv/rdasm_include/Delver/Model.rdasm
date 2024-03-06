@@ -1,7 +1,7 @@
 /*
 ; Copyright 2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 ; Wiki: http://www.ferazelhosting.net/wiki/delv
-; 
+;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
 ;    the Free Software Foundation, either version 3 of the License, or
@@ -15,18 +15,18 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;
-; This header file defines data structures and constants used by 
+; This header file defines data structures and constants used by
 ; Cythera 1.0.4. They are not expected to work with any other first-party
 ; Delver scenario (or version), as constants and even opcodes could in
-; theory change under DelvEd. (ReDelv does not have this problem of 
+; theory change under DelvEd. (ReDelv does not have this problem of
 ; gratuitous constant-reassignment, and new first-party anythings seem
 ; extremely unlikely at this point.)
 ;
 ; Note that this file is GPL licensed; all scripts produced which include it
-; are also required to be GPL licensed - if you distribute their compiled 
-; form, you must also make the source code available. Of course, an 
+; are also required to be GPL licensed - if you distribute their compiled
+; form, you must also make the source code available. Of course, an
 ; interface is not copyrightable, or at least shouldn't be, so you can make
-; your own header file to do the same thing if you really want. */ 
+; your own header file to do the same thing if you really want. */
 
 defines Object (
 
@@ -42,7 +42,7 @@ defines Object (
 
     HasSkill             (0x0004)
 
- /*  Seen in object type 58 (room objects, 1Bxx), characters also have 
+ /*  Seen in object type 58 (room objects, 1Bxx), characters also have
      a default implementation. */
     LookAt               (0x0007)
 
@@ -67,7 +67,7 @@ defines Object (
  /* void Object.UseOn(self, target)
     A method, which should effect the use of this object on another. Note
     that in the case of e.g. casting a spell or using a skill, "self" is the
-    skill object itself, not the caster/user. The object for the user is 
+    skill object itself, not the caster/user. The object for the user is
     instead typically gotten from Globals.Current. The target is supplied
     as a Prop, and must be casted to a Character to access Character fields
     (e.g. magic points or nutrition). UseOn returns nothing. */
@@ -79,7 +79,7 @@ defines Object (
     UseAt returns nothing. */
     UseAt                (0x000B)
 
-    
+
     Talk                 (0x000C)
 
     Wear                 (0x000D)
@@ -99,7 +99,7 @@ defines Object (
     // Nothing has 001C
     // seen in 48/19xx monster classes
     OnDeath              (0x001D)
-    
+
     // called for e.g. swamp, lava
     StepOn               (0x001F)
     // Corpses and the talking doors in Pnyx have 001E
@@ -123,22 +123,22 @@ defines Object (
     Stacking             (0x0028)
     // Array giving the object's aspect as a function of the current hour,
     // useful for making sundials.
-    AspectByHour         (0x0029) 
+    AspectByHour         (0x0029)
     MeleeWeapon          (0x002A)
     ThrownWeapon         (0x002B)
     ArmorValue           (0x002C)
     Ammunition           (0x002D)
     RangedWeapon         (0x002E)
     Shield               (0x002F)
-    
+
 
     AlchemicalReagent    (0x0030)
     AlchemicalProperties (0x0030)
     // no 31
     LightSource          (0x0032)
  /* array Object.AskedAbout(self)
-    A field, containing a list of two items. The first item of the list is 
-    a string which contains what a character knowledgeable about the subject 
+    A field, containing a list of two items. The first item of the list is
+    a string which contains what a character knowledgeable about the subject
     would say. The second item is a list of the NPCs who know about the item
     when asked about it. E.g. a magic item would be something like:
     ["This is infused with strange goat magics.", [People.Timon]] */
@@ -172,7 +172,7 @@ defines ClassFlags (
   //                     (0x0000100) Blood, stalagmites
   //                     (0x0000200) Doors
   HasTimedBehavior       (0x0000800) // Bombs, hourglasses
-  
+
 )
 
 defines Types (
@@ -199,7 +199,7 @@ defines DObj (
     aspect                  (3)
     prop_type               (4)
     obj_type                (4)
-    aspect_and_proptype     (5) // this field &0x03FF is prop type, &0xFC00 is aspect. 
+    aspect_and_proptype     (5) // this field &0x03FF is prop type, &0xFC00 is aspect.
     data1                   (6)
     data2                   (7)
     data3                   (8) // d3 = (d1 << 8) | d2

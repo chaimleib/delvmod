@@ -4,7 +4,7 @@
 #
 # Copyright 2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/mag.py
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -19,14 +19,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -48,12 +48,12 @@ Available Commands:
   compatible PATCH1 PATCH2 [... PATCHN]
      Report if the listed patches are compatible, i.e. if they overwrite
     none of the same resources (0xFFFF excepted.)
-  
+
 If no command is given, mag.py with launch in GUI mode, if available.
 
 Note that the patches mag.py creates are not compatible with Magpie. mag.py
 is however compatible with Magpie patches and can apply them. Also note that
-unlike Magpie, mag.py is not a patch manager; it only creates and applies 
+unlike Magpie, mag.py is not a patch manager; it only creates and applies
 patches. It can't unapply them.
 
 """
@@ -89,7 +89,7 @@ elif command == 'compatible':
               os.path.basename(path)) for path in argv[2:]], 2)
     conflicts = False
     for (a,aname),(b,bname) in combos:
-        if not a.compatible(b): 
+        if not a.compatible(b):
             print(aname, "conflicts with", bname)
             conflicts = True
             break

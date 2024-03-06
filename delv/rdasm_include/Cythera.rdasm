@@ -1,7 +1,7 @@
 /*
 ; Copyright 2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 ; Wiki: http://www.ferazelhosting.net/wiki/delv
-; 
+;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
 ;    the Free Software Foundation, either version 3 of the License, or
@@ -15,18 +15,18 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;
-; This header file defines data structures and constants used by 
+; This header file defines data structures and constants used by
 ; Cythera 1.0.4. They are not expected to work with any other first-party
 ; Delver scenario (or version), as constants and even opcodes could in
-; theory change under DelvEd. (ReDelv does not have this problem of 
+; theory change under DelvEd. (ReDelv does not have this problem of
 ; gratuitous constant-reassignment, and new first-party anythings seem
 ; extremely unlikely at this point.)
 ;
 ; Note that this file is GPL licensed; all scripts produced which include it
-; are also required to be GPL licensed - if you distribute their compiled 
-; form, you must also make the source code available. Of course, an 
+; are also required to be GPL licensed - if you distribute their compiled
+; form, you must also make the source code available. Of course, an
 ; interface is not copyrightable, or at least shouldn't be, so you can make
-; your own header file to do the same thing if you really want. */ 
+; your own header file to do the same thing if you really want. */
 
 defines Items (
     Potion               (0x01F)
@@ -184,8 +184,8 @@ defines AISpellTypes (
     MassStatusEffect     (3)
     Utility              (4) // AI doesn't seem to use these
     MassCuring           (5)
-    
-    
+
+
 )
 
 defines Skills (

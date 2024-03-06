@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -15,11 +15,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 import gtk, images, delv.util, gobject
 import sys, tempfile, os, subprocess
-MSG_NO_UNDERLAY = """Couldn't create library; if you are editing a saved game, 
+MSG_NO_UNDERLAY = """Couldn't create library; if you are editing a saved game,
 you need to underlay a scenario before opening resources that use library
 facilities (e.g. refer to props or tiles.) Exception was: %s"""
 class Editor(gtk.Window):
@@ -41,20 +41,20 @@ class Editor(gtk.Window):
         self.redelv.set_unsaved()
     def is_unsaved(self):
         return self._unsaved
-    def open_external_editor(self, editor, write_cb, read_cb, 
+    def open_external_editor(self, editor, write_cb, read_cb,
            file_extension='.data', cb_data=None):
         """Open an external editor with the provided command (which should
            be something like 'gimp %s') on a tempfile, after writing to
            that tempfile with the provided callback. The callback will be
            called as write_cb(filename, cb_data).
            When (if) the file is changed by the external editor, it will run
-           read_cb(filename, cb_data). 
+           read_cb(filename, cb_data).
            """
         if self.external_editor:
             self.error_message("Close the existing external editor first.")
             return
         self.external_editor_tempfile = tempfile.NamedTemporaryFile('w+b',
-            prefix='redelvobj', 
+            prefix='redelvobj',
             suffix='%04X%s'%(self.res.resid,file_extension))
         write_cb(self.external_editor_tempfile, cb_data)
         proc = subprocess.Popen(editor%self.external_editor_tempfile.name,
@@ -91,8 +91,8 @@ class Editor(gtk.Window):
             return True
 
         return True
-       
-        
+
+
     def __del__(self):
         self.redelv.unregister_editor(self)
     def __init__(self, redelv, resource, canonical=True, *argv, **argk):
@@ -134,8 +134,8 @@ class Editor(gtk.Window):
     def warn_unsaved_changes(self):
         return self.ask_unsaved()
     def ask_unsaved(self):
-        dialog = gtk.MessageDialog(self, 
-            gtk.DIALOG_MODAL , 
+        dialog = gtk.MessageDialog(self,
+            gtk.DIALOG_MODAL ,
             gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
             "You will lose unsaved changes to this resource; are you sure?")
         rv= gtk.RESPONSE_YES != dialog.run()
@@ -156,8 +156,8 @@ class Editor(gtk.Window):
         chooser.destroy()
         return rv
     def yn_ask(self,prompt="Are you sure?"):
-        dialog = gtk.MessageDialog(self, 
-            gtk.DIALOG_MODAL , 
+        dialog = gtk.MessageDialog(self,
+            gtk.DIALOG_MODAL ,
             gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
             prompt)
         rv = gtk.RESPONSE_YES == dialog.run()
@@ -176,10 +176,10 @@ class Editor(gtk.Window):
         else:
             rv = None
         chooser.destroy()
-        return rv 
+        return rv
     def error_message(self, message):
-        dialog = gtk.MessageDialog(self, 
-            gtk.DIALOG_MODAL , 
+        dialog = gtk.MessageDialog(self,
+            gtk.DIALOG_MODAL ,
             gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
             message)
         dialog.run()

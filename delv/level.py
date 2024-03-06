@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 # Maps and prop lists. Convenience utilities for map visualization.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -58,7 +58,7 @@ class PropListEntry(object):
     def __init__(self, flags, loc, aspect, proptype, d3, propref, storeref, u,
                  index=None):
         self.index=index
-        self.set_location(loc)        
+        self.set_location(loc)
         self.flags = flags;self.aspect=aspect&0x1F
         self.rotated = aspect&0xE0
         self.proptype=proptype;self.d3=d3;self.propref=propref
@@ -101,7 +101,7 @@ class PropListEntry(object):
         self.d3 = v
     def get_d3(self):
         return self.d3
-    def debug(self, library): 
+    def debug(self, library):
         # Man I need to refactor, look at that nomenclature
         if self.show_in_map():
             tid = library.get_prop(self.proptype).get_tile(self.aspect)
@@ -113,7 +113,7 @@ class PropListEntry(object):
                 self.get_name(library), self.get_d3())
         else:
             return "{%04X:%02X(%04X) %s}"%(
-                self.proptype | (self.aspect<<10) | (self.rotated<<5), 
+                self.proptype | (self.aspect<<10) | (self.rotated<<5),
                 self.flags, self.get_d3(), self.get_name(library))
     def get_name(self, library):
         if self.flags == 0x42:
@@ -137,7 +137,7 @@ class PropList(store.Store):
     def append(self, prop):
         self.props.append(prop)
         prop.index = len(self.props)-1
-        if not self.propsat.has_key(prop.loc): 
+        if not self.propsat.has_key(prop.loc):
             self.propsat[prop.loc] = []
         self.propsat[prop.loc].append(prop)
     def write_to_bfile(self, dest=None):
@@ -170,7 +170,7 @@ class PropList(store.Store):
             if not self.propsat.has_key(loc): self.propsat[loc] = []
             self.propsat[loc].append(nprop)
             index += 1
-        #for prlist in self.propsat.values(): 
+        #for prlist in self.propsat.values():
         #    prlist.sort(key=lambda p:p.draw_order())
     def props_at(self,loc):
         return self.propsat.get(loc,[])
@@ -208,13 +208,13 @@ class Map(store.Store):
         self.roof_layer_size = self.src.read_uint16()
         self.roof_underlayer_size = self.src.read_uint16()
         assert self.roof_layer_size == self.roof_underlayer_size
-        
+
         # if 0, show blackness instead
         self.horizontal_edge_propagation = self.src.read_uint8()
         self.vertical_edge_propagation = self.src.read_uint8()
 
         # which zoneport you end up at when you walk off of the map in
-        # the four cardinal directions. Usually the same, but can be 
+        # the four cardinal directions. Usually the same, but can be
         # different - see 0x8026 for how the Cademia bridge is implemented
         self.exit_zoneport_north = self.src.read_uint16()
         self.exit_zoneport_east = self.src.read_uint16()
@@ -233,7 +233,7 @@ class Map(store.Store):
         self.map_data = array.array('H')
         for _ in range(self.width*self.height):
             self.map_data.append(self.src.read_uint16())
-    
+
 
 class Level(object):
     pass

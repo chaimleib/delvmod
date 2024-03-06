@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 # Maps and prop lists. Convenience utilities for map visualization.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -43,17 +43,17 @@ class Sound(store.Store):
     pass
 
 class Asnd(Sound):
-    """Class for Delver sound resources. (Might be 'asnd' for "Ambrosia 
+    """Class for Delver sound resources. (Might be 'asnd' for "Ambrosia
        Sound Tool" but that's speculative.)"""
     def __init__(self, src=None):
         self.samples = array.array('h')
         self.rate = 22050
-        self.duration =0 
+        self.duration =0
         self.data = None
         store.Store.__init__(self, src)
         self.set_source(src)
         if self.src: self.load_from_bfile()
-        
+
     def write_to_bfile(self, dest=None):
         if dest is None: dest = self.src
         dest.seek(0)
@@ -65,7 +65,7 @@ class Asnd(Sound):
             # Yes, this seems stupid, but it's the way it is
             # No idea why 8 bit sound is stored in 16 bit shorts.
             dest.write_sint16(sample>>8)
-        
+
     def load_from_bfile(self):
         self.src.seek(0)
         if self.src.read(4) != 'asnd': raise SoundError("Bad magic number")
@@ -76,7 +76,7 @@ class Asnd(Sound):
         samp = 0
         while not self.src.eof():
             #samp += self.src.read_sint16()
-            #self.samples.append(samp) 
+            #self.samples.append(samp)
             self.samples.append(self.src.read_sint16()<<8)
         self.data = None
     def get_rate(self):
@@ -88,7 +88,7 @@ class Asnd(Sound):
         self.samples = array.array('h',newsamples)
         self.data = None
         # It's actually size, not duration... anyway, may need to pad.
-        
+
         if len(self.samples) < 512:
             self.samples.extend([0]*(512-len(self.samples)))
             self.duration = 0
@@ -98,8 +98,8 @@ class Asnd(Sound):
     def set_rate(self, newrate):
         self.rate = newrate
         self.data = None
-        
-    
+
+
 class SoundSND(Sound):
     pass
 
@@ -141,132 +141,132 @@ SOFT_SYNTH_COMPONENT_SUBTYPE = 'ss  '
 GM_SYNTH_COMPONENT_SUBTYPE = 'gm  '
 # GM instrument mapping
 INSTRUMENT_NAMES = """Acoustic Grand Piano
-Bright Acoustic Piano 
+Bright Acoustic Piano
 Electric Grand Piano
-Honky-tonk Piano 
-Electric Piano 1 
-Electric Piano 2 
-Harpsichord 
-Clavi 
-Celesta 
-Glockenspiel 
-Music Box 
-Vibraphone 
-Marimba 
-Xylophone 
-Tubular Bells 
-Dulcimer 
-Drawbar Organ 
-Percussive Organ 
-Rock Organ 
-Church Organ 
-Reed Organ 
-Accordion 
-Harmonica 
-Tango Accordion 
-Acoustic Guitar (nylon) 
-Acoustic Guitar (steel) 
-Electric Guitar (jazz) 
-Electric Guitar (clean) 
-Electric Guitar (muted) 
-Overdriven Guitar 
-Distortion Guitar 
-Guitar harmonics 
-Acoustic Bass 
-Electric Bass (finger) 
-Electric Bass (pick) 
-Fretless Bass 
-Slap Bass 1 
-Slap Bass 2 
-Synth Bass 1 
-Synth Bass 2 
-Violin 
+Honky-tonk Piano
+Electric Piano 1
+Electric Piano 2
+Harpsichord
+Clavi
+Celesta
+Glockenspiel
+Music Box
+Vibraphone
+Marimba
+Xylophone
+Tubular Bells
+Dulcimer
+Drawbar Organ
+Percussive Organ
+Rock Organ
+Church Organ
+Reed Organ
+Accordion
+Harmonica
+Tango Accordion
+Acoustic Guitar (nylon)
+Acoustic Guitar (steel)
+Electric Guitar (jazz)
+Electric Guitar (clean)
+Electric Guitar (muted)
+Overdriven Guitar
+Distortion Guitar
+Guitar harmonics
+Acoustic Bass
+Electric Bass (finger)
+Electric Bass (pick)
+Fretless Bass
+Slap Bass 1
+Slap Bass 2
+Synth Bass 1
+Synth Bass 2
+Violin
 Viola
-Cello 
-Contrabass 
-Tremolo Strings 
-Pizzicato Strings 
-Orchestral Harp 
-Timpani 
-String Ensemble 1 
-String Ensemble 2 
-SynthStrings 1 
-SynthStrings 2 
-Choir Aahs 
-Voice Oohs 
-Synth Voice 
-Orchestra Hit 
-Trumpet 
-Trombone 
-Tuba 
-Muted Trumpet 
-French Horn 
-Brass Section 
-SynthBrass 1 
-SynthBrass 2 
+Cello
+Contrabass
+Tremolo Strings
+Pizzicato Strings
+Orchestral Harp
+Timpani
+String Ensemble 1
+String Ensemble 2
+SynthStrings 1
+SynthStrings 2
+Choir Aahs
+Voice Oohs
+Synth Voice
+Orchestra Hit
+Trumpet
+Trombone
+Tuba
+Muted Trumpet
+French Horn
+Brass Section
+SynthBrass 1
+SynthBrass 2
 Soprano Sax
-Alto Sax 
-Tenor Sax 
-Baritone Sax 
-Oboe 
+Alto Sax
+Tenor Sax
+Baritone Sax
+Oboe
 English Horn
-Bassoon 
-Clarinet 
+Bassoon
+Clarinet
 Piccolo
-Flute 
-Recorder 
+Flute
+Recorder
 Pan Flute
 Blown Bottle
-Shakuhachi 
-Whistle 
-Ocarina 
-Lead 1 (square) 
+Shakuhachi
+Whistle
+Ocarina
+Lead 1 (square)
 Lead 2 (sawtooth)
-Lead 3 (calliope) 
-Lead 4 (chiff) 
-Lead 5 (charang) 
-Lead 6 (voice) 
-Lead 7 (fifths) 
+Lead 3 (calliope)
+Lead 4 (chiff)
+Lead 5 (charang)
+Lead 6 (voice)
+Lead 7 (fifths)
 Lead 8 (bass + lead)
 Pad 1 (new age)
-Pad 2 (warm) 
+Pad 2 (warm)
 Pad 3 (polysynth)
-Pad 4 (choir) 
-Pad 5 (bowed) 
-Pad 6 (metallic) 
-Pad 7 (halo) 
-Pad 8 (sweep) 
-FX 1 (rain) 
-FX 2 (soundtrack) 
-FX 3 (crystal) 
-FX 4 (atmosphere) 
-FX 5 (brightness) 
-FX 6 (goblins) 
-FX 7 (echoes) 
-FX 8 (sci-fi) 
-Sitar 
-Banjo 
-Shamisen 
-Koto 
-Kalimba 
-Bag pipe 
-Fiddle 
-Shanai 
-Tinkle Bell 
-Agogo 
-Steel Drums 
-Woodblock 
-Taiko Drum 
-Melodic Tom 
-Synth Drum 
-Reverse Cymbal 
-Guitar Fret Noise 
-Breath Noise 
-Seashore 
-Bird Tweet 
-Telephone Ring 
-Helicopter 
-Applause 
+Pad 4 (choir)
+Pad 5 (bowed)
+Pad 6 (metallic)
+Pad 7 (halo)
+Pad 8 (sweep)
+FX 1 (rain)
+FX 2 (soundtrack)
+FX 3 (crystal)
+FX 4 (atmosphere)
+FX 5 (brightness)
+FX 6 (goblins)
+FX 7 (echoes)
+FX 8 (sci-fi)
+Sitar
+Banjo
+Shamisen
+Koto
+Kalimba
+Bag pipe
+Fiddle
+Shanai
+Tinkle Bell
+Agogo
+Steel Drums
+Woodblock
+Taiko Drum
+Melodic Tom
+Synth Drum
+Reverse Cymbal
+Guitar Fret Noise
+Breath Noise
+Seashore
+Bird Tweet
+Telephone Ring
+Helicopter
+Applause
 Gunshot""".strip().split('\n')
 
 class Music(Sound):
@@ -284,10 +284,10 @@ class Music(Sound):
         self.src = util.BinaryHandler(src)
         body_offset = self.src.read_uint32() # body_offset tells when the general commands stop and others begin; may not need it, just read through
         musi = self.src.read(4)
-        if musi != MUSIC_COMPONENT_TYPE: 
+        if musi != MUSIC_COMPONENT_TYPE:
             raise ValueError("%s is not a music resource"%src)
         self.flags = [self.src.read_uint32() for _ in range(3)]
- 
+
         # while self.src.tell() < body_offset:
         while not self.src.eof():
             command = self.src.readb(4)
@@ -439,7 +439,7 @@ class Music(Sound):
     def setup_pygame_midi_output(self, output):
         "Set up the MIDI output to play this music."
         for partnumber,instrument in self.instruments.items():
-            if instrument > 0x80: instrument &= 0x7F 
+            if instrument > 0x80: instrument &= 0x7F
             output.set_instrument(instrument,partnumber)
     def part(self,partnumber=None):
         """Return the general midi instrument associated with a part number."""

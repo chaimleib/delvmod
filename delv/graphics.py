@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -33,12 +33,12 @@ from . import colormap, util, store
 from .util import bits_pack, ncbits_pack, ncbits_of, bits_of, bitstruct_pack
 
 def DelvImageFactory(src, *args, **kwargs):
-    """Return the appropriate kind of DelvImage subclass for the 
+    """Return the appropriate kind of DelvImage subclass for the
        delv.archive.Resource object you provide."""
     return _CLASS_HINTS.get(src.subindex, DelvImage)(src, *args, **kwargs)
-    
+
 def DelvImageFactoryMode(src, mode, *args, **kwargs):
-    """Return the appropriate kind of DelvImage subclass for the 
+    """Return the appropriate kind of DelvImage subclass for the
        specified mode, one of tiles, portrait, landscape or sized."""
     return _NAME_HINTS.get(mode, DelvImage)(src, *args, **kwargs)
 
@@ -50,11 +50,11 @@ class DelvImage(store.Store):
        You should probably not instantiate this class directly, but instead
        one of its child classes (General, for sized images; TileSheet, for
        32x512 sets of sixteen 32x32 tiles; Portrait, for 64x64 character
-       portraits; or Landscape, for 288x32 level images. You can use 
-       DelvImageFactory (arguments same as DelvImage's constructor) to 
+       portraits; or Landscape, for 288x32 level images. You can use
+       DelvImageFactory (arguments same as DelvImage's constructor) to
        automatically pick the right class, if you are loading from a
        delv.archive.Resource object.
-       
+
        The file format used, is documented here in detail:
        http://www.ferazelhosting.net/wiki/Delver%20Compressed%20Graphics
     """
@@ -64,7 +64,7 @@ class DelvImage(store.Store):
         """Create a new Delver Compressed Graphics Image. src can be None,
            the default, which creates an empty image of the default size
            for this type, or an random-access indexable item such as a list,
-           string or array, which will be assumed to be compressed data, 
+           string or array, which will be assumed to be compressed data,
            or a delv Resource object (also assumed to be compressed data.)"""
         #if isinstance(src, archive.Resource):
         #    self.src = bytearray(src.get_data())
@@ -87,11 +87,11 @@ class DelvImage(store.Store):
             self.flags2 = bits_of(header, 1, 31)
             self.logical_height = self.height + self.flags2
             # TODO - figure out what the deal is with this.
-            # DelvTechWiki conjectures that it has something to do with 
+            # DelvTechWiki conjectures that it has something to do with
             # objects that have some sort of response to dragging/clicking
             # only in certain areas. But it has colors similar to the main
             # object...
-            if self.flags: 
+            if self.flags:
                 self.logical_width += 4
                 self.width += self.flags
             if self.flags2:
@@ -153,7 +153,7 @@ class DelvImage(store.Store):
             elif opcode < 0xE0:
                 # Short data
                 # They do not seem to have any visual effect.
-                # It is quite possible that this represents a short run of 
+                # It is quite possible that this represents a short run of
                 # literal data (< C0); it only appears as the penultimate
                 # opcode in the corpus. On this basis we assume 4 bits of
                 # literals, but only D2 is seen.
@@ -225,9 +225,9 @@ class DelvImage(store.Store):
         if self.has_header:
             data = bytearray(4)
             bits_pack(data, self.width>>2, 14, 0 )
-            bits_pack(data, self.flags,     2, 15) 
+            bits_pack(data, self.flags,     2, 15)
             bits_pack(data, self.height,   16, 16)
-        else: 
+        else:
             data = bytearray()
         data += self.condense_opcodes(codes)
         data += '\xFF' # Termination opcode
@@ -252,10 +252,10 @@ class DelvImage(store.Store):
             gf += self.image[yr*self.logical_width+x:yr*self.logical_width+x+w]
         return gf
     def get_image(self):
-        """Get only the part of the image normally displayed by 
+        """Get only the part of the image normally displayed by
            the engine to the user. This is usually all of the image;
            except for certain Sized image resources ID 8Fxx."""
-        if self.width == self.logical_width: 
+        if self.width == self.logical_width:
             self.cached_visual = self.image
         if self.cached_visual: return self.cached_visual
         self.cached_visual = bytearray(self.width*self.height)
@@ -267,7 +267,7 @@ class DelvImage(store.Store):
             v_cursor += self.width
         return self.cached_visual
     def set_image(self, data):
-        """Set the uncompressed data of the logical image. data must be a 
+        """Set the uncompressed data of the logical image. data must be a
            linear indexable item of size logical_width*logical_height, of
            integer values that represent indexed color pixels. Left to right,
            top to bottom, densely packed."""
@@ -283,9 +283,9 @@ class DelvImage(store.Store):
            for your target game (e.g the Cythera CLUT); dithering
            and color-matching are beyond the scope of this project."""
         self.src = None
-        if not self.image: 
+        if not self.image:
              self.image = bytearray(self.logical_width*self.logical_height)
-        for yr in range(y,y+h): 
+        for yr in range(y,y+h):
              self.image[yr*self.logical_width+x:yr*self.logical_width+x+w] = (
                  src[(yr-y)*w:(yr-y)*w + w])
     def draw_into_tile(self,src,n):
@@ -296,14 +296,14 @@ class DelvImage(store.Store):
     def get_subtile(self,n,m):
         """Get the mth subtile of the nth tile of this image. (See .get_tile
            for definition of nth tile). The mth subtile is the 8x8 chunk of
-           the tile, numbered starting from the top-left, but going 
+           the tile, numbered starting from the top-left, but going
            top-to-bottom THEN left-to-right."""
         return self.get_from(*self.subtile_rect(n,m))
     def get_tile(self,n):
         """Get the nth 32x32 tile of this image. Clasically meaningful only
            for tile sheets, where it returns the nth from the top (counting
            from zero.) For the sake of completeness, though, it will work
-           on other images, in which case the tiles are numbered top to 
+           on other images, in which case the tiles are numbered top to
            bottom, left to right. The format is the same as get_from."""
         return self.get_from(*self.tile_rect(n))
 
@@ -317,7 +317,7 @@ class DelvImage(store.Store):
         return ((n//16)*32 + (m//4)*8,
                 (n*32)%512 + (m%4)*8,
                 8,8)
-  
+
     def get_size(self):
         """Return (width,height)."""
         return self.width,self.height
@@ -388,7 +388,7 @@ class DelvImage(store.Store):
             (index,  [(3,8), (7,1)]),
             (clen-3, [(3,13)      ]),
             (lits,   [(2,11)      ])])
-          
+
         #check = ncbits_of(code, (3,8), (7,1))
         #if check != index:
         #    print "ERROR %08X %08X"%(index,check), clen-3, lits

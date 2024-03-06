@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2015-16 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,8 +16,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 import csv
 import gtk, pango
 import editors
@@ -31,25 +31,25 @@ class ScriptEditor(editors.Editor):
     name = "Scripting System Editor"
     default_size = 680,512
     icon = images.script_path
-    def gui_setup(self): 
+    def gui_setup(self):
         pbox = gtk.VBox(False,0)
         self.set_default_size(*self.default_size)
         menu_items = (
             ("/File/Import Text", "<control>I", self.file_import, 0, None),
             ("/File/Export Text", "<control>E", self.file_export, 0, None),
             ("/File/Revert to Saved Source", None, self.load_source, 0, None),
-            ("/File/Revert to Disassembly", None, self.load_disassemble, 0, 
+            ("/File/Revert to Disassembly", None, self.load_disassemble, 0,
                      None),
             ("/File/Load from TAUCS", None, self.load_taucs, 0, None),
             ("/File/Assemble and Save", "<control>S", self.file_save, 0, None),
-            ("/File/Save Source Code", "<shift><control>S", 
+            ("/File/Save Source Code", "<shift><control>S",
                   self.do_save_source,
                   0, None),
-            ("/Edit/Edit in External Text Editor", "<control>G", 
+            ("/Edit/Edit in External Text Editor", "<control>G",
                  self.edit_external, 0, None),
-            ("/Edit/Purge Source", None, 
+            ("/Edit/Purge Source", None,
                  self.purge, 0, None),
-            #("/Edit/Check Syntax", "<control>T", 
+            #("/Edit/Check Syntax", "<control>T",
             #     self.edit_syntax, 0, None),
 
             #("/Edit/Copy", "<control>C", self.edit_copy, 0, None),
@@ -80,11 +80,11 @@ class ScriptEditor(editors.Editor):
         self.asm_status.set_text("Disassembling binary... ")
         hbox.pack_start(self.asm_status, True, True, 0)
         self.auto_assemble = gtk.ToggleButton(
-            "Auto-Assemble") 
+            "Auto-Assemble")
         self.auto_assemble.set_active(True)
         hbox.pack_start(self.auto_assemble, False, True, 0)
         self.save_source = gtk.ToggleButton(
-            "Auto-save Source") 
+            "Auto-save Source")
         self.save_source.set_active(True)
         hbox.pack_start(self.save_source, False, True, 0)
         pbox.pack_start(hbox, False, True, 0)
@@ -111,7 +111,7 @@ class ScriptEditor(editors.Editor):
                         |self.canonical_object.data[1])
                 ofs2 = ((ord(obin[0])<<8)
                         |ord(obin[1]))
-                if (ofs1 == ofs2 
+                if (ofs1 == ofs2
                     and obin[0:ofs1] == self.canonical_object.data[0:ofs1]):
                     self.asm_status.set_text(
                     "Pass with table mismatch; ready.")
@@ -123,10 +123,10 @@ class ScriptEditor(editors.Editor):
                 self.asm_status.set_text("Passed validation check; ready.")
             self.cycle_check = True
             while gtk.events_pending(): gtk.main_iteration()
-                
+
 
         return self.assembler
-    
+
     def editor_setup(self):
         self.load()
         self.text_buf.connect("changed", self.textbuf_changed, None)
@@ -139,7 +139,7 @@ class ScriptEditor(editors.Editor):
         except urllib2.HTTPError:
             self.asm_status.set_text(
                 "ERROR: Could not find canonical sources for this resource.")
-            #message = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, 
+            #message = gtk.MessageDialog(type=gtk.MESSAGE_ERROR,
             #                            buttons=gtk.BUTTONS_OK)
             #message.set_markup(
             #    "Could not find canonical sources for this resource.")
@@ -213,7 +213,7 @@ class ScriptEditor(editors.Editor):
         self.set_unsaved()
         if self.auto_assemble.get_active(): self.file_save()
     def file_import(self,*args):
-        #if self.unsaved and self.warn_unsaved_changes(): return 
+        #if self.unsaved and self.warn_unsaved_changes(): return
         path = "<undefined>"
         try:
             path = self.ask_open_path()
@@ -226,7 +226,7 @@ class ScriptEditor(editors.Editor):
         self.set_unsaved()
         self.asm_status.set_text("Imported a file (not assembled yet.)")
         # set text to data here
-    
+
     def file_export(self, *args):
         path = self.ask_save_path(default = "Script%04X.rdasm"%self.res.resid)
         if not path: return

@@ -4,7 +4,7 @@
 #
 # Copyright 2014-2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -19,25 +19,25 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-ABOUT = """This file created by the Python module delv, written by 
+ABOUT = """This file created by the Python module delv, written by
 Bryce Schroeder as part of the Technical Documentation Project; more
 information can be found at http://www.ferazelhosting.net/wiki/delv
 
 Comments can be addressed to bryce.schroeder@gmail.com
 On the web at: http://www.bryce.pw
 
-The following license applies to module delv, and not necessarily 
+The following license applies to module delv, and not necessarily
 to the content of this archive file:
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ for idx in archive.subindices():
     if not resids: continue
     print(idx, "has", len(archive.resource_ids(idx)), "resources")
 
-# Modify a resource, as an array: 
+# Modify a resource, as an array:
 # (This changes the text of the Sapphire Book of Wisdom)
 archive[0x021B][0xDA7:0xDAA] = 'hax'
 
@@ -88,7 +88,7 @@ archive[0xBC00] = "This file written by delv %s"%delv.version
 about_resource = archive.get(0xBC35, True)
 about_resource.hint_encryption(True)
 
-# A way to read/edit resource - as file-like objects (They have many 
+# A way to read/edit resource - as file-like objects (They have many
 # helpful methods for reading/writing binary, see delv.util.BinaryHandler)
 rfile = about_resource.as_file()
 rfile.write(ABOUT)

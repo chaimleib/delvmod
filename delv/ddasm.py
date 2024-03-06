@@ -1,6 +1,6 @@
 # Copyright 2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -15,14 +15,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 	
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -54,7 +54,7 @@ class Disassembler(object):
             self.content = [read_DVMObj(self.infile)]
         for content in self.content: content.load(self)
             #another = self.content[0].load(self)
-            #while another: 
+            #while another:
             #    self.infile.seek(another)
             #    self.content.append(read_DVMObj(self.infile))
             #    another = self.content[-1].load(self)
@@ -83,7 +83,7 @@ class Disassembler(object):
                     obj.load(self, namehint='Sub')
                     content.register_sub(obj)
                 elif hasattr(obj, 'load'):
-                    obj.load(self) 
+                    obj.load(self)
             self.infile.seek(p)
         if self.context_resource:
             print('resource 0x%04X\n'%self.context_resource, file=of)
@@ -158,7 +158,7 @@ class DArray(list, DVMObj):
                 if self.dd.get_label(addr,False):
                     continue
                 self[i] = read_DVMObj(self.near)
-                if hasattr(self[i],'load'): self[i].load(dd, 
+                if hasattr(self[i],'load'): self[i].load(dd,
                                                          anonymous=True)
     def show(self, i, of):
         name = None if not self.dd else self.dd.get_label(self.offset, False)
@@ -175,7 +175,7 @@ class DArray(list, DVMObj):
         print(')', end='', file=of)
         if len(self)> 6: print('', file=of)
 
-    
+
 
 
 class DTable(dict, DVMObj):
@@ -205,13 +205,13 @@ class DTable(dict, DVMObj):
                  if hasattr(self[k],'load'): self[k].load(dd,
                                                           anonymous=True)
                  self.ovals.append(self[k])
-             else: 
+             else:
                  self.ovals.append(v)
     def show(self, i, of):
         name = None if not self.dd else self.dd.get_label(self.offset, False)
         print(INDENT*i+'table (', end=' ', file=of) #%s('%(name if name else ''),
         if len(self)> 3: print('\n'+INDENT*(i+1), end=' ', file=of)
-        
+
         for key,item in zip(self.field_ordering, self.ovals):
         #for key,item in self.items():
             print('0x%04X ='%key, end=' ', file=of)
@@ -238,13 +238,13 @@ class DClass(DTable):
         DTable.__init__(self, ifile)
     def register_sub(self, sub):
         self.subs.append((sub.offset, sub))
-    
+
     def load(self, dd, anonymous=False):
          self.dd =dd
          self.method_locs = {}
          valids = []
          for k,v in self.items():
-             if v & 0x80000000: 
+             if v & 0x80000000:
                  #print("CTXR", dd.context_resource)
                  if (v&0x7FFF0000)>>16 != dd.context_resource: continue
                  valids.append((v&0xFFFF,k))
@@ -257,14 +257,14 @@ class DClass(DTable):
              self.near.seek(st)
              #print("%20s (0x%04X): 0x%04X-0x%04X"%(
              #    symbolics.DASM_OBJECT_HINTS.get(k,'????'),k,st,en))
-             self.dd.get_label(st, 
+             self.dd.get_label(st,
                  hint=symbolics.DASM_OBJECT_HINTS.get(k,"Field%04X"%k),
                  unique=False)
              self.method_locs[k] = st
              p = self.near.tell()
              self.near.seek(st)
              self[k] = read_DVMObj(self.near, en-st)
-             if hasattr(self[k],'load'): 
+             if hasattr(self[k],'load'):
                  #print('%x'%st, en-st, k, self[k])
                  self[k].load(dd)
              self.near.seek(p)
@@ -292,7 +292,7 @@ class DClass(DTable):
                 if not item in self.content_order:
                     self.content_order.append(item)
                     self.order_offsets.append(0x10000)
-       
+
         for offset, name, dobj in showcd:
             self.content_order.append(dobj)
             self.order_offsets.append(offset)
@@ -314,10 +314,10 @@ class DClass(DTable):
                 order.append((cv, cf))
             for subo, sub in self.subs:
                 order.append((self.dd.labels[subo], sub))
-            
+
 
         for k,item in order:
-                
+
             #item = self[k]
             print(file=of)
             #if k: print((' Field 0x%04X '%k).center(78,'/'), file=of)
@@ -395,13 +395,13 @@ class Opcode(object):
         if self.field is None: return ''
         if self.field < 0: return '%d'%self.fixed_field
         return ('0x%'+('0%dX'%(self.fixed_field*2)))%self.field
-        
-       
+
+
 
 class OpLocal(Opcode):
     mnemonic = 'loc'
     def parse(self, bfile):
-        self.symbol = self.func.get_local(self.opcode, 
+        self.symbol = self.func.get_local(self.opcode,
                                           self.mnemonic.title())
     def parameters(self):
         return self.symbol
@@ -457,7 +457,7 @@ def word2str(i,dd):
             return str(i | ~(-1&0x0FFFFFFF))
         elif i < 0x30000000:
             return '<%08X>'%i
-        elif i < 0x40000000: 
+        elif i < 0x40000000:
             resid = i&0xFFFF
             if resid in symbolics.DASM_RESOURCE_NAME_HINTS:
                 respart = (symbolics.DASM_RESOURCE_NAME_HINTS['_name']
@@ -492,7 +492,7 @@ def word2str(i,dd):
             return '<%08X>'%i
         else:
             resid =(i&0x7FFF0000)>>16
-            offset = i&0xFFFF 
+            offset = i&0xFFFF
             if resid == dd.context_resource:
                 respart = 'here'
             elif resid in symbolics.DASM_RESOURCE_NAME_HINTS:
@@ -501,7 +501,7 @@ def word2str(i,dd):
             else:
                 respart = '0x%04X'%resid
             offspart = dd.get_label(offset,False) or '0x%04X'%offset
-            
+
             return respart+':'+offspart
 
 
@@ -555,7 +555,7 @@ class OpSys(Opcode):
     expect = 1
     def parameters(self):
         return symbolics.DASM_SYSCALL_NAMES.get(self.opcode, "0x%02X"%self.opcode)
-    
+
 class OpWriteFarWord(Opcode):
     mnemonic = 'write_far_word'
     expect = 1
@@ -633,7 +633,7 @@ class OpBranch(Opcode):
         self.dd.get_label(self.target, 'Branch')
     def parameters(self):
         return self.dd.get_label(self.target, 'Branch')
-    
+
 
 class OpIfNot(OpIf):
     mnemonic = 'if_not'
@@ -649,7 +649,7 @@ class OpLoadNearWord(Opcode):
     mnemonic = 'load_near_word'
     expect=0
     #fixed_field = 'ClassData'
-    def parse(self, bfile):            
+    def parse(self, bfile):
         self.field = bfile.read_uint16()
         self.label = self.dd.get_label(self.field, 'ClassData')
         t=bfile.tell()
@@ -660,7 +660,7 @@ class OpLoadNearWord(Opcode):
         bfile.seek(t)
     def parameters(self):
         return self.label
-        
+
 
 # TODO: deal with labels.
 OpTable = {
@@ -707,7 +707,7 @@ OpTable = {
     0x85: OpWriteFarWord,
     0x86: Opcoder('set_field', 2, symbolics.DASM_STRUCT_HINTS),
     0x87: Opcoder('set_global', 1, symbolics.DASM_GLOBAL_NAME_HINTS),
-    0x88: OpBranch,#coder('branch', 0, 'Branch'), 
+    0x88: OpBranch,#coder('branch', 0, 'Branch'),
     0x89: OpSwitch,
     0x8A: Opcoder('print', 1),
     0x8B: Opcoder('return', 1),
@@ -718,7 +718,7 @@ OpTable = {
     0x90: OpConversationResponse,
     0x92: Opcoder('ai_state', 1, 1),
     0x93: Opcoder('gui_close',1),
-    
+
     0x9B: Opcoder('gui',1,symbolics.DASM_GUI_NAME_HINTS),
     0x9C: Opcoder('call_index', 2, 2),
     0x9D: Opcoder('method', 1, symbolics.DASM_OBJECT_HINTS),
@@ -766,7 +766,7 @@ class DFunction(DVMObj):
         assert self.local_count < 0x30
         for n in range(self.local_count): self.get_local(n,hint="Local")
         self.body = ifile.read() if length_hint is None else ifile.read(
-            length_hint-3) 
+            length_hint-3)
         self.size = len(self.body)
     def arglist(self):
         return ', '.join([self.get_local(x|0x30) for x in range(
@@ -785,7 +785,7 @@ class DFunction(DVMObj):
                 dat, offs = line
                 if offs < 0: continue
                 lb = self.dd.get_label(offs, False)
-                if lb: 
+                if lb:
                     print((il)*INDENT+lb+':', file=ost)
                 #else:
                 #    print((il)*INDENT+'// 0x%04X'%offs, file=ost)
@@ -793,7 +793,7 @@ class DFunction(DVMObj):
                 ost.write((il)*INDENT+"'")
                 for cn, ch in enumerate(dat):
                     lb = self.dd.get_label(offs+cn, False)
-                    
+
                     if cn and lb:
                         ost.write("'\n"+(il)*INDENT)
                         ost.write(lb+':\n')
@@ -803,8 +803,8 @@ class DFunction(DVMObj):
                     elif 0x80 > ord(ch) >= 0x20: ost.write(ch)
                     else: ost.write('\\x%02X'%ord(ch))
                 ost.write("'\n")
-                    
-                         
+
+
                 #print((il)*INDENT+"'"+repr(dat+'"')[1:-2]+"'", file=ost)
             else:
                 line.show(il, ost)
@@ -813,10 +813,10 @@ class DFunction(DVMObj):
         self.dd = dd
         self.name = dd.get_label(self.offset, namehint)
         t = self.near.tell()
-        
+
         self.near.seek(self.offset+3)
         self.code = []
-        textbuf = [] 
+        textbuf = []
         subs_found = []
         self.expect_close = []
         self.indent_segments = []
@@ -825,7 +825,7 @@ class DFunction(DVMObj):
         mode = 'direct'
         lastoffset = self.near.tell()
         while self.near.tell() < self.offset+self.size+3:
-            
+
             if self.near.tell() in self.dd.pseudo_ops:
                 psu = self.dd.pseudo_ops[self.near.tell()]
                 del self.dd.pseudo_ops[self.near.tell()]
@@ -853,7 +853,7 @@ class DFunction(DVMObj):
                     print("    Goes from 0x%04X to 0x%04X (length 0x%04X)"%(
                         subroutinefound, skipaddr, skipaddr-subroutinefound))
 
-                    sub = DFunction(self.near,  
+                    sub = DFunction(self.near,
                                     length_hint=skipaddr-subroutinefound, bonus_indents=1)
                     sub.load(self.dd, namehint = "Subroutine")
                     self.code.append(sub)
@@ -879,7 +879,7 @@ class DFunction(DVMObj):
             if mode is 'code':
                 #print("code mode")
                 self.ilevel.append(len(self.indent_segments)+1)
-                if opcode < 0x80 and not self.expect_close: 
+                if opcode < 0x80 and not self.expect_close:
                     mode = 'direct'
                     #print("Abandoning code mode", self.indent_segments)
                     lastoffset = self.near.tell()-1
@@ -902,7 +902,7 @@ class DFunction(DVMObj):
                 elif opcode in OpTable:
                     self.code.append(OpTable[opcode](opcode,self.near,self))
                 else:
-                    print("Bad opcode '0x%02X', offset 0x%X"%(opcode, 
+                    print("Bad opcode '0x%02X', offset 0x%X"%(opcode,
                                        self.near.tell()))
                     assert False, "Halting."
             if ps_after:
@@ -913,17 +913,17 @@ class DFunction(DVMObj):
             self.code.append((''.join(map(chr,textbuf)),lastoffset))
             self.ilevel.append(1)
         self.near.seek(t)
-         
 
-def read_DVMObj(binfile, length_hint=None): 
+
+def read_DVMObj(binfile, length_hint=None):
     """Read a Delver Virtual Machine object from a binary file.
        The appropriate DVMObj subclass is returned. Note that this is
-       not for atoms (True, False, integers, drefs etc.) 
+       not for atoms (True, False, integers, drefs etc.)
 
        It guesses based on the first byte of the input. 81 = function.
-       9x = array. Ax = table. 0x at start = class. Otherwise 
-       NUL-terminated string is assumed. 
- 
+       9x = array. Ax = table. 0x at start = class. Otherwise
+       NUL-terminated string is assumed.
+
        Note that if you know for sure what the file is, you should
        use the appropriate DVMObj constructor."""
     t = binfile.tell()

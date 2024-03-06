@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,8 +16,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 # FIXME
 import csv
 import gtk
@@ -40,7 +40,7 @@ class RLCol(object):
         bool: (lambda d: str(d))
     }
     # Parser: given a row from the table and a column assignment,
-    # produce a row to 
+    # produce a row to
     _def_parser = {
         int: int_parser,
         str: (lambda s: s),
@@ -64,12 +64,12 @@ class RLCol(object):
         self.delv_field = field
     def format(self, delv_row):
         pass
-    
+
 
 class RecordListEditor(editors.Editor):
     """Delver has many resources that take the form of an array of some kind
-       of binary records. This is a generic editor for them. It edits 
-       delv.store.RecordList objects implementing .rows() (and subclasses 
+       of binary records. This is a generic editor for them. It edits
+       delv.store.RecordList objects implementing .rows() (and subclasses
        thereof.)"""
     name = "Unimplemented (Record List Editor)"
     default_size = 512,400

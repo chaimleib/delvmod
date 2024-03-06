@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -41,7 +41,7 @@ from .hints import _RES_HINTS, _SCEN_HINTS
 
 def decrypt(data, prokey):
     """Decrypt the data provided with the given pro-key. The prokey is
-       used to generate the seed value and parameters for the 
+       used to generate the seed value and parameters for the
        pseudorandom number generator that is used to create the key."""
     cleartext = bytearray(len(data))
     key = prokey ^ (prokey>>8)
@@ -111,7 +111,7 @@ class ResourceFile(util.BinaryHandler):
     def __len__(self):
         return self.length_limit-self.trans_offset
     def __repr__(self):
-        return '<ResourceFile from %s. P=%d T=%d L=%s>'%(repr(self.resource), 
+        return '<ResourceFile from %s. P=%d T=%d L=%s>'%(repr(self.resource),
             self.position, self.trans_offset, self.length_limit)
     def tell(self):
         return self.position - self.trans_offset
@@ -156,11 +156,11 @@ class ResourceFile(util.BinaryHandler):
         self.resource.data[self.position:self.position+len(string)] = string
         self.resource.dirty = True
         self.position += len(string)
-    
-        
+
+
 
 class Resource(object):
-    """A an object that represents a an individual resource in 
+    """A an object that represents a an individual resource in
        an archive. """
     def __init__(self, offset, size, subindex=0, n=0, archive=None):
         self.offset = offset # 0 if never been on disk
@@ -187,16 +187,16 @@ class Resource(object):
         if mdref.length is None:
             return ResourceFile(self, trans_offset=mdref.offset)
         else:
-            return ResourceFile(self, trans_offset=mdref.offset, 
+            return ResourceFile(self, trans_offset=mdref.offset,
                 length_limit=mdref.offset+mdref.length)
-    def preview(self): 
+    def preview(self):
         """Generate a human-readable preview."""
         d = filter(
             (lambda x: chr(x) in string.printable and (
                 chr(x) not in string.whitespace)), self.get_data())
         return '"%s"'%''.join(map(chr,d[:20]))
-        
-        
+
+
     def human_readable_size(self):
         lend = len(self.data)
         if lend < 9999: return "%d B"%lend
@@ -207,11 +207,11 @@ class Resource(object):
            If you write to the object, it will indeed change the contents
            of the resource, but in all cases you need to explicitly write
            out the Archive to save changes to disk. It defines read, write,
-           seek, tell, truncate, and the various binary helper methods found in 
+           seek, tell, truncate, and the various binary helper methods found in
            delv.util.BinaryHandler."""
         if not self.loaded:self.load()
         return ResourceFile(self)
-     
+
     def __getitem__(self, n):
         """Return the nth byte of the resource."""
         if not self.loaded: self.load()
@@ -245,13 +245,13 @@ class Resource(object):
         self.canon_encryption = canon_encryption if (
             canon_encryption is not None) else self.encrypted
     def is_encrypted(self):
-        """Returns True if this resource is encrypted _in the medium 
+        """Returns True if this resource is encrypted _in the medium
            it was loaded from_."""
         if self.encrypted is None: self.load()
         return self.encrypted
     def canonically_encrypted(self):
         """Returns True if this resource is encrypted in the single-file
-           archive. If this Resource came from a Delver Archive loaded 
+           archive. If this Resource came from a Delver Archive loaded
            from a file (or created de novo), this function returns the
            same value as is_encrypted(). However, if we are dealing with
            an archive loaded from a directory that was dumped from an Archive,
@@ -267,7 +267,7 @@ class Resource(object):
     # Private methods
     def write(self, dest):
         new_offset = dest.tell()
-        if not self.loaded: 
+        if not self.loaded:
             self.load()
             #dest.seek(new_offset)
         self.offset = new_offset
@@ -286,7 +286,7 @@ class Resource(object):
         if not self.loaded: self.load()
         dest.seek(0)
         dest.write(self.data)
-        self.dirty = False  
+        self.dirty = False
     def load_from_file(self, src):
         self.data = bytearray(src.read())
         self.loaded = True
@@ -300,14 +300,14 @@ class Resource(object):
         self.archive.arcfile.seek(fpos)
         if self.encrypted is None:
             self.encrypted = self.archive.canon_encryption_of(self.subindex, self.resid)
-            if self.canon_encryption is None: 
+            if self.canon_encryption is None:
                 self.canon_encryption = self.encrypted
         if self.encrypted is None:
             self.decrypt_if_required()
         elif self.encrypted is True:
             self.data = decrypt(self.data, resid(self.subindex,self.n))
-        
-        
+
+
     def decrypt_if_required(self):
         print("Decrypt if required", repr(self), self.archive)
         presumptive = decrypt(self.data, resid(self.subindex, self.n))
@@ -318,17 +318,17 @@ class Resource(object):
         else:
             self.encrypted = False
             self.canon_encryption = False
-        
+
 
 class Archive(object):
-    """Class for representing Delver Archives. The implementation is 
+    """Class for representing Delver Archives. The implementation is
        eager; the entire file is loaded into memory when it is opened."""
     known_encrypted = []
     single_known = {}
     known_clear = []
     def __init__(self, src=None, archive_type='scenario', gui_treestore=None):
         """If src is None, then the constructor creates a new empty archive.
-           If src is a file-like object, it will read in an archive from 
+           If src is a file-like object, it will read in an archive from
            that file. If src is a string, it will attempt to open it as
            a file read-only."""
         self.gui_treestore=gui_treestore
@@ -368,10 +368,10 @@ class Archive(object):
             nres.load_from_file(dfile)
             nres.hint_encryption(False, canon_e)
             self[rid] = nres
-            
+
         self.source_string = 'Packed from %s'%path
         if self.gui_treestore: self.add_gui_tree()
-    def from_file(self, src): 
+    def from_file(self, src):
         """Load a delver archive from a file-like object."""
         self.arcfile = util.BinaryHandler(src)
         self.load_header()
@@ -394,7 +394,7 @@ class Archive(object):
     def to_directory(self, path):
         """Dump the contents of the archive, unencrypted, to path."""
         assert os.path.isdir(path)
-        metadata = {'source': self.source(), 
+        metadata = {'source': self.source(),
             'creator': 'delv (www.ferazelhosting.net/wiki/delv)',
             'scenario_title': self.scenario_title.decode("macroman"),
             'player_name': self.player_name.decode("macroman")}
@@ -417,14 +417,14 @@ class Archive(object):
         self.save_header(dest)
         # Skip to just past the spot where we'll put the master index later
         dest.write(bytearray(0x800))
-        # Write all the resources. 
+        # Write all the resources.
         for n,subindex in enumerate(self.all_subindices):
             if not subindex:
                 self.master_index[n] = 0,0
                 continue
             at_least_one = False
             for m,res in enumerate(subindex):
-                if res: 
+                if res:
                     res.write(dest)
                     at_least_one = True
             if not at_least_one: # Prune empty subindices, if any arise
@@ -435,7 +435,7 @@ class Archive(object):
             if not subindex: continue
 
             # Can make it only as long as it needs to be...?
-            self.master_index[n] = dest.tell(), 2048 
+            self.master_index[n] = dest.tell(), 2048
             for res in subindex:
                 if res:
                     res.write_index(dest)
@@ -445,13 +445,13 @@ class Archive(object):
         dest.seek(self.master_index_offset + 8)
         for offset,length in self.master_index:
             dest.write_offlen(offset,length)
-                
+
     def canon_encryption_of(self, subindex, resid=None):
         if resid and resid in self.single_known: return self.single_known[resid]
         return self.encryption_knowledge.get(subindex, None)
 
     def to_string(self):
-        """Produces one (possibly very large) string with the 
+        """Produces one (possibly very large) string with the
            archive in it. Mainly here for front-end web stuff."""
         stio = StringIO()
         self.to_file(stio)
@@ -482,12 +482,12 @@ class Archive(object):
             self.all_subindices[subindex][n] = r
             print("creating new resource %04X"%idx,r)
         return r
-                
 
-    def __getitem__(self, idx): 
-        """Retrieve the data of a resource using the index[] operator. 
-           Its sematics differ slightly from .get in that it will raise 
-           IndexError if the resource does not exist, whereas .get will not 
+
+    def __getitem__(self, idx):
+        """Retrieve the data of a resource using the index[] operator.
+           Its sematics differ slightly from .get in that it will raise
+           IndexError if the resource does not exist, whereas .get will not
            produce exceptions. idx can be the two-byte resource ID or it can be
            a tuple with the subindex and individual resource ID. Another
            difference is that the content of the resource, and not the
@@ -496,9 +496,9 @@ class Archive(object):
         if res is None:
             raise IndexError("Resource %s is not in use"%idx)
         return res.get_data()
-        
+
     def __setitem__(self, idx, value):
-        """idx sematics are the same as __getitem__. If value is not 
+        """idx sematics are the same as __getitem__. If value is not
            already a Resource object, it will be automatically wrapped.
            New resources are created if needed."""
         subindex,n = indices(idx)
@@ -523,7 +523,7 @@ class Archive(object):
             sx = self.all_subindices[subindex]
             return [resid(subindex,n) for n,r in enumerate(sx) if r]
         else:
-            return functools.reduce(operator.add, 
+            return functools.reduce(operator.add,
                 [self.resource_ids(si) for si in self.subindices()])
     def subindices(self):
         """Return a list of valid subindices for this archive."""
@@ -539,7 +539,7 @@ class Archive(object):
             sx = self.all_subindices[subindex]
             return [r for r in sx if r]
         else:
-            return functools.reduce(operator.add, 
+            return functools.reduce(operator.add,
                 [self.resources(si) for si in self.subindices()])
     def __iter__(self):
         """This iterator is over all extant resources in the archive. That
@@ -587,8 +587,8 @@ class Archive(object):
              self.master_index[n] = self.arcfile.read_offlen()
         self.all_subindices = []
         for subn,(offset, length) in enumerate(self.master_index):
-            
-            if not offset: 
+
+            if not offset:
                 self.all_subindices.append([])
                 continue
             subindex = []
@@ -598,7 +598,7 @@ class Archive(object):
             for n in range(size):
                 res_offset, res_length = self.arcfile.read_offlen()
                 if res_offset:
-                    subindex.append(Resource(res_offset, res_length, 
+                    subindex.append(Resource(res_offset, res_length,
                        subn, n, self))
                     rescount += 1
                 else:
@@ -623,11 +623,11 @@ class Archive(object):
                      r.subindex,r.n
                      ])
 
-    
-        
+
+
 class Player(Archive):
     """Class for manipulating Delver Player Files, i.e. saved games."""
-    
+
 
 class Scenario(Archive):
     """Class for manipulating Delver Scenario files."""
@@ -655,8 +655,8 @@ class Patch(Scenario):
         else: # Magpie format
             self.patch_info = data.read_pstring(0x138)
         return self.patch_info
-        
-        
+
+
     def compatible(self, other_patch, exclude = [0xFFFF,0xBC00,0xBC35]):
         """Returns False if two patches are not compatible. Returns True
            if they might be compatible. ;) """
@@ -678,7 +678,7 @@ class Patch(Scenario):
             eq = base.get(resid)
             if (not eq) or (eq.get_data() != modified.get(resid).get_data()):
                 nd = modified.get(resid)
-                if not nd.loaded: nd.load() 
+                if not nd.loaded: nd.load()
                 self[resid] = nd
-         
-            
+
+

@@ -1,13 +1,13 @@
 /*globalprint.rdasm - Example of a RDASM program. Paste it into resource
                       0x3039 and use the shovel on a non-diggable object
-                      to examine a global variable. 
+                      to examine a global variable.
 
- This is the very first "real" RDASM program (i.e. not a program made 
+ This is the very first "real" RDASM program (i.e. not a program made
  for the nonce to test the assembler.)
 
  Copyright 2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
  Wiki: http://www.ferazelhosting.net/wiki/delv
- 
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or

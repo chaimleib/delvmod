@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -15,8 +15,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 import editors
 import gtk,gobject
@@ -72,7 +72,7 @@ class GraphicsEditor(editors.Editor):
     def edit_external(self, *argv):
         try:
             import Image
-            self.Image = Image        
+            self.Image = Image
         except ImportError:
             self.error_message("Couldn't import python imaging library (PIL)")
             return
@@ -81,7 +81,7 @@ class GraphicsEditor(editors.Editor):
             self.redelv.preferences['graphics_editor_cmd'],
             self.external_writeout, self.load_image_from_path,
             file_extension='.png')
-        
+
     def cleanup(self):
         if self.animation_sid is not None:
             gobject.source_remove(self.animation_sid)
@@ -102,11 +102,11 @@ class GraphicsEditor(editors.Editor):
             self.animation_sid = None
     def animation_timer(self):
         gc = self.pixmap.new_gc()
-        self.pixmap.draw_indexed_image(gc, 
+        self.pixmap.draw_indexed_image(gc,
             0, 0, self.image.logical_width,self.image.logical_height,
-            gtk.gdk.RGB_DITHER_NORMAL, 
-            str(self.image.get_logical_image()), 
-            self.image.logical_width, 
+            gtk.gdk.RGB_DITHER_NORMAL,
+            str(self.image.get_logical_image()),
+            self.image.logical_width,
             delv.colormap.animated_rgb24[self.pal_n%8])
         self.display.set_from_pixmap(self.pixmap,None)
         self.pal_n += 1
@@ -127,9 +127,9 @@ class GraphicsEditor(editors.Editor):
                 gtk.gdk.visual_get_system().depth)
         # Requiring a graphics context makes it "easier!" :/
         gc = self.pixmap.new_gc()
-        self.pixmap.draw_indexed_image(gc, 
+        self.pixmap.draw_indexed_image(gc,
             0, 0, self.image.logical_width,self.image.logical_height,
-            gtk.gdk.RGB_DITHER_NORMAL, 
+            gtk.gdk.RGB_DITHER_NORMAL,
             str(data), self.image.logical_width, delv.colormap.rgb24)
         self.display.set_from_pixmap(self.pixmap,None)
         self.flags.set_text("0x%02X"%self.image.flags)
@@ -148,7 +148,7 @@ class GraphicsEditor(editors.Editor):
         self.set_saved()
         self.load_image()
     def get_pixbuf_from_pixmap(self):
-        pbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, 
+        pbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8,
             self.image.logical_width,self.image.logical_height)
         pbuf.get_from_drawable(self.pixmap, gtk.gdk.colormap_get_system(),
             0,0,0,0,self.image.logical_width,self.image.logical_height)
@@ -159,14 +159,14 @@ class GraphicsEditor(editors.Editor):
            gtk.gdk.visual_get_system().depth)
         gc = self.pixmap.new_gc()
         print pil_img.size, len(pil_img.tostring())
-        self.pixmap.draw_indexed_image(gc, 0,0,pil_img.size[0], 
-           pil_img.size[1], gtk.gdk.RGB_DITHER_NORMAL, 
+        self.pixmap.draw_indexed_image(gc, 0,0,pil_img.size[0],
+           pil_img.size[1], gtk.gdk.RGB_DITHER_NORMAL,
            pil_img.tostring(),
            pil_img.size[0], delv.colormap.rgb24)
         self.set_unsaved()
         self.display.set_from_pixmap(self.pixmap,None)
     def file_import(self,*args):
-        #if self.unsaved and self.warn_unsaved_changes(): return 
+        #if self.unsaved and self.warn_unsaved_changes(): return
         path = "<undefined>"
         try:
             path = self.ask_open_path()
@@ -182,7 +182,7 @@ class GraphicsEditor(editors.Editor):
         self.set_unsaved()
         self.display.set_from_pixmap(self.pixmap,None)
         self.redelv.set_unsaved()
-    
+
     def file_export(self, *args):
         path = self.ask_save_path(default = "RGB%04X.png"%self.res.resid)
         if not path: return
@@ -191,8 +191,8 @@ class GraphicsEditor(editors.Editor):
         # The text chunk mechanism could be used to preserve non-visual data...
         pbuf.save(path, "png", {})
     def external_writeout(self, path, cbdata):
-        pil_img = self.Image.frombuffer("P", 
-                (self.image.logical_width, self.image.logical_height), 
+        pil_img = self.Image.frombuffer("P",
+                (self.image.logical_width, self.image.logical_height),
                 self.image.get_logical_image(), "raw",
                 ("P",0,1))
         pil_img.putpalette(delv.colormap.pil)
@@ -202,8 +202,8 @@ class GraphicsEditor(editors.Editor):
         if not path: return
         try:
             import Image
-            pil_img = Image.frombuffer("P", 
-                (self.image.logical_width, self.image.logical_height), 
+            pil_img = Image.frombuffer("P",
+                (self.image.logical_width, self.image.logical_height),
                 self.image.get_logical_image(), "raw",
                 ("P",0,1))
             pil_img.putpalette(delv.colormap.pil)
@@ -223,7 +223,7 @@ class GraphicsEditor(editors.Editor):
             pixbuf.get_width(), pixbuf.get_height())
         self.set_unsaved()
         self.display.set_from_pixmap(self.pixmap,None)
-        
+
     def edit_cut(self, *args):
         self.edit_copy()
         self.edit_clear()
@@ -234,7 +234,7 @@ class GraphicsEditor(editors.Editor):
             self.image.height,self.image.width)
         self.set_unsaved()
         self.display.set_from_pixmap(self.pixmap,None)
- 
+
 class TileSheetEditor(GraphicsEditor):
     force_type = delv.graphics.TileSheet
     has_flags = False
@@ -246,7 +246,7 @@ class PortraitEditor(GraphicsEditor):
     name = "Portrait Editor"
 class SizedEditor(GraphicsEditor):
     force_type = delv.graphics.General
-    has_flags = True 
+    has_flags = True
     default_size=480,480
     name = "Sized Image Editor"
 class IconEditor(GraphicsEditor):

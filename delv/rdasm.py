@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -34,7 +34,7 @@ from . import util
 All_Operations = {}
 Statement_Operations = {}
 RDASM_opcode_names = []
-# TODO  
+# TODO
 # Documentation
 # 5. disassembler
 # 6. provisions for regression testing
@@ -182,7 +182,7 @@ class Op_load_near_word(Opcode):
     def generate(self, of, ctx, lbl=INT_SYM):
         of.write_uint8(0x47)
         of.write_uint16(ctx.getlval(lbl, self, of.tell()))
-    
+
 class Op_global(Opcode):
     mnemonic = 'glo'
     def generate(self, of, ctx, which=INT_SYM):
@@ -226,7 +226,7 @@ class Op_less_than_or_equal(Opcode):
 
 class Op_greater_than(Opcode):
     mnemonic = 'gt'
-    encoding = 0x51 
+    encoding = 0x51
 
 class Op_greater_than_or_equal(Opcode):
     mnemonic = 'ge'
@@ -266,7 +266,7 @@ class Op_left_shift(Opcode):
 
 class Op_right_shift(Opcode):
     mnemonic = 'rsh'
-    encoding = 0x5B  
+    encoding = 0x5B
 
 class Op_logical_and(Opcode):
     mnemonic = 'and'
@@ -392,7 +392,7 @@ class Op_cases(Opcode):
          of.write_uint16(len(lbls))
          for lbl in lbls:
               of.write_uint16(ctx.getlval(lbl,self,of.tell()))
-        
+
 
 class Op_print(Opcode):
     mnemonic = 'print'
@@ -492,7 +492,7 @@ class Op_system_call(Opcode):
         of.write_uint8(ctx.getval(which))
 
 
-      
+
 ###################### END OPCODES #####################################
 
 # I hope python purgatory isn't too bad
@@ -519,7 +519,7 @@ for item in globals():
 #    return real_decorator
 
 def dict_write_code(table, ofile, context, force_order = None):
-    if isinstance(table, DDict): 
+    if isinstance(table, DDict):
         table.write_code(ofile, context, force_order)
         return
 
@@ -544,7 +544,7 @@ def dict_write_code(table, ofile, context, force_order = None):
     for address,ptr in addrs:
         ofile.seek(address)
         ofile.write_uint16(ptr)
-    ofile.seek(t)  
+    ofile.seek(t)
 
 
 def write_array_item(ofile, item, context, callbacks):
@@ -584,7 +584,7 @@ def direct_hex_to_bytearray(text):
     #print(f)
     return bytearray(f)
 
-class SymbolList(list): 
+class SymbolList(list):
     def __hash__(self):
         return hash('.'.join(self))
 class VarRef(SymbolList):
@@ -628,7 +628,7 @@ class Array(list):
         for address,ptr in addrs:
             ofile.seek(address)
             ofile.write_uint16(ptr)
-        ofile.seek(t)  
+        ofile.seek(t)
 
 class Label(SymbolList): pass
 #class ResRef(tuple):
@@ -639,7 +639,7 @@ class Label(SymbolList): pass
 #    def write_code(self,ofile,context):
 #        ofile.write_uint16(0x3000|context.getval(self[1]))
 #        ofile.write_uint16(context.getval(self[0]))
-#class ObjRef(tuple): 
+#class ObjRef(tuple):
 #    def write_code(self,ofile,context):
 #        ofile.write_uint8(0x40)
 #        ofile.write_uint8(context.getval(self[0]))
@@ -668,7 +668,7 @@ class Empty(object):
     def write_code(self,ofile,context=None):
         ofile.write_uint32(0x5000FFFE)
 
-class Function(object): 
+class Function(object):
     def __init__(self,label=None, args=None, body=None, ctx=None):
         self.label = label
         self.args = args
@@ -754,7 +754,7 @@ class DDict(dict):
         for k,v in contents: self[k]=v
         self.contents = contents
     def write_code(self, ofile, context, force_order=None):
-        assert force_order is None 
+        assert force_order is None
         #order = force_order or [k for k,v in self.contents]
         ofile.write_uint16(0xA000|len(self.contents))
         callbacks = []
@@ -776,7 +776,7 @@ class DDict(dict):
         for address,ptr in addrs:
             ofile.seek(address)
             ofile.write_uint16(ptr)
-        ofile.seek(t)  
+        ofile.seek(t)
 
 RDASM_Grammar_Preamble = r"""
 comment =  (('/*' (~'*/' anything)* '*/')|((';'|'//') (~'\n' anything)* '\n')) -> None
@@ -826,7 +826,7 @@ word_literal = '<' ws <(hex_digit){8}>:x ws '>' -> int(x,16)
 res_arrayref = (integer|symbol):r ws '[' ws (integer|symbol):i ws ']' -> arrayref(r,i,asm)
 resref = (integer|symbol):r ws ':' ws (integer|symbol):o ->resref(r,o,asm)
 objref = (integer|symbol):o ws '@' ws (integer|symbol):c -> objref(c,o,asm)
-varref = '&' ws (integer|symbol):o -> varref(o, asm) 
+varref = '&' ws (integer|symbol):o -> varref(o, asm)
 #
 true = ('True'|'true') -> 0x50000001
 false = ('False'|'false') -> 0x50000000
@@ -861,9 +861,9 @@ or_expression = av:a ws '|' ws av:b -> a|b
 add_expression = av:a ws '+' ws av:b -> a+b
 #sub_expression = av:a ws '-' ws av:b -> a-b
 #and_expression = av:a ws '&' ws av:b -> a&b
-define_expression =  or_expression | add_expression | atom |  symbol:s -> asm.lookup_symbol(s) 
+define_expression =  or_expression | add_expression | atom |  symbol:s -> asm.lookup_symbol(s)
 
-simple_define = 'define' ws symbol:k ws '(' ws define_expression:e ws ')' -> asm.define_symbol(k, e) 
+simple_define = 'define' ws symbol:k ws '(' ws define_expression:e ws ')' -> asm.define_symbol(k, e)
 sdef_block = ws symbol:k ws '(' ws define_expression:e ws ')' ws ','? ws -> (k,e)
 defines = 'defines' ws symbol:k ws '(' ws sdef_block*:d ws ')' -> asm.define_symbols(k, d)
 
@@ -879,7 +879,7 @@ short_use = 'use' ws symbol:s -> asm.use(s)
 resource = 'resource' ws av:v -> asm.set_context_resource(v)
 classfield = 'class_field' ws av:k ws av:v -> asm.class_field(k,v)
 label = simple_symbol:s ws ':' -> asm.toplevel_label(s)
-toplevel = define | fieldorder | function | array | table | classdata | classfield | class | direct | comment | include | use |short_use|short_include|resource | direct_hex | direct_string |label 
+toplevel = define | fieldorder | function | array | table | classdata | classfield | class | direct | comment | include | use |short_use|short_include|resource | direct_hex | direct_string |label
 toplevelitem = (ws? toplevel:a ws?) -> a
 program = toplevelitem*:a -> a
 
@@ -915,19 +915,19 @@ class Assembler(object):
         self.linenumber=0
         self.filename="<unknown>"
         self.mstream = message_stream
-        self.fieldnames = {} 
+        self.fieldnames = {}
         self.field_order = []
         self.function_contexts = []
         self.output_file = None
     def final_label(self, latelabel, offset):
         self.final_labels.append((latelabel,offset))
-    def set_field_order(self, order): 
+    def set_field_order(self, order):
         self.field_order = order
     def class_field(self,value,field):
         #print("defining", SymbolList(["Field%04X"%field]), value)
         self.define_symbol(SymbolList(["Field%04X"%field]), value)
         self.class_fields.append((value,field))
-        
+
     def begin_function_context(self, func):
         context = {sym:n for n,sym in enumerate(func.args)}
         callbacks = []
@@ -961,7 +961,7 @@ class Assembler(object):
                 self.fieldnames[SymbolList(sym[1:])] = self.lookup_symbol(sym)
         #print(self.fieldnames)
         return bytearray(b'\xFF\xFF')
-        
+
     def define_symbols(self, base, syms):
         for k,v in syms:
             #print("dss",base,k,v)
@@ -1007,15 +1007,15 @@ class Assembler(object):
         fn,fc,cb = self.get_function_context()
         if fn.label: self.define_symbol( SymbolList(fn.label + label), position)
         fc[label] = position
-            
+
     def getfval(self,thing,warn_new=True,loopvar=1):
         #print("getfval", thing, warn_new)
         if not isinstance(thing,SymbolList): return thing
         fn,fc,cb = self.get_function_context()
-        if thing in fc: 
+        if thing in fc:
             #print("    Local -> ", fc[thing])
             return fc[thing]
-        if thing in self.symtab: 
+        if thing in self.symtab:
             #print("    Global -> ", lookup_symbol[thing])
             return lookup_symbol(thing)
         if warn_new is None:
@@ -1025,7 +1025,7 @@ class Assembler(object):
             #print("    Unbound.")
             self.error("Local variable %s used before assignment"%thing[0], warn=True)
         rv = fn.local_vars
-        fc[thing] = rv 
+        fc[thing] = rv
         fn.local_vars += loopvar
         return fc[thing] + (loopvar-1)
     def lookup_symbol(self, sym):
@@ -1037,7 +1037,7 @@ class Assembler(object):
     def error(self,msg,warn=False):
         print("%s %s:%d:"%("Warning:" if warn else "Error:",
             self.filename, self.linenumber), msg, file=self.mstream)
-    
+
     def write_code(self, item, ofile):
         if item is None:
             return None
@@ -1049,19 +1049,19 @@ class Assembler(object):
         else:
             rv = item.write_code(ofile, self)
         return rv
- 
+
     def write_class_table(self,of):
         fieldnames = self.fieldnames
         table = {}
 
-        
-        
+
+
         for k,v in self.class_fields:
             table[k] = v
         for sym,field in self.fieldnames.items():
             #if field in table:
             #    self.error("Redefinition of class field 0x%04X (%s)"%(field,sym),warn=True)
-            if sym in self.symtab: 
+            if sym in self.symtab:
                 sv = self.getval(sym)
                 if sv < 0x10000:
                     table[field] = (
@@ -1091,7 +1091,7 @@ class Assembler(object):
                         print("---> Field%04X"%k)
                         assert False
         dict_write_code(table, of, self, force_order=order)
-         
+
     def assemble(self,source):
         source = source.strip()
 

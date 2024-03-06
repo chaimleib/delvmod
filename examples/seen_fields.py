@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -15,8 +15,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -55,7 +55,7 @@ for res in arch.resource_ids(series):
     items = rfile.read_uint16()&0x0FFF
     print((" 0x%04X%s: %5d bytes, %d fields "%(res,' ("%s")'%name if name else '', len(rfile),items)
         ).center(60,"-"))
-    
+
     for n in range(items):
         value = rfile.read_uint32()
         key = rfile.read_uint16()
@@ -91,7 +91,7 @@ fieldorder.sort()
 for count, key in fieldorder:
     value = seen_fields[key]
     print((" FIELD 0x%04X - %d occurance%s"%(
-       key,fieldcounts[key], 
+       key,fieldcounts[key],
        's' if fieldcounts[key] > 1 else ' in 0x%04X'%singletons[key]
        )).center(70,'-'))
     for val,count in value.items():

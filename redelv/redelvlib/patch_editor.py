@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -15,11 +15,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 import gtk,editors
 MAGPIE_WARN = """This patch is currently in Magpie format. Saving it will
-change the format to mag.py format, which is not compatible with Magpie. 
+change the format to mag.py format, which is not compatible with Magpie.
 Proceed?
 """
 class PatchEditor(editors.Editor):
@@ -82,14 +82,14 @@ class PatchEditor(editors.Editor):
         except Exception,e:
             self.error_message("Couldn't write to '%s': %s"%(path,repr(e)))
     def file_save(self,*argv):
-        if 'Magpie' in self.patch_format and not self.yn_ask(MAGPIE_WARN): 
+        if 'Magpie' in self.patch_format and not self.yn_ask(MAGPIE_WARN):
             return
         self.rfile = self.res.as_file()
         self.rfile.write("MAGPY")
         self.rfile.write(self.patch_info)
         self.rfile.truncate()
         self.set_saved()
-            
+
     def editor_setup(self):
         self.load()
     def load(self, *argv):

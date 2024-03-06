@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Version: 0.20
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -54,7 +54,7 @@ class dref(object):
 
 def int_to_bits(value,size):
     result = bytearray(size)
-    j =0 
+    j =0
     for i in range(size-1,-1,-1):
         result[j] = (value >> i)&1
         j += 1
@@ -66,7 +66,7 @@ def bytes_to_bits(src):
     result = bytearray(len(src)*8)
     ri = 0
     for byte in src:
-        for bi in range(7,-1,-1): 
+        for bi in range(7,-1,-1):
             result[ri] = (byte>>bi)&1
             ri += 1
     return result
@@ -107,7 +107,7 @@ def bits_pack(target, value, size, index,debug=False):
 def ncbits_pack(target, value, *fields):
     """Alter target to contain the value given, broken up into
        nonconsecutive bitfields using the same sematics as ncbits_of.
-       
+
        Look on this, ye coders, and repeat the sacred mantra:
           "Premature optimization is the root of all evil."
     """
@@ -120,15 +120,15 @@ def ncbits_pack(target, value, *fields):
         fieldbits = value & (0xFFFFFFFFFFFFFFFF >> (64-size))
         bits_pack(target, fieldbits, size, index)
         value >>= size
-    
+
 
 def ncbits_of(data, *fields):
-    """Returns an integer bit field from the bytearray data, 
+    """Returns an integer bit field from the bytearray data,
        the integer being made up of all the fields combined.
-       Each field is a tuple in the format (size,index). 
+       Each field is a tuple in the format (size,index).
        e.g. if  you had a bytearray foo of three bytes as follows:
-       
-         -----AB-, ---CDEFG, HI--JKL-   
+
+         -----AB-, ---CDEFG, HI--JKL-
 
        And you wanted to extract the bits ABCDEFGHIJKL as one
        12-bit integer, you'd say:
@@ -151,17 +151,17 @@ def bits_of(data, size, index):
     "Read a slice of the bytearray data bitwise - indices in bits"
     byte_index = index // 8
     bit_index = index % 8
-    byte_end = (size+index) // 8 
-    bit_size = size % 8 
+    byte_end = (size+index) // 8
+    bit_size = size % 8
     result = data[byte_index] & (0xFF >> bit_index)
     while byte_index < byte_end:
         byte_index += 1
-        if len(data) == byte_index: 
+        if len(data) == byte_index:
             result <<= 8; break
         result = (result << 8) | data[byte_index]
     result >>= 8 - (bit_index + bit_size) % 8
     return result
-        
+
 
 
 class BinaryHandler(object):
@@ -233,12 +233,12 @@ class BinaryHandler(object):
     def write_struct(self, s, v, offset=None):
         if offset is not None: self.seek(offset)
         if type(v) is int:
-            self.write(s.pack(v)) 
+            self.write(s.pack(v))
         else:
             self.write(s.pack(*v))
     def write_uint8(self, v, offset=None):
         self.write_struct(self.S_uint8, v, offset)
-    def write_sint8(self, v, offset=None): 
+    def write_sint8(self, v, offset=None):
         self.write_struct(self.S_sint8, v, offset)
     def write_uint16(self,v,offset=None):
         self.write_struct(self.S_uint16, v, offset)
@@ -254,7 +254,7 @@ class BinaryHandler(object):
         self.write_struct(self.S_sint32, v, offset)
     def write_offlen(self,offs,length,offset=None):
         self.write_struct(self.S_offlen, (offs,length), offset)
-    
+
     def write_sint24(self,v,offset=None):
         if offset is not None: self.seek(offset)
         self.write_uint8((v&0xFF0000)>>16)
@@ -329,7 +329,7 @@ class BinaryHandler(object):
             empty = self.read_uint8()
             assert not empty
             atom = self.read_uint16()
-            
+
             return {0xFFFF:None, 0: False, 1: True}[atom]
         elif ty&0x80 == 0x00:
             v = self.read_uint24()|((ty&0x0F)<<24)
@@ -355,7 +355,7 @@ class BinaryHandler(object):
             self.write_sint24(v)
         else:
             assert False, "Can't write (%s) as a delver atom"%v
-        
+
 
     def read_sint24(self, offset=None):
         "Return a signed 24-bit integer."
@@ -392,7 +392,7 @@ class BinaryHandler(object):
         units = self.read_uint8(offset)
         fraction = self.read_uint8()
         return units + fraction/256.0
-        
+
     def read_cstring(self, offset=None):
         if offset is not None: self.seek(offset)
         buf = bytearray()

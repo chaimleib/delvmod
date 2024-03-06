@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -15,15 +15,15 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 import gtk,editors
 import delv
 import delv.sound
 import os, tempfile, struct, wave, subprocess, images
 
 MAGPIE_WARN = """This patch is currently in Magpie format. Saving it will
-change the format to mag.py format, which is not compatible with Magpie. 
+change the format to mag.py format, which is not compatible with Magpie.
 Proceed?
 """
 class SoundEditor(editors.Editor):
@@ -97,7 +97,7 @@ class SoundEditor(editors.Editor):
         while i < len(data):
             newsamples.append(pstr.unpack(data[i:i+pstr.size])[0])
             i += pstr.size
-            
+
         self.sound.set_samples(newsamples)
         self.update()
         self.set_unsaved()

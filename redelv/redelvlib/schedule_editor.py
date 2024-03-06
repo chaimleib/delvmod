@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,8 +16,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 import delv.ddasm
 import gtk
 import editors
@@ -60,7 +60,7 @@ class ScheduleEditor(editors.Editor):
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",0)
         self.data_view.append_column(dc)
-        
+
         dc = gtk.TreeViewColumn()
         dc.set_title("Name")
         c = gtk.CellRendererText()
@@ -149,7 +149,7 @@ class ScheduleEditor(editors.Editor):
                 "0x%02X"%charid, names[charid], '','','','','','',''])
             self.gui_tree_rows[charid]=t
             for hour, mode, scripting, level, x, y in schedule:
-                self.tree_data.append(t, 
+                self.tree_data.append(t,
                     ["0x%02X"%charid, names[charid], "%2d:00"%hour,
                      '0x%02X'%mode,'0x%04X'%scripting,'0x%02X'%level,
                      delv.hints._RES_HINTS.get(0x8000|level,'???'),
@@ -157,13 +157,13 @@ class ScheduleEditor(editors.Editor):
 
     def file_save(self, *argv):
         self.schedules.empty()
-        
+
         schedules = []
         itr = self.tree_data.get_iter_first()
         while itr:
             chd = self.tree_data.iter_children(itr)
             entries = []
-            while chd: 
+            while chd:
                 entries.append([
                    int(self.tree_data.get_value(chd,2).replace(':00','')),
                    int(self.tree_data.get_value(chd,3).replace('0x',''),16),
@@ -188,7 +188,7 @@ class ScheduleEditor(editors.Editor):
         self.set_unsaved()
     def edit_clear(self, *argv):
         self.tree_data = gtk.TreeStore(str,str, str,str,str,str,str,str,str)
-        self.data_view.set_model(self.tree_data)  
+        self.data_view.set_model(self.tree_data)
         self.set_unsaved()
     def edit_copy(self, *argv):
         tm,row = self.data_view.get_selection().get_selected_rows()
@@ -205,7 +205,7 @@ class ScheduleEditor(editors.Editor):
         if tm.get_value(itr,2):
             for n,v in enumerate(data[2:],2):
                 self.tree_data.set_value(itr, n, v)
-        else: 
+        else:
             #append
             chrid = tm.get_value(itr,0)
             chrnm = tm.get_value(itr,1)
@@ -222,7 +222,7 @@ class ScheduleEditor(editors.Editor):
     def edit_insert(self, *argv):
         tm,row = self.data_view.get_selection().get_selected_rows()
         row = row[-1] if row else '0'
-        
+
         itr = tm.get_iter(row)
         chrid = tm.get_value(itr,0)
         chrnm = tm.get_value(itr,1)
@@ -243,7 +243,7 @@ class ScheduleEditor(editors.Editor):
         hour = int(new_text[:new_text.find(':')])
         self.tree_data.set_value(itr, 2, '%2d:00'%hour)
         self.set_unsaved()
-        
+
     def editor_cb_mode(self, renderer, path, new_text):
         mode=int(new_text.replace('0x',''),16)
         itr = self.tree_data.get_iter(path)
@@ -259,7 +259,7 @@ class ScheduleEditor(editors.Editor):
         itr = self.tree_data.get_iter(path)
         self.tree_data.set_value(itr, 5, '0x%02X'%level)
         # load level name
-        self.tree_data.set_value(itr, 6, 
+        self.tree_data.set_value(itr, 6,
             delv.hints._RES_HINTS.get(0x8000|level,'???'))
         self.set_unsaved()
 

@@ -1,7 +1,7 @@
 /*
 ; Copyright 2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 ; Wiki: http://www.ferazelhosting.net/wiki/delv
-; 
+;
 ;    This program is free software: you can redistribute it and/or modify
 ;    it under the terms of the GNU General Public License as published by
 ;    the Free Software Foundation, either version 3 of the License, or
@@ -15,18 +15,18 @@
 ;    You should have received a copy of the GNU General Public License
 ;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;
-; This header file defines data structures and constants used by 
+; This header file defines data structures and constants used by
 ; Cythera 1.0.4. They are not expected to work with any other first-party
 ; Delver scenario (or version), as constants and even opcodes could in
-; theory change under DelvEd. (ReDelv does not have this problem of 
+; theory change under DelvEd. (ReDelv does not have this problem of
 ; gratuitous constant-reassignment, and new first-party anythings seem
 ; extremely unlikely at this point.)
 ;
 ; Note that this file is GPL licensed; all scripts produced which include it
-; are also required to be GPL licensed - if you distribute their compiled 
-; form, you must also make the source code available. Of course, an 
+; are also required to be GPL licensed - if you distribute their compiled
+; form, you must also make the source code available. Of course, an
 ; interface is not copyrightable, or at least shouldn't be, so you can make
-; your own header file to do the same thing if you really want. */ 
+; your own header file to do the same thing if you really want. */
 defines Resources (
     Skills       (0x1A00)
     Items        (0x1000)
@@ -50,15 +50,15 @@ defines GUI (
     TextBox      (0x14)
 )
 defines Resources (
-    GiveDirections         (0x0816)  
+    GiveDirections         (0x0816)
     BlacksmithTasker       (0x0C86)
     CountMoneyInParty      (0x0D04)
-    
+
     PickLock               (0x0E43)
     AdjCharLevel           (0x0E86)
     // GainExp (Char, Amount)
     GainExp                (0x0E8B)
-    
+
     // CastSpell(Caster, SpellLevel, ManaCost)
     CastSpell              (0x0EA1)
 
@@ -71,12 +71,12 @@ defines Resources (
 defines RPGUtil (
     BlacksmithTasker       (0x0C86)
     CountMoneyInParty      (0x0D04)
-    
+
     PickLock               (0x0E43)
     AdjCharLevel           (0x0E86)
     // GainExp (Char, Amount)
     GainExp                (0x0E8B)
-    
+
     // CastSpell(Caster, SpellLevel, ManaCost)
     CastSpell              (0x0EA1)
 
@@ -137,7 +137,7 @@ defines System (
     UnseenCD               (0xCD)
     EnemyIterator          (0xCE)
     EffectIterator         (0xCF)
-    MonsterIterator        (0xD0) 
+    MonsterIterator        (0xD0)
     NearbyIterator         (0xD1)
     PlayNote               (0xD2)
     PlaySound              (0xD3)
@@ -156,11 +156,11 @@ defines System (
     UnknownE0              (0xE0)
     MagicAuraEffect        (0xE1)
     ShootEffect            (0xE2)
-    FlashTile              (0xE3)  
+    FlashTile              (0xE3)
     HitWithTile            (0xE4)
     GetNextProp            (0xE5)
-    RefreshView            (0xE6) 
-    SpecialView            (0xE7) 
+    RefreshView            (0xE6)
+    SpecialView            (0xE7)
     OpenConversation       (0xE8)
     FinishConversation     (0xE9)
     BeginCutscene          (0xEA)
@@ -216,6 +216,6 @@ defines Globals (
     GameDay              (0x0F)
     CurrentZone          (0x10)
     DifficultyLevel      (0x11)
-    CurrentRoom          (0x12) 
+    CurrentRoom          (0x12)
     IsPlayerTurn         (0x13)
 )

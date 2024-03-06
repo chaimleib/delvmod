@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2016 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -34,17 +34,17 @@ GRAPHICS_TILESHEET = 141
 _OBJECT_SI_HINTS = {
    127: level.Map,
    128: level.PropList,
-   131: graphics.Landscape, 
+   131: graphics.Landscape,
    135: graphics.Portrait,
    137: graphics.SkillIcon,
    141: graphics.TileSheet,
    142: graphics.General,
    144: sound.Asnd,
 }
-for n in range(0,15): 
+for n in range(0,15):
     if not n in _OBJECT_SI_HINTS:
         _OBJECT_SI_HINTS[n] = dscript.Direct
-for n in range(15,127): 
+for n in range(15,127):
     if not n in _OBJECT_SI_HINTS:
         _OBJECT_SI_HINTS[n] = dscript.Class
 
@@ -58,7 +58,7 @@ _OBJECT_RESID_HINTS = {
   0xF010: store.TileFauxPropsList,
   0xF011: store.ByteList,
   0xF012: store.ByteList,
-  0xF002: store.TileAttributesList, 
+  0xF002: store.TileAttributesList,
   0xF013: store.TileCompositionList,
   #0x0201: script.CharacterNames,
   0x8EFF: graphics.General,
@@ -69,8 +69,8 @@ def class_by_resid(resid):
        otherwise return None"""
     return _OBJECT_RESID_HINTS.get(resid,
            _OBJECT_SI_HINTS.get((resid >> 8) - 1, None))
-    
-_ZONES = ["Nowhere", 
+
+_ZONES = ["Nowhere",
     "World",
     "Odemia",
     "LandKing Hall",
@@ -97,7 +97,7 @@ _ZONES = ["Nowhere",
     "Mining camp", #0x18
     "Tyrant's Tomb",
     "Scylla Temple",
-    "Crab Cove", 
+    "Crab Cove",
     "Machaon's Workshop",
     "Abydos",
     "Under Abydos",
@@ -188,19 +188,19 @@ for n,name in enumerate(_ZONES):
 _SCEN_HINTS = {
     1: "String Lists",2: "Static Data",3: "AI Scripts",4: "Script Data",
     7: "Shared Dialogue Scripts",
-    8: "Scripts", 9: "Potion Scripts", 10: "Scripts", 11: "Scripts", 
+    8: "Scripts", 9: "Potion Scripts", 10: "Scripts", 11: "Scripts",
     12: "Scripts",
-    13: "Game Mechanics Scripts", 14: "Scripts", 
+    13: "Game Mechanics Scripts", 14: "Scripts",
     16: "Object Scripts", 19: "Zone Scripts",
     15: "Object Scripts",17:"Object Scripts",18:"Object Scripts",
-    20: "Composite Zone Scripts", 
+    20: "Composite Zone Scripts",
     23: "Character Scripts", 24: "Monster Scripts",
-    25: "Skill and Action Scripts", 
-    26: "Area Scripts", 27: "Area Scripts", 
+    25: "Skill and Action Scripts",
+    26: "Area Scripts", 27: "Area Scripts",
     47: "Default Method Implementations",
-    127: "Maps", 128: "Prop Lists", 131: "Landscape Graphics", 
+    127: "Maps", 128: "Prop Lists", 131: "Landscape Graphics",
     135: "Character Portraits", 137: "Skill Icons", 141: "Tile Graphics",
-    142: "General Graphics", 143: "Music", 144: "Sounds", 
+    142: "General Graphics", 143: "Music", 144: "Sounds",
     239: "General Data", 254: "Patch Description",
     187: "Metadata from delv",
     191: "Metadata from ReDelv",

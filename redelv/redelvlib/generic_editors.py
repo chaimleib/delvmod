@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,8 +16,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 import csv
 import gtk
 import editors
@@ -63,10 +63,10 @@ class TileNameListEditor(editors.Editor):
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",0)
         self.data_view.append_column(dc)
-        
+
         dc = gtk.TreeViewColumn()
         dc.set_title("Tile Name Code")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_namecode)
         dc.pack_start(c,True)
@@ -75,14 +75,14 @@ class TileNameListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("Singular")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",2)
         self.data_view.append_column(dc)
 
         dc = gtk.TreeViewColumn()
         dc.set_title("Plural")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",3)
         self.data_view.append_column(dc)
@@ -114,14 +114,14 @@ class TileNameListEditor(editors.Editor):
                 new_text, True))
         else:
             self.tree_data.set_value(itr, 3, '')
-        
+
         self.set_unsaved()
     def load(self, *argv):
         self.tilenames = delv.store.TileNameList(self.res)
         for cutoff, name in self.tilenames.items():
             self.tree_data.append([
                 "0x%04X"%cutoff, name, self.tilenames.get_name(cutoff,False),
-                self.tilenames.get_name(cutoff,True) if '\\' in name else '', 
+                self.tilenames.get_name(cutoff,True) if '\\' in name else '',
                 cutoff])
     def file_import(self, *argv):
         path = "<undefined>"
@@ -134,17 +134,17 @@ class TileNameListEditor(editors.Editor):
                 repr(e)))
             return
         self.tree_data = gtk.ListStore(str,str,str,str,int)
-        self.data_view.set_model(self.tree_data)        
+        self.data_view.set_model(self.tree_data)
         for cutoff, name in csvfile:
             cutoff = int(cutoff[2:],16)
             self.tree_data.append([
                 "0x%04X"%cutoff, name, self.tilenames.namecode(name,False),
-                self.tilenames.namecode(name,True) if '\\' in name else '', 
+                self.tilenames.namecode(name,True) if '\\' in name else '',
                 cutoff])
         self.set_unsaved()
 
     def file_export(self, *argv):
-        path = self.ask_save_path(default = "Data%04X.csv"%self.res.resid) 
+        path = self.ask_save_path(default = "Data%04X.csv"%self.res.resid)
         if not path: return
         try:
             csvfile = csv.writer(open(path,'wb'))
@@ -157,7 +157,7 @@ class TileNameListEditor(editors.Editor):
             csvfile.writerow([
                 self.tree_data.get_value(itr, n) for n in xrange(2)])
             itr = self.tree_data.iter_next(itr) #barbaric... what is this C++
-        
+
     def file_save(self, *argv):
         self.tilenames.empty()
         itr = self.tree_data.get_iter_first()
@@ -176,7 +176,7 @@ class TileNameListEditor(editors.Editor):
         pass
     def edit_clear(self, *argv):
         self.tree_data = gtk.ListStore(str,str,str,str,int)
-        self.data_view.set_model(self.tree_data)  
+        self.data_view.set_model(self.tree_data)
         self.set_unsaved()
     def edit_delete(self, *argv):
         tm,row = self.data_view.get_selection().get_selected_rows()
@@ -186,7 +186,7 @@ class TileNameListEditor(editors.Editor):
     def edit_insert(self, *argv):
         tm,row = self.data_view.get_selection().get_selected_rows()
         row = row[-1] if row else '0'
-        
+
         itr = tm.get_iter(row)
         nidx = tm.get_value(itr,4)+1
         tm.insert_after(itr, ["0x%04X"%nidx, "Nothing", "Nothing","",nidx])

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,16 +16,16 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 # This file addresses sundry storage types used within Delver Archives,
-# and as such is mostly a helper for other parts of delv. 
+# and as such is mostly a helper for other parts of delv.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -41,7 +41,7 @@ import array, bisect
 from . import util
 
 class Store(object):
-    def __init__(self, src): 
+    def __init__(self, src):
         #print "new store", repr(src),self
         self.data = None
         self.checked_out = 0
@@ -70,7 +70,7 @@ class Store(object):
            user unpredictably."""
         self.checked_out += 1
     def return_to_library(self):
-        """Inform the archive that the object is no longer subject to 
+        """Inform the archive that the object is no longer subject to
            alteration by the user."""
         self.checked_out -= 1
         assert self.checked_out >= 0
@@ -82,7 +82,7 @@ class Store(object):
             self.write_to_bfile(bh)
             # I wonder why StringIO doesn't have a method that does this:
             self.data = bytearray(buf.getvalue())
-        return self.data 
+        return self.data
 import json
 class JSONDictionary(Store):
     def purge(self, resid):
@@ -101,7 +101,7 @@ class JSONDictionary(Store):
         #print "reading in jsondictionary"
         data = self.src.read()
         if not data:
-            self.ds = {} 
+            self.ds = {}
             return
         self.ds = json.loads(data)
     def write_to_bfile(self, dest=None):
@@ -248,7 +248,7 @@ def namecode(name, plural):
 class TileNameList(Store):
     def __init__(self, src):
         Store.__init__(self, src)
-       
+
         self.empty()
         if self.src: self.load_from_bfile()
     def items(self):

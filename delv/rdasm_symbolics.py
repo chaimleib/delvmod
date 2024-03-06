@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -45,7 +45,7 @@ DASM_RESOURCE_NAME_HINTS = {
     '_name': 'Resources',
     0x0816: 'GiveDirections',
     0x0C86: 'BlacksmithTasker',
-    0x0D04: 'CountMoneyInParty', 
+    0x0D04: 'CountMoneyInParty',
 #    0x0D07: 'TEST0D07',
     0x0E43: 'PickLock',
     0x0E86: 'AdjCharLevel',
@@ -63,7 +63,7 @@ DASM_GLOBAL_NAME_HINTS = {
     0x05: "PlayerCharacter", # Seems to have to be cast to character
     0x06: "CharactersInParty",
     0x07: "CharactersInParty2",
-    0x09: "CurrentCharacter", 
+    0x09: "CurrentCharacter",
     0x0A: "ConversationResponse",
     0x0C: "Karma",
     0x0D: "Registered",
@@ -110,8 +110,8 @@ ASM_SYSCALL_NAMES = {
     'UnseenAF':               (0xAF),
     'UnseenB0':               (0xB0),
     'RemoveItem':             (0xB1),
-    'UnseenB2':               (0xB2), 
-    'UnseenB3':               (0xB3), 
+    'UnseenB2':               (0xB2),
+    'UnseenB3':               (0xB3),
     'ModalNumberInput':       (0xB4), # (str prompt, int min, int max (inclusive))
     'UnseenB5':               (0xB5),
     'UnseenB6':               (0xB6),
@@ -143,7 +143,7 @@ ASM_SYSCALL_NAMES = {
     'MonsterIterator':        (0xD0), # angers conspecific mons when 1 atkd
     'NearbyIterator':         (0xD1),
     'PlayNote':               (0xD2),
-    'PlaySound':              (0xD3), 
+    'PlaySound':              (0xD3),
     'UnknownD4':              (0xD4),
     'UnseenD5':               (0xD5),
     'PlayMusic':              (0xD6),
@@ -164,7 +164,7 @@ ASM_SYSCALL_NAMES = {
     'GetNextProp':            (0xE5), # Gets the next prop on the proplist in a
                                       # map or container. If you are calling it
                                       # on a prop on the map, it will skip over
-                                      # props in containers. None returned if 
+                                      # props in containers. None returned if
                                       # called on the last prop in a container.
                                       # this is used to implement bellows.
     'RefreshView':            (0xE6),
@@ -190,7 +190,7 @@ ASM_SYSCALL_NAMES = {
     'GetProp':                (0xFA), # get prop from the propref field in map
     'UnseenFB':               (0xFB),
     'SetAutomapping':         (0xFC),
-    'SetBackgroundColor':     (0xFD), # parameter is cythera clut color   
+    'SetBackgroundColor':     (0xFD), # parameter is cythera clut color
     'UnseenFE':               (0xFE),
     'UnseenFF':               (0xFF)
 }
@@ -200,17 +200,17 @@ DASM_SYSCALL_NAMES['_name'] = 'System'
 
 ASM_STRUCT_HINTS = {
     'flags':                0x00,
-    'x':                    0x01, 
-    'y':                    0x02, 
-    'aspect':               0x03, 
-    'obj_type':             0x04, 
+    'x':                    0x01,
+    'y':                    0x02,
+    'aspect':               0x03,
+    'obj_type':             0x04,
     'aspect_and_proptype':  0x05,
-    'data1':                0x06, 
-    'data2':                0x07, 
+    'data1':                0x06,
+    'data2':                0x07,
     'data3':                0x08,
     'quantity':             0x09,
     'tile':                 0x0A, # aspect lower 4 bits
-    'container':            0x0B, 
+    'container':            0x0B,
     'erode_effect':         0x0C, # as polyps or slimes
     'rotate':               0x0D,
     # 0x0E-0x10 unseen
@@ -224,12 +224,12 @@ ASM_STRUCT_HINTS = {
     'body':                 0x17, # characters only
     'reflex':               0x18, # cast to Character
     'mind':                 0x19, # before using.
-    'exp':                  0x1A, 
+    'exp':                  0x1A,
     'level':                0x1B,
     'health':               0x1C,
     'full_health':          0x1D,
     'magic':                0x1E,
-    'full_magic':           0x1F, 
+    'full_magic':           0x1F,
     'dispatch_thing':       0x20, # haven't been able to figure it out yet
     'training':             0x21,
     'target':               0x22,

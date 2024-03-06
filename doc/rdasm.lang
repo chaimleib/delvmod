@@ -3,12 +3,12 @@
  GTKSourceView syntax coloring file for RDASM.
  This file is part of delv, http://www.ferazelhosting.net/wiki/delv
  Author: Bryce Schroeder <bryce.schroeder@gmail.com>
- Based on the examples provided with gtksourceview, by e.g. 
+ Based on the examples provided with gtksourceview, by e.g.
  Marco Barisione and Emanuele Aina.
 
  This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License as 
- published by the Free Software Foundation; either version 3 of 
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 3 of
  the License, or (at your option) any later version.
 
  This library is distributed in the hope that it will be useful,
@@ -41,9 +41,9 @@
         <style id="hexadecimal"       _name="Hexadecimal number"  map-to="def:base-n-integer"/>
         <style id="binary"            _name="Binary number"       map-to="def:base-n-integer"/>
         <style id="rawword"           _name="Raw Word"            map-to="def:base-n-integer"/>
-        <style id="specialword"       _name="Special word"        map-to="def:boolean"/> 
-        <style id="directive"         _name="Directive"           map-to="def:preprocessor"/> 
-        <style id="toptype"           _name="Top Type"            map-to="def:type"/> 
+        <style id="specialword"       _name="Special word"        map-to="def:boolean"/>
+        <style id="directive"         _name="Directive"           map-to="def:preprocessor"/>
+        <style id="toptype"           _name="Top Type"            map-to="def:type"/>
         <style id="opcode"            _name="Opcode"              map-to="def:keyword"/>
     </styles>
 

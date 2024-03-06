@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2014-2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,14 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -94,7 +94,7 @@ class _PrintOuter(object):
             return atom.str_disassemble(il+1)
 
 def TypeFactory(script, src, library=None, organic_offset=None,
-        only_local=False, end_label_prefix=None): 
+        only_local=False, end_label_prefix=None):
         rewind = src.tell()
         cntype = src.read_uint8()
         src.seek(rewind)
@@ -108,11 +108,11 @@ def TypeFactory(script, src, library=None, organic_offset=None,
         else:
             return src.read_cstring()
         if isinstance(obj,DispatchTable):
-            obj.demarshal(script, src, len(src), 
+            obj.demarshal(script, src, len(src),
                  organic_offset=organic_offset,classtable=False,
                  end_label_prefix=end_label_prefix)
         else:
-            obj.demarshal(script, src, len(src), 
+            obj.demarshal(script, src, len(src),
                    organic_offset=organic_offset,
                    end_label_prefix=end_label_prefix)
         if library: obj.load_from_library(library, only_local=only_local)
@@ -120,7 +120,7 @@ def TypeFactory(script, src, library=None, organic_offset=None,
 
 
 
-class Array(list, _PrintOuter): 
+class Array(list, _PrintOuter):
     override_dref = None
     def empty(self):
         self[:] = []
@@ -149,7 +149,7 @@ class Array(list, _PrintOuter):
                 if only_local and self.script.res.resid != self[n].resid:
                     continue
                 self[n] = TypeFactory(self.script,
-                    library.get_dref(self[n]), library, 
+                    library.get_dref(self[n]), library,
                          organic_offset=self[n].offset,
                          end_label_prefix=self.end_label_prefix)
     def disassemble(self, out, indent):
@@ -161,7 +161,7 @@ class Array(list, _PrintOuter):
             return
         self.pn(indent, "array [")
         for n,item in enumerate(self):
-            if False: #self.references.has_key(n): 
+            if False: #self.references.has_key(n):
                 self.p(indent, "#{ %4d: }# "%n)
                 self.disassemble_atom(indent+1,self.references[n])
                 self.pn(indent+1,'')
@@ -253,7 +253,7 @@ class DCConversationPrompt(DCVariableFieldOperation):
             suggestion='conv_%03X'%self.nextfield)
     def get_fields(self):
         return ', '.join(map(rstr, self.promptstr))
-         
+
 class DCAsk(DCVariableFieldOperation):
     mnemonic = 'ask'
     def decode_length(self, data):
@@ -317,7 +317,7 @@ class DOPushWord(DCVariableFieldOperation):
     length = 1
     afterlength = 0
     def decode_length(self, data):
-        if data[1] == 0x30: 
+        if data[1] == 0x30:
              self.mnemonic = 'push'
              return 5
         elif data[1] == 0x01:
@@ -342,7 +342,7 @@ class DOPushData(DCVariableFieldOperation):
         return (data[1]<<8)|data[2]+3
     def decode(self):
         s = util.BinaryHandler(StringIO(self.data[3:]))
-        self.contents = TypeFactory(self.script_context, s, 
+        self.contents = TypeFactory(self.script_context, s,
              library=FauxLibrary(self.script_context.res),
              organic_offset=self.true_offset+3,only_local=True)
         if hasattr(self.contents,'load_from_library'):
@@ -387,7 +387,7 @@ class DCExpressionContainer(DCVariableFieldOperation):
     def get_afterlength(self, data):
         return self.afterlength
     def decode(self): pass
-    def disassemble(self, out, indent): 
+    def disassemble(self, out, indent):
         self.set_stream(out)
         #self.dlabel(indent)
         self.p(indent, self.get_mnemonic())
@@ -396,7 +396,7 @@ class DCExpressionContainer(DCVariableFieldOperation):
             for item in group:
                  item.disassemble(out, indent+1)
             self.pn(indent, ')')
-        
+
 class DC9D(DCExpressionContainer):
     mnemonic = 'signal_self? 0x%02X'
     length = 2
@@ -414,7 +414,7 @@ class DCSeriesB(DCExpressionContainer):
         self.which = self.data[0]
     def get_mnemonic(self):
         return self.mnemonic%self.which
-   
+
 
 class DCStringConstant(DCVariableFieldOperation):
     mnemonic = ''
@@ -437,11 +437,11 @@ class DOSeriesA(DCExpressionContainer):
     def get_mnemonic(self):
         return self.mnemonic%self.which
 
-    
+
 class DOOperator(DCFixedFieldOperation):
     mnemonics = {
         0x46: 'index',
-        0x4A: 'add',   0x4C: 'mul',   0x4B: 'sub',  0x4D: 'div', 
+        0x4A: 'add',   0x4C: 'mul',   0x4B: 'sub',  0x4D: 'div',
         0x4E: 'mod', 0x4F: 'lt', 0x50: 'le',
         0x51: 'gt', 0x52: 'ge', 0x54: 'eq', 0x53: 'ne', 0x55: 'neg',
         0x56: 'andb', 0x57: 'orb', 0x58: 'xorb', 0x59: 'notb',
@@ -538,7 +538,7 @@ class DCIfStatement(DCExpressionContainer):
     groups = 1
     afterlength = 2
     def decode(self):
-        self.offset = (self.data[-2]<<8)|self.data[-1] 
+        self.offset = (self.data[-2]<<8)|self.data[-1]
         self.label = self.script_context.get_offset_label(self.offset,
             suggestion='branch_%d'%DCIfStatement.branch_count)
         DCIfStatement.branch_count += 1
@@ -564,7 +564,7 @@ class DCCallRes(DCExpressionContainer):
     mnemonic = 'call'
     length = 3
     def decode(self):
-        self.resid = (self.data[1]<<8)|self.data[2] 
+        self.resid = (self.data[1]<<8)|self.data[2]
     def get_mnemonic(self):
         return '%s res 0x%04X'%(self.mnemonic,self.resid)
 class DCCallArray(DCExpressionContainer):
@@ -572,7 +572,7 @@ class DCCallArray(DCExpressionContainer):
     length = 3
     groups = 2
     def decode(self):
-        self.base_resid = (self.data[1]<<8)|self.data[2] 
+        self.base_resid = (self.data[1]<<8)|self.data[2]
     def get_mnemonic(self):
         return '%s res 0x%04X'%(self.mnemonic,self.base_resid)
 
@@ -582,7 +582,7 @@ class DC9E(DCCallArray):
     groups = 1
     def get_mnemonic(self):
         return '%s 0x%02X%02X'%((self.mnemonic,)+tuple(self.data[1:3]))
- 
+
 
 class DCSignal(DCExpressionContainer):
     mnemonic = 'signal'
@@ -633,9 +633,9 @@ def DCOperationFactory(data, i, code, script, mode = 'toplevel',
         elif opc == 0x8F:
             op = DCAsk
         elif opc == 0x90:
-            op = DCConversationPrompt  
+            op = DCConversationPrompt
         elif opc == 0x92:
-            op = DO92  
+            op = DO92
         elif opc == 0x93:
             op = DO93
         elif opc == 0x9C:
@@ -656,13 +656,13 @@ def DCOperationFactory(data, i, code, script, mode = 'toplevel',
         elif opc == 0xCE:
             op = DCCE
         elif opc&0xF0 == 0xC0:
-            op = DCSignal        
+            op = DCSignal
 
         elif opc&0xF0 == 0xD0:
             op = DOSeriesD
         elif opc&0xF0 == 0xE0:
             op = DOSeriesE
-        
+
         elif opc == 0xF5:
             op = DCF5
         elif opc&0xF0 == 0xF0:
@@ -706,7 +706,7 @@ def DCOperationFactory(data, i, code, script, mode = 'toplevel',
         elif opc == 0x64:
             op = DONField
         elif opc == 0x63:
-            op = DOCast    
+            op = DOCast
         elif opc == 0x93:
             op = DO93
         elif opc == 0x9B:
@@ -732,9 +732,9 @@ def DCOperationFactory(data, i, code, script, mode = 'toplevel',
             i += 1
         else:
             op = DCBytes
-        
+
         if op:
-            op = op(data,i,organic_offset+i) 
+            op = op(data,i,organic_offset+i)
             i += len(op)
         return op,i
 class Code(list, _PrintOuter):
@@ -767,7 +767,7 @@ class Code(list, _PrintOuter):
     def disassemble(self, out, indent):
         self.set_stream(out)
         self.p(indent, "function (%s) "%(' '.join(self.arg_names)))
-        if self.localc: self.pn(indent+1, 
+        if self.localc: self.pn(indent+1,
                 'with (%s) {'%(' '.join(self.local_names)))
         else: self.pn(indent, "{")
         for op in self:
@@ -784,7 +784,7 @@ class Code(list, _PrintOuter):
     def printout(self, out, level=0):
         print >> out, '\t'*level, str(self)
         self.disassemble(out, level+1)
-       
+
 class DispatchTable(dict, _PrintOuter):
     def empty(self):
         self.references = {}
@@ -805,11 +805,11 @@ class DispatchTable(dict, _PrintOuter):
             self[signal] = atom
             if isinstance(atom, util.dref):
                 offsets.append((atom.offset,atom))
-        if classtable: 
+        if classtable:
             self.suggest_table_names()
         else:
             self.suggest_internal_names()
-       
+
         if not offsets: return
         if classtable:
             offsets.sort()
@@ -830,8 +830,8 @@ class DispatchTable(dict, _PrintOuter):
                 if only_local and self.script.res.resid != self[n].resid:
                     continue
                 self[n] = TypeFactory(self.script,
-                    library.get_dref(self[n]), 
-                    library, 
+                    library.get_dref(self[n]),
+                    library,
                     organic_offset=self[n].offset, only_local=only_local,
                     end_label_prefix=self.end_label_prefix)
                 if self.references[n].resid == self.script.res.resid:
@@ -854,7 +854,7 @@ class DispatchTable(dict, _PrintOuter):
         self.pn(indent, "index [")
         for key,value in self.items():
             if key in self.references: value = self.references[key]
-            if value is None: 
+            if value is None:
                 self.pn(indent+1, '0x%04X: nil'%key)
             elif isinstance(value, int):
                 self.pn(indent+1, '0x%04X: %d'%(key,value))
@@ -874,13 +874,13 @@ class DispatchTable(dict, _PrintOuter):
     def printout(self, out, level):
         print >> out, '\t'*level, "Dispatch Table"
         for signal,item in self.items():
-            print >> out, '\t'*(level+1), "0x%04X:"%signal 
+            print >> out, '\t'*(level+1), "0x%04X:"%signal
             if hasattr(item, 'printout'): item.printout(out, level+2)
             else: print >> out, '\t'*(level+2), repr(item)[:40]
 
 class Class(_PrintOuter):
     def __init__(self, script, src=None, end=None, organic_offset=0):
-        self.dispatch = None 
+        self.dispatch = None
         self.script = script
         if src: self.demarshal(self.script, src, end,
              organic_offset=organic_offset)
@@ -903,7 +903,7 @@ class Class(_PrintOuter):
             item.disassemble(out, indent+2)
         self.dtindex.disassemble(out, indent+1)
         self.pn(indent, "}")
- 
+
 class Script(store.Store):
     class_container = False
     library = None
@@ -927,7 +927,7 @@ class Script(store.Store):
         if ref.resid == self.res.resid and ref.offset in self.symbol_table:
             return self.symbol_table[ref.offset]
         if check_only: return None
-        if suggestion is None: 
+        if suggestion is None:
             suggestion = "label_%d"%self.unique_symbol
             self.unique_symbol += 1
         self.symbol_table[ref] = suggestion
@@ -936,11 +936,11 @@ class Script(store.Store):
     def get_offset_label(self, offset, suggestion=None,check_only=False):
         return self.get_dref_label(dref(self.res.resid, offset),
             suggestion,check_only=check_only)
-        
+
     def load_from_bfile(self):
         #print repr(self.src.resource)
         self.src.seek(0)
-        if self.class_container: 
+        if self.class_container:
             self.obj = Class(self, self.src, len(self.src))
         else:
             cntype = self.src.read_uint8()
@@ -969,7 +969,7 @@ class Script(store.Store):
         print >> out, "-- Script Object from %s --"%repr(self.src)
         self.obj.disassemble(out, 1)
     def disassemble(self, target=None):
-        if target is None: 
+        if target is None:
              out = StringIO()
         else:
              out = target
@@ -989,15 +989,15 @@ class Script(store.Store):
             if value.startswith('data_') and isinstance(key,dref):
                  offset = int(value[13:],16)
                  print >> out, "%s: /* 0x%04X, %s */"%(value, offset,key)
-                 ditem = TypeFactory(self,self.res.get_offset_file(offset), 
-                     self.library, offset, only_local=True, 
+                 ditem = TypeFactory(self,self.res.get_offset_file(offset),
+                     self.library, offset, only_local=True,
                      end_label_prefix='signal_')
                  if hasattr(ditem, 'disassemble'):
                      print >> out, ditem.disassemble(out,1)
                  else:
                      print >> out, '   ',
                      print >> out, self.str_disassemble_atom(ditem)
-                
+
     def str_disassemble_atom(self, atom):
         if atom is None:
             return "nil"
@@ -1010,10 +1010,10 @@ class Script(store.Store):
         else:
             return "<BAD ATOM %s>"%repr(atom)
 
-        
-        
-        
-        
+
+
+
+
 class ClassContainer(Script):
     class_container = True
 

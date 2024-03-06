@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2015 Bryce Schroeder, www.bryce.pw, bryce.schroeder@gmail.com
 # Wiki: http://www.ferazelhosting.net/wiki/delv
-# 
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -16,16 +16,16 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Please do not make trouble for me or the Technical Documentation Project by
-# using this software to create versions of the "Cythera Data" file which 
+# using this software to create versions of the "Cythera Data" file which
 # have bypassed registration checks.
 # Also, remember that the "Cythera Data" file is copyrighted by Ambrosia and
 # /or Glenn Andreas, and publishing modified versions without their permission
-# would violate that copyright. 
+# would violate that copyright.
 #
-# "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
-# Ambrosia Software, Inc. 
+# "Cythera" and "Delver" are trademarks of either Glenn Andreas or
+# Ambrosia Software, Inc.
 # This file addresses sundry storage types used within Delver Archives,
-# and as such is mostly a helper for other parts of delv. 
+# and as such is mostly a helper for other parts of delv.
 import delv.util, delv.archive, delv.store, delv.library
 import delv.colormap, delv.level
 import editors
@@ -56,23 +56,23 @@ class SearchCriterion(object):
             return
         ops = [('>=', operator.ge), ('<=', operator.le),
                ('>', operator.gt),  ('<', operator.lt),
-               ('!=',operator.ne),  
+               ('!=',operator.ne),
                ('!&',(lambda a,b: not (a & b))), ('&', operator.and_)]
         self.op = operator.eq
         self.mask = 0xFFFFFFFF
         self.offset = 0
-        if '#' in mode: 
+        if '#' in mode:
             self.mask=0x0000FFFF
             self.offset = 0
-        if '@' in mode: 
+        if '@' in mode:
             self.mask=0x0000FFFF
             self.offset = 0x100
         for tok,op in ops:
-            if tok in mode: 
+            if tok in mode:
                  self.op = op
                  mode = mode.replace(tok,'')
                  break
-        
+
         self.operand = self.parse_int(mode)
     def parse_int(self,mode):
         base = 10
@@ -99,7 +99,7 @@ class SearchCriterion(object):
             return self.re.search(value) is not None
         if self.stringmode:
             return self.query in value
-        
+
         if isinstance(value, str):
             value=self.parse_int(value.strip().split()[0])
         if self.mask != 0xFFFFFFFF: value -= self.offset
@@ -126,7 +126,7 @@ class PropListEditor(editors.Editor):
             ("/Edit/Insert Entry",  "<control>N", self.edit_insert,0,None),
             ("/Edit/Select All",    "<control>A", self.select_all,0,None),
             ("/Map/Open Map",        "<control>M",    self.open_map, 0, None),
-            ("/Map/Send Selection to Map",  "<alt>S", 
+            ("/Map/Send Selection to Map",  "<alt>S",
                   self.send_selection, 0, None),
             ("/Map/Reload Map",  "<alt>R", self.reload_map, 0, None),
             #("/Select/Container Contents", "<control>O",None,0,None),
@@ -155,19 +155,19 @@ class PropListEditor(editors.Editor):
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",0)
         self.data_view.append_column(dc)
-        
+
         dc = gtk.TreeViewColumn()
         dc.set_title("Flags")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_flags)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",1)
         self.data_view.append_column(dc)
-        
+
         dc = gtk.TreeViewColumn()
         dc.set_title("Free")
-        c = gtk.CellRendererToggle() 
+        c = gtk.CellRendererToggle()
         #c.connect('toggled', self.editor_callback_free)
         dc.pack_start(c,True)
         dc.add_attribute(c,"active",12)
@@ -175,7 +175,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("Prop Type")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_proptype)
         dc.pack_start(c,True)
@@ -184,7 +184,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("Location")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_location)
         dc.pack_start(c,True)
@@ -193,7 +193,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("Rotate?")
-        c = gtk.CellRendererToggle() 
+        c = gtk.CellRendererToggle()
         #c.set_activatable(True)
         #c.connect('toggled', self.editor_callback_rotate)
         dc.pack_start(c,True)
@@ -202,7 +202,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("Aspect")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_aspect)
         dc.pack_start(c,True)
@@ -211,7 +211,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("D1")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_d1)
         dc.pack_start(c,True)
@@ -220,7 +220,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("D2")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_d2)
         dc.pack_start(c,True)
@@ -229,7 +229,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("D3")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_d3)
         dc.pack_start(c,True)
@@ -238,7 +238,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("Prop Reference")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_propref)
         dc.pack_start(c,True)
@@ -247,7 +247,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("Storage")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_storage)
         dc.pack_start(c,True)
@@ -256,7 +256,7 @@ class PropListEditor(editors.Editor):
 
         dc = gtk.TreeViewColumn()
         dc.set_title("Unknown")
-        c = gtk.CellRendererText() 
+        c = gtk.CellRendererText()
         c.set_property('editable',False)
         #c.connect('edited', self.editor_callback_u)
         dc.pack_start(c,True)
@@ -372,10 +372,10 @@ class PropListEditor(editors.Editor):
                 "%d"%prop.get_d2(), "0x%04X"%prop.get_d3(),
                 "0x%04X"%prop.propref, "0x%08X"%prop.storeref, idx,
                 prop.okay_to_take(),"0x%04X"%prop.u
-                ]) 
+                ])
     def criterion_change(self, entry, accessor):
         new_text = entry.get_text()
-        if not new_text: 
+        if not new_text:
             del self.search_criteria[accessor]
         else:
             try:
@@ -400,7 +400,7 @@ class PropListEditor(editors.Editor):
             if ',' in new_text:
                 x,y = new_text.split(',')
                 x,y = int(x,base),int(y,base)
-                rloc =(x<<12)|y 
+                rloc =(x<<12)|y
             elif '@' in new_text:
                 new_text = new_text.replace('@','')
                 container = int(new_text.strip().split()[0],base)
@@ -409,11 +409,11 @@ class PropListEditor(editors.Editor):
                 new_text = new_text.replace('#','')
                 container = int(new_text.strip().split()[0],base)
                 rloc = (oldloc&0xFF0000)|container
-            else: 
+            else:
                 rloc = int(new_text.strip().split()[0],base)
         except: return
         flags = int(self.tree_data.get_value(itr,1)[2:],16)
-        self.tree_data.set_value(itr, 3, 
+        self.tree_data.set_value(itr, 3,
             delv.level.textual_location(flags, rloc))
         self.set_unsaved()
     def editor_callback_flags(self, renderer, path, new_text):
@@ -426,13 +426,13 @@ class PropListEditor(editors.Editor):
         # as usual pygtk not making it any nicer either
         itr = self.tree_data.get_iter(
              self.tree_filter.convert_path_to_child_path(path))
-        
+
         loc = int(self.tree_data.get_value(itr,3)[2:8],16)
         proptype = int(self.tree_data.get_value(itr,2)[2:5],16)
         aspect = int(self.tree_data.get_value(itr,5))
         self.tree_data.set_value(itr, 1, "0x%02X"%ival)
         self.tree_data.set_value(itr, 12, ival&0x01)
-        self.tree_data.set_value(itr, 3, 
+        self.tree_data.set_value(itr, 3,
             delv.level.textual_location(ival, loc))
         self.tree_data.set_value(itr, 2,
             "0x%03X (%s)"%(proptype, delv.level.proptypename_with_flags(
@@ -440,7 +440,7 @@ class PropListEditor(editors.Editor):
 
         self.set_unsaved()
     #def editor_callback_free(self, renderer, path, new_text):
-    #    itr = self.tree_data.get_iter(path)flags = 
+    #    itr = self.tree_data.get_iter(path)flags =
     def editor_callback_aspect(self, renderer, path, new_text):
         try:
             aspect = int(new_text.strip())
@@ -464,14 +464,14 @@ class PropListEditor(editors.Editor):
                     '0x','').replace('$',''), 16)
             else:
                 d1 = int(new_text.strip().split()[0])
-        except Exception,e: 
+        except Exception,e:
             print repr(e)
             return
         if d1 < 0 or d1 > 255: return
         itr = self.tree_data.get_iter(
             self.tree_filter.convert_path_to_child_path(path))
 
-        d3 =  int(self.tree_data.get_value(itr, 8)[2:],16)  
+        d3 =  int(self.tree_data.get_value(itr, 8)[2:],16)
         d3 &= 0x00FF
         d3 |= (d1<<8)
         self.tree_data.set_value(itr, 6, "%d"%d1)
@@ -483,14 +483,14 @@ class PropListEditor(editors.Editor):
                     '0x','').replace('$',''), 16)
             else:
                 d2 = int(new_text.strip().split()[0])
-        except Exception,e: 
+        except Exception,e:
             print repr(e)
             return
         if d2 < 0 or d2 > 255: return
         itr = self.tree_data.get_iter(
             self.tree_filter.convert_path_to_child_path(path))
 
-        d3 =  int(self.tree_data.get_value(itr, 8)[2:],16)  
+        d3 =  int(self.tree_data.get_value(itr, 8)[2:],16)
         d3 &= 0xFF00
         d3 |= d2
         self.tree_data.set_value(itr, 7, "%d"%d2)
@@ -502,14 +502,14 @@ class PropListEditor(editors.Editor):
                     '0x','').replace('$',''), 16)
             else:
                 d3 = int(new_text.strip().split()[0])
-        except Exception,e: 
+        except Exception,e:
             print repr(e)
             return
         if d3 < 0 or d3 > 0xFFFF: return
         itr = self.tree_data.get_iter(
             self.tree_filter.convert_path_to_child_path(path))
 
-        self.tree_data.set_value(itr, 6, "%d"%(d3>>8)     )   
+        self.tree_data.set_value(itr, 6, "%d"%(d3>>8)     )
         self.tree_data.set_value(itr, 7, "%d"%(d3&0x00FF))
         self.tree_data.set_value(itr, 8, "0x%04X"%d3)
     def editor_callback_proptype(self,  renderer, path, new_text):
@@ -558,7 +558,7 @@ class PropListEditor(editors.Editor):
         idx = len(self.tree_data)
         self.tree_data.append(["%d"%idx, "0xFF", "0x000", "0x000000",
             False, "0", "0","0","0x0000", "0x00000000", "0x0000", idx, True,
-            "0x0000" 
+            "0x0000"
             ])
     def cleanup(self):
         if self.map_editor: self.map_editor.prop_editor = None
@@ -590,7 +590,7 @@ class PropListEditor(editors.Editor):
         itr = self.tree_data.get_iter_first()
         while itr:
             index = self.tree_data.get_value(itr, 11)
-            # you see what I have to put up with: 
+            # you see what I have to put up with:
             if index in selection:
                 try:
                     pth = self.tree_filter.convert_child_path_to_path(
@@ -600,7 +600,7 @@ class PropListEditor(editors.Editor):
                 except TypeError: pass
             itr = self.tree_data.iter_next(itr)
 
-     
+
 
 # Note to self, make this support general tile layers
 # Also, abstract the tile drawing so the code can be reused in something
@@ -610,7 +610,7 @@ class MapEditor(editors.Editor):
     name = "Map Editor [nothing opened]"
     default_size = 800,600
     co_object = delv.level.Map
-    def gui_setup(self): 
+    def gui_setup(self):
         self.mouse_position = 0,0
 
         pbox = gtk.VBox(False,0)
@@ -665,7 +665,7 @@ class MapEditor(editors.Editor):
         sw.add_with_viewport(self.sbox)
         pbox.pack_start(sw, True, True, 0)
         self.sw = sw
- 
+
         hbox = gtk.HBox(False,0)
 
         hbox.pack_start(gtk.Label("Cursor:"),False,True,0)
@@ -742,17 +742,17 @@ class MapEditor(editors.Editor):
         self.selection = None
         self.library = self.redelv.get_library()
         self.load()
-        self.pixmap = gtk.gdk.Pixmap(None, 
+        self.pixmap = gtk.gdk.Pixmap(None,
             self.lmap.width*32, self.lmap.height*32,
                 gtk.gdk.visual_get_system().depth)
         print 0,0,self.lmap.width*32, self.lmap.height*32
         self.gc = self.pixmap.new_gc(function=gtk.gdk.COPY)
         self.gc.set_foreground(gtk.gdk.Color(pixel=0x00000000))
         #self.gc.set_background(gtk.gdk.Color(255,0,0))
-        self.pixmap.draw_rectangle(self.gc, True, 
+        self.pixmap.draw_rectangle(self.gc, True,
             0,0,self.lmap.width*32,self.lmap.height*32)
         #self.view_rect=0,0,self.sw.allocation.width,self.sw.allocation.height
-        self.draw_map()     
+        self.draw_map()
 
     def draw_tile(self, x, y, tid, pal=delv.colormap.rgb24, as_prop=False,
                   offset=(0,0),rotated=False,inhibit=False):
@@ -775,7 +775,7 @@ class MapEditor(editors.Editor):
                                    offset=offset,rotated=rotated,inhibit=True)
                     self.draw_tile(x,y-1, tile.index-1, pal=pal,as_prop=True,
                                    offset=offset,rotated=rotated,inhibit=True)
-            else: 
+            else:
                 if as_prop and attr & 0x00000C0 ==   0x40:
                     self.draw_tile(x,y-1, tile.index-1, pal=pal,as_prop=True,
                                    offset=offset,rotated=rotated,inhibit=True)
@@ -794,7 +794,7 @@ class MapEditor(editors.Editor):
         if tile.requires_mask or as_prop:
             self.gc.set_clip_origin(x*32-xo, y*32-yo)
             self.gc.set_clip_mask(tile.get_pixmap_mask(gtk,rotated))
-        else: 
+        else:
             self.gc.set_clip_mask(None)
         self.pixmap.draw_indexed_image(self.gc, x*32-xo, y*32-yo, 32, 32,
             gtk.gdk.RGB_DITHER_NORMAL, tile.get_image(rotated),
@@ -805,7 +805,7 @@ class MapEditor(editors.Editor):
             self.draw_tile(x, y, fptile, pal=pal,as_prop=True,
                            offset=fauxprop.get_offset(tile.fauxprop_aspect),
                            rotated=tile.fauxprop_rotate)
-        
+
     # FIXME needs to incorporate faux props into the prop list and draw
     # them under the same priority system as listed props
     def draw_map(self,stop=None):
@@ -824,19 +824,19 @@ class MapEditor(editors.Editor):
                     x,y = p.get_loc()
                     proptype = self.library.get_prop(p.proptype)
                     proptile = proptype.get_tile(p.aspect)
-                    self.draw_tile(x,y,proptile, 
+                    self.draw_tile(x,y,proptile,
                         offset=proptype.get_offset(p.aspect), as_prop=True,
                         rotated=p.rotated)
                 # draw invisible props
                 invisible = filter(lambda r: not r.show_in_map(), prpat)
-                for p in invisible: 
+                for p in invisible:
                     x,y = p.get_loc()
                     proptype = self.library.get_prop(p.proptype)
                     if p.flags == 0x42:
                         proptile = proptype.get_debug_tile(p.aspect)
                     else:
                         proptile = 0x017F
-                    self.draw_tile(x,y,proptile, 
+                    self.draw_tile(x,y,proptile,
                         offset=proptype.get_offset(p.aspect), as_prop=True,
                         rotated=p.rotated)
         if isinstance(self.selection, tuple):
@@ -855,7 +855,7 @@ class MapEditor(editors.Editor):
                 else:
                     proptile = proptype.get_debug_tile(p.aspect)
                 x,y = p.loc
-                self.draw_tile(x,y,proptile, 
+                self.draw_tile(x,y,proptile,
                     offset=proptype.get_offset(p.aspect), as_prop=True,
                     rotated=p.rotated, pal=delv.colormap.selected_rgb24)
 
@@ -870,7 +870,7 @@ class MapEditor(editors.Editor):
         self.lmap = self.canonical_object
         self.props = self.library.get_object(self.res.resid + 0x0100)
     def change_selection(self, ns):
-        if self.selection == ns: return 
+        if self.selection == ns: return
         self.selection = ns
         self.draw_map()
     def scroll_to_tile(self, x, y):
@@ -926,7 +926,7 @@ class MapEditor(editors.Editor):
                  lambda p:p.debug(self.library),p)))
     def mouse_movement(self, widget, event):
         if event.x is None or event.y is None: return
-        x,y= widget.translate_coordinates(self.display, 
+        x,y= widget.translate_coordinates(self.display,
              int(event.x),int(event.y))
         newp = x//32,y//32
         if newp != self.mouse_position:
@@ -946,7 +946,7 @@ class MapEditor(editors.Editor):
 
     def mouse_click(self, widget, event):
         if event.x is None or event.y is None: return
-        x,y= widget.translate_coordinates(self.display, 
+        x,y= widget.translate_coordinates(self.display,
              int(event.x),int(event.y))
         newp = x//32,y//32
         if self.click_tool: self.click_tool(*newp)
@@ -957,7 +957,7 @@ class MapEditor(editors.Editor):
         pbuf = self.get_pixbuf_from_pixmap()
         pbuf.save(path, "png", {})
     def get_pixbuf_from_pixmap(self):
-        pbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, 
+        pbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8,
             self.lmap.width*32,self.lmap.height*32)
         pbuf.get_from_drawable(self.pixmap, gtk.gdk.colormap_get_system(),
             0,0,0,0,self.lmap.width*32,self.lmap.height*32)
