@@ -37,9 +37,9 @@ class Tile(object):
         self.fauxprop,self.fauxprop_aspect,self.fauxprop_rotate = fauxprop
         self.mask = None
         self.rotated_mask = None
-        self.image = str(image)
+        self.image = bytes(image)
         self.rotated_cache = None
-        self.requires_mask =(attributes & 0xFF000000) and '\x00' in self.image
+        self.requires_mask =(attributes & 0xFF000000) and b'\x00' in self.image
     def draw_priority(self):
         if not self.attributes: return 0xFFFFFFFF
         return (self.attributes&0xBFCDFD1C)
@@ -56,7 +56,7 @@ class Tile(object):
         rotated = bytearray(32*32)
         for y in range(32):
             rotated[y*32:y*32+32] = self.image[y::32]
-        return str(rotated)
+        return bytes(rotated)
     def get_pixmap_mask(self,gtk,rotated=False):
         """This is really just to save redelv the bother of having 
            a separate cache of tile masks..."""
@@ -70,7 +70,7 @@ class Tile(object):
              function=gtk.gdk.COPY) 
         mask.draw_rectangle(off, True, 0,0,32,32)
         for n,pixel in enumerate(image):
-            if pixel != '\x00': 
+            if pixel != b'\x00':
                 mask.draw_point(on, n%32, n//32)
         #    else:
         #        self.mask.draw_point(off, n%32, n//32)
