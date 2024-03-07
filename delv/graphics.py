@@ -160,8 +160,8 @@ class DelvImage(store.Store):
                 operation = data[cursor:cursor+1]; cursor += 1
                 literals =  bits_of(operation,  4,4)
                 self.cdata(data[cursor:cursor+literals]); cursor += literals
-                #print "Unknwn opcode %02X lit=%d c=%X"%(operation[0],literals,
-                #    cursor)
+                #print("Unknwn opcode %02X lit=%d c=%X"%(operation[0],literals,
+                #    cursor))
             elif opcode < 0xF0:
                 # short run 0xE0-0xEF
                 operation = data[cursor:cursor+2]; cursor += 2
@@ -177,7 +177,7 @@ class DelvImage(store.Store):
             elif opcode == 0xFF:
                 # terminate 0xFF
                 operation = data[cursor]; cursor += 1
-                #print "Orderly termination. dc:%x pc:%X"%(cursor,self.cursor)
+                #print("Orderly termination. dc:%x pc:%X"%(cursor,self.cursor))
             else:
                 # unknown opcode
                 raise UnknownOpcode("0x%02X at 0x%06X"%(opcode,cursor))
@@ -391,7 +391,7 @@ class DelvImage(store.Store):
 
         #check = ncbits_of(code, (3,8), (7,1))
         #if check != index:
-        #    print "ERROR %08X %08X"%(index,check), clen-3, lits
+        #    print("ERROR %08X %08X"%(index,check), clen-3, lits)
         code += d[i:i+lits]
         return (lits+clen)/(2.0+lits),i+lits+clen,code
     def en_long_copy(self,i,d,lits):
@@ -409,7 +409,7 @@ class DelvImage(store.Store):
 
         #check = ncbits_of(code, (6, 16),(3,8),(6,2))
         #if check != index:
-        #    print "ERROR", index,check, clen-3, lits
+        #    print("ERROR", index,check, clen-3, lits)
         code += d[i:i+lits]
         return (lits+clen)/(3.0+lits),i+lits+clen,code
     def en_short_run(self,i,d):

@@ -42,13 +42,13 @@ from . import util
 
 class Store(object):
     def __init__(self, src):
-        #print "new store", repr(src),self
+        #print("new store", repr(src),self)
         self.data = None
         self.checked_out = 0
         self.set_source(src)
     def set_source(self, src):
         from . import archive
-        #print "setsource", repr(src)
+        #print("setsource", repr(src))
         self.src = None
         if issubclass(src.__class__, util.BinaryHandler):
             self.src = src
@@ -62,7 +62,7 @@ class Store(object):
         else:
             print(dir(src), hasattr(src, 'resid'))
             assert False, "Invalid source %s"%repr(src)
-        #print "final", repr(self.src), repr(self.res)
+        #print("final", repr(self.src), repr(self.res))
     def is_checked_out(self):
         return self.checked_out
     def check_out(self):
@@ -89,16 +89,16 @@ class JSONDictionary(Store):
         if not hasattr(self,'ds'): self.load_from_bfile()
         del self.ds[str(resid)]
     def save_source(self, resid, text):
-        #print "saving %d bytes of text for %04X"%(len(text),resid)
+        #print("saving %d bytes of text for %04X"%(len(text),resid))
         if not hasattr(self, 'ds'): self.load_from_bfile = {}
         self.ds[str(resid)] = text
         self.write_to_bfile()
     def get(self, resid, defl=None):
         if not hasattr(self,'ds'): self.load_from_bfile()
-        #print "getting", resid, self.ds.keys()
+        #print("getting", resid, self.ds.keys())
         return self.ds.get(str(resid),defl)
     def load_from_bfile(self):
-        #print "reading in jsondictionary"
+        #print("reading in jsondictionary")
         data = self.src.read()
         if not data:
             self.ds = {}
@@ -107,7 +107,7 @@ class JSONDictionary(Store):
     def write_to_bfile(self, dest=None):
         if not hasattr(self,'ds'): self.load_from_bfile()
         if dest is None: dest = self.src
-        #print "writing out jsondictionary to",dest,self.src, repr(self.res)
+        #print("writing out jsondictionary to",dest,self.src, repr(self.res))
         dest.seek(0)
         dest.write(json.dumps(self.ds))
         dest.truncate()

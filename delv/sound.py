@@ -312,16 +312,16 @@ class Music(Sound):
                     self.channels[part] = midi_channel
                 elif subtype == GEN_PART_KEY: # Detect key changes, not using
                     value = self.src.readb(next_op - data_offs - 4) # data chunk is everything from start to next op (-4 bytes of end of gen event)
-                    # print "General: KEY CHANGE ", part, binascii.hexlify(value), self.src.tell()
+                    # print("General: KEY CHANGE ", part, binascii.hexlify(value), self.src.tell())
                 elif subtype == GEN_TUNE_DIFF: # sequence with tune difference, not using # TODO: maybe support tune diff?
                     # tune diffs appear to be tiny in Cythera, very little reason to include
                     # tuning even less widely supported than pitch bend, which varies greatly among synths itself
                     # given the lack of support, difficulty of using with the library, and seemingly tiny impact -- not using tune diffs now
                     value = self.src.readb(next_op - data_offs - 4)
-                    # print "General: TUNE DIFF ", part, binascii.hexlify(value), self.src.tell()
+                    # print("General: TUNE DIFF ", part, binascii.hexlify(value), self.src.tell())
                 elif subtype == GEN_USED_NOTES: # Note used list is not necessary (probably used for QT pre-buffering), not using
                     value = self.src.readb(next_op - data_offs - 4)
-                    # print "General: NOTES USED ", part, binascii.hexlify(value), self.src.tell()
+                    # print("General: NOTES USED ", part, binascii.hexlify(value), self.src.tell())
                 elif subtype == GEN_NOTE_REQUEST: # Set instrument number
                     nrflags = self.src.read_uint8() # control behavior if exact instrument not found in qt synth: either play best match or nothing
                     reserved = self.src.read_uint8() # unused
@@ -345,7 +345,7 @@ class Music(Sound):
                     raise MusicError("Failed QTMA validity check: Econtrol Event at ", self.src.tell())
                 controller = bits_of(tail, 14, 2)
                 value = bits_of(tail, 16, 16)
-                # print "Extended Controller ", part, controller, value, self.src.tell()
+                # print("Extended Controller ", part, controller, value, self.src.tell())
             elif t4 == T4_ENOTE:
                 tail = self.src.readb(4)
                 part = bits_of(command, 12, 4)
@@ -359,13 +359,13 @@ class Music(Sound):
                 subtype = bits_of(command, 8, 8)
                 value = bits_of(command, 16, 16)
                 # if subtype == MARK_END:
-                #     print "Marker: END " ,value, self.src.tell()
+                #     print("Marker: END " ,value, self.src.tell())
                 # elif subtype == MARK_BEAT:
-                #     print  "Marker: BEAT " ,value, self.src.tell()
+                #     print("Marker: BEAT " ,value, self.src.tell())
                 # elif subtype == MARK_TEMPO:
-                #     print "Marker: TEMPO " ,value, self.src.tell()
+                #     print("Marker: TEMPO " ,value, self.src.tell())
                 # else:
-                #     print "Unsupported Marker Event subtype %d with value %d at %d"%(subtype,value,self.src.tell())
+                #     print("Unsupported Marker Event subtype %d with value %d at %d"%(subtype,value,self.src.tell()))
             elif t3 == T3_CONTROL:
                 part = bits_of(command, 5, 3)
                 controller = bits_of(command, 8, 8)

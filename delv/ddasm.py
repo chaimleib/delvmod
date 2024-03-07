@@ -148,13 +148,13 @@ class DArray(list, DVMObj):
             self.append(ifile.read_uint32())
     def load(self, dd, anonymous=False):
         self.dd = dd
-        #print ">>> Loading the array at 0x%04X"%self.offset
+        #print(">>> Loading the array at 0x%04X"%self.offset)
         if not anonymous: self.name = dd.get_label(self.offset, "Array")
         for i in range(len(self)):
             if self[i] & 0x80000000:
                 addr = self[i]&0xFFFF
                 self.near.seek(addr)
-                #print ">>> Preparing to load", i, '0x%04X'%(self[i]&0xFFFF), self[i]
+                #print(">>> Preparing to load", i, '0x%04X'%(self[i]&0xFFFF), self[i])
                 if self.dd.get_label(addr,False):
                     continue
                 self[i] = read_DVMObj(self.near)
@@ -774,7 +774,7 @@ class DFunction(DVMObj):
     def show(self, i=0, ost=sys.stdout):
         print(i*INDENT+'function %s(%s) ('%(
              self.name, self.arglist()), file=ost)
-        #print "***",self.bi,self.name
+        #print("***",self.bi,self.name)
         i += self.bi
         for n in range(self.local_count):
             print((1+i)*INDENT+'var Local%02X'%n , file=ost)
@@ -837,8 +837,8 @@ class DFunction(DVMObj):
                 #    mode = 'direct'
 
             opcode = self.near.read_uint8()
-            #print "%04X"%(self.near.tell()-1), mode, "%x"%opcode,
-            #print "%02X"%opcode, len(self.expect_close)
+            #print("%04X"%(self.near.tell()-1), mode, "%x"%opcode, end='')
+            #print("%02X"%opcode, len(self.expect_close))
             if opcode == 0x81:  # oh joy a function within a function.
                 subroutinefound = self.near.tell()-1
                 print("Subroutine discovered at 0x%04X"%(subroutinefound))

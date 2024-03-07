@@ -171,9 +171,9 @@ class Array(list, _PrintOuter):
                 self.pn(indent+1,'')
         self.pn(indent, "]")
     def printout(self, out, level):
-        print >> out, '\t'*level, "Array"
+        print('\t'*level, "Array", file=out)
         for n,item in enumerate(self):
-            print >> out, '\t'*(level+1), "%3d:"%n, item
+            print('\t'*(level+1), "%3d:"%n, item, file=out)
 class CharacterNameArray(Array):
     override_dref = 0x0201
 
@@ -193,7 +193,7 @@ class DCOperation(_PrintOuter):
         self.set_stream(out)
         lab = self.script_context.get_offset_label(self.true_offset,
             check_only=True)
-        #print "**", lab, '%04X'%self.true_offset, self.get_mnemonic()
+        #print("**", lab, '%04X'%self.true_offset, self.get_mnemonic())
         if lab is not None:
             self.pn(indent, '%s: '%lab)
         else:
@@ -490,7 +490,7 @@ class DCLocalAssignment(DCExpressionContainer):
     length = 2
     def decode(self):
         self.which = self.data[1]
-        #print 'XXXXXX %02X/%02X/%02X/%02X'%tuple(self.data[0:4])
+        #print('XXXXXX %02X/%02X/%02X/%02X'%tuple(self.data[0:4]))
         self.local_name = self.code_context.get_local_name(self.which)
     def get_mnemonic(self):
         return '%s %s'%(self.mnemonic,self.local_name)
@@ -782,7 +782,7 @@ class Code(list, _PrintOuter):
     def load_from_library(self, library, only_local=False):
         pass
     def printout(self, out, level=0):
-        print >> out, '\t'*level, str(self)
+        print('\t'*level, str(self), file=out)
         self.disassemble(out, level+1)
 
 class DispatchTable(dict, _PrintOuter):
@@ -872,11 +872,11 @@ class DispatchTable(dict, _PrintOuter):
                 value.disassemble(out, indent+2)
         self.pn(indent, "]")
     def printout(self, out, level):
-        print >> out, '\t'*level, "Dispatch Table"
+        print('\t'*level, "Dispatch Table", file=out)
         for signal,item in self.items():
-            print >> out, '\t'*(level+1), "0x%04X:"%signal
+            print('\t'*(level+1), "0x%04X:"%signal, file=out)
             if hasattr(item, 'printout'): item.printout(out, level+2)
-            else: print >> out, '\t'*(level+2), repr(item)[:40]
+            else: print('\t'*(level+2), repr(item)[:40], file=out)
 
 class Class(_PrintOuter):
     def __init__(self, script, src=None, end=None, organic_offset=0):
@@ -938,7 +938,7 @@ class Script(store.Store):
             suggestion,check_only=check_only)
 
     def load_from_bfile(self):
-        #print repr(self.src.resource)
+        #print(repr(self.src.resource))
         self.src.seek(0)
         if self.class_container:
             self.obj = Class(self, self.src, len(self.src))
@@ -964,9 +964,9 @@ class Script(store.Store):
             self.obj.load_from_library(library,only_local)
     def printout(self, out, level=0):
         if not hasattr(self.obj, 'disassemble'):
-            print >> out, "Atom:", self.obj
+            print("Atom:", self.obj, file=out)
             return
-        print >> out, "-- Script Object from %s --"%repr(self.src)
+        print("-- Script Object from %s --"%repr(self.src), file=out)
         self.obj.disassemble(out, 1)
     def disassemble(self, target=None):
         if target is None:
@@ -975,12 +975,12 @@ class Script(store.Store):
              out = target
         try:
             if not hasattr(self.obj, 'disassemble'):
-                print >> out, self.str_disassemble_atom(self.obj)
+                print(self.str_disassemble_atom(self.obj), file=out)
             else:
                 self.obj.disassemble(out, 0)
         except IndexError as e:
-            print >> out, '\n', ' DISASSEMBLY ERROR '.center(78,'*')
-            print >> out, repr(e)
+            print('\n', ' DISASSEMBLY ERROR '.center(78,'*'), file=out)
+            print(repr(e), file=out)
         self.disassemble_symtable_data(out)
         if target is None: return out.getvalue()
         return "<ERROR>"
@@ -988,15 +988,15 @@ class Script(store.Store):
         for key,value in self.symbol_table.items():
             if value.startswith('data_') and isinstance(key,dref):
                  offset = int(value[13:],16)
-                 print >> out, "%s: /* 0x%04X, %s */"%(value, offset,key)
+                 print("%s: /* 0x%04X, %s */"%(value, offset,key), file=out)
                  ditem = TypeFactory(self,self.res.get_offset_file(offset),
                      self.library, offset, only_local=True,
                      end_label_prefix='signal_')
                  if hasattr(ditem, 'disassemble'):
-                     print >> out, ditem.disassemble(out,1)
+                     print(ditem.disassemble(out,1), file=out)
                  else:
-                     print >> out, '   ',
-                     print >> out, self.str_disassemble_atom(ditem)
+                     print('   ', end='', file=out)
+                     print(self.str_disassemble_atom(ditem), file=out)
 
     def str_disassemble_atom(self, atom):
         if atom is None:
