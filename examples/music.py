@@ -50,7 +50,7 @@ Using delv Version: %s
 
 
 if len(sys.argv)<2:
-    print >> sys.stderr, USAGE
+    print(USAGE, file=sys.stderr)
     sys.exit(-1)
 
 source = open(sys.argv[1],'rb')
@@ -61,17 +61,17 @@ if len(sys.argv)<3: # individual file
 else: # archive
     resource = delv.archive.Scenario(source).get(int(sys.argv[2],16))
     if not resource:
-        print >> sys.stderr, "No resource", sys.argv[2], "found in that archive."
+        print("No resource", sys.argv[2], "found in that archive.", file=sys.stderr)
         sys.exit(-1)
     music = delv.sound.Music(resource.get_data())
 
-print "Using port", PORT, pygame.midi.get_device_info(PORT)
+print("Using port", PORT, pygame.midi.get_device_info(PORT))
 output = pygame.midi.Output(PORT,0)
-print "Instruments"
+print("Instruments")
 for part,instrument in music.part().items():
-    print part, instrument
+    print(part, instrument)
     if instrument < 128:
-        print "\t",delv.sound.INSTRUMENT_NAMES[instrument]
+        print("\t", delv.sound.INSTRUMENT_NAMES[instrument])
 music.setup_pygame_midi_output(output)
 
 
