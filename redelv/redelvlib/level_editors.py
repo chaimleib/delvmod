@@ -26,6 +26,7 @@
 # Ambrosia Software, Inc.
 # This file addresses sundry storage types used within Delver Archives,
 # and as such is mostly a helper for other parts of delv.
+from __future__ import print_function
 import delv.util, delv.archive, delv.store, delv.library
 import delv.colormap, delv.level
 import editors
@@ -43,10 +44,10 @@ class SearchCriterion(object):
         if self.remode:
             try:
                 self.re = re.compile(mode[1:])
-            except Exception,e:
+            except Exception as e:
                 # would like an error message but we'd have to give up on
                 # live updates of the search window...
-                print repr(e)#self.error_message(
+                print(repr(e)) #self.error_message(
                 self.re = None
             return
 
@@ -464,8 +465,8 @@ class PropListEditor(editors.Editor):
                     '0x','').replace('$',''), 16)
             else:
                 d1 = int(new_text.strip().split()[0])
-        except Exception,e:
-            print repr(e)
+        except Exception as e:
+            print(repr(e))
             return
         if d1 < 0 or d1 > 255: return
         itr = self.tree_data.get_iter(
@@ -483,8 +484,8 @@ class PropListEditor(editors.Editor):
                     '0x','').replace('$',''), 16)
             else:
                 d2 = int(new_text.strip().split()[0])
-        except Exception,e:
-            print repr(e)
+        except Exception as e:
+            print(repr(e))
             return
         if d2 < 0 or d2 > 255: return
         itr = self.tree_data.get_iter(
@@ -502,8 +503,8 @@ class PropListEditor(editors.Editor):
                     '0x','').replace('$',''), 16)
             else:
                 d3 = int(new_text.strip().split()[0])
-        except Exception,e:
-            print repr(e)
+        except Exception as e:
+            print(repr(e))
             return
         if d3 < 0 or d3 > 0xFFFF: return
         itr = self.tree_data.get_iter(
@@ -745,7 +746,7 @@ class MapEditor(editors.Editor):
         self.pixmap = gtk.gdk.Pixmap(None,
             self.lmap.width*32, self.lmap.height*32,
                 gtk.gdk.visual_get_system().depth)
-        print 0,0,self.lmap.width*32, self.lmap.height*32
+        print(0,0,self.lmap.width*32, self.lmap.height*32)
         self.gc = self.pixmap.new_gc(function=gtk.gdk.COPY)
         self.gc.set_foreground(gtk.gdk.Color(pixel=0x00000000))
         #self.gc.set_background(gtk.gdk.Color(255,0,0))

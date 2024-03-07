@@ -76,7 +76,7 @@ class SoundEditor(editors.Editor):
         if not path: return
         try:
             wavin = wave.open(path, 'rb')
-        except Exception, e:
+        except Exception as e:
             self.error_message("Couldn't read '%s': %s"%(path,repr(e)))
             return
         if wavin.getnchannels() != 1:
@@ -107,7 +107,7 @@ class SoundEditor(editors.Editor):
         if not path.endswith(".wav"): path += ".wav"
         try:
             self.wave_out(open(path, 'wb'))
-        except Exception, e:
+        except Exception as e:
             self.error_message("Couldn't write '%s': %s"%(path,repr(e)))
     def wave_out(self, fileobj):
         wavout = wave.open(fileobj, 'wb')

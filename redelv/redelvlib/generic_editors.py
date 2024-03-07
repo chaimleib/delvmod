@@ -129,7 +129,7 @@ class TileNameListEditor(editors.Editor):
             path = self.ask_open_path()
             if not path: return
             csvfile = csv.reader(open(path,'rb'))
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
             return
@@ -148,7 +148,7 @@ class TileNameListEditor(editors.Editor):
         if not path: return
         try:
             csvfile = csv.writer(open(path,'wb'))
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
             return

@@ -18,6 +18,7 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or
 # Ambrosia Software, Inc.
 
+from __future__ import print_function
 import editors
 import gtk,gobject
 import delv
@@ -87,7 +88,7 @@ class GraphicsEditor(editors.Editor):
             gobject.source_remove(self.animation_sid)
     def palette_toggled(self, *argv):
         newstate = self.toggle_palette.get_active()
-        print "Palette animation:",newstate
+        print("Palette animation:", newstate)
         if newstate:
             if self.is_unsaved():
                 self.error_message("Save your changes, or revert them, first.")
@@ -158,7 +159,7 @@ class GraphicsEditor(editors.Editor):
         self.pixmap = gtk.gdk.Pixmap(None, pil_img.size[0], pil_img.size[1],
            gtk.gdk.visual_get_system().depth)
         gc = self.pixmap.new_gc()
-        print pil_img.size, len(pil_img.tostring())
+        print(pil_img.size, len(pil_img.tostring()))
         self.pixmap.draw_indexed_image(gc, 0,0,pil_img.size[0],
            pil_img.size[1], gtk.gdk.RGB_DITHER_NORMAL,
            pil_img.tostring(),
@@ -172,7 +173,7 @@ class GraphicsEditor(editors.Editor):
             path = self.ask_open_path()
             if not path: return
             pixbuf = gtk.gdk.pixbuf_new_from_file(path)
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
             return

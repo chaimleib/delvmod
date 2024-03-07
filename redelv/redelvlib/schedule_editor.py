@@ -177,8 +177,8 @@ class ScheduleEditor(editors.Editor):
         self.schedules.schedules=schedules # I laughed.
         self.schedules.write_to_bfile()
         #newdata = self.schedules.get_data()
-        #print "set schedules", len(self.schedules.schedules)
-        #print repr(self.res), len(newdata)
+        #print("set schedules", len(self.schedules.schedules))
+        #print(repr(self.res), len(newdata))
         #self.res.set_data(newdata)
         self.set_saved()
         self.redelv.set_unsaved()
@@ -226,7 +226,7 @@ class ScheduleEditor(editors.Editor):
         itr = tm.get_iter(row)
         chrid = tm.get_value(itr,0)
         chrnm = tm.get_value(itr,1)
-        #print '**', repr(itr), str(itr), chrid, chrnm
+        #print('**', repr(itr), str(itr), chrid, chrnm)
         if tm.get_value(itr,2):
             p=None
             s=itr

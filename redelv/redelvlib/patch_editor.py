@@ -62,7 +62,7 @@ class PatchEditor(editors.Editor):
             f = open(path,'r')
             patch_info = str(f.read())
             f.close()
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't read from '%s': %s"%(path,repr(e)))
         self.patch_info = patch_info
         self.textbox.get_buffer().set_text(patch_info)
@@ -79,7 +79,7 @@ class PatchEditor(editors.Editor):
             f = open(path,'w')
             f.write(self.patch_info)
             f.close()
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't write to '%s': %s"%(path,repr(e)))
     def file_save(self,*argv):
         if 'Magpie' in self.patch_format and not self.yn_ask(MAGPIE_WARN):
