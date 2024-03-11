@@ -17,7 +17,8 @@
 #
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
-import gtk, images, delv.util, gobject
+from gi.repository import Gtk, Gdk, GObject
+import images, delv.util
 import sys, tempfile, os, subprocess
 MSG_NO_UNDERLAY = """Couldn't create library; if you are editing a saved game, 
 you need to underlay a scenario before opening resources that use library

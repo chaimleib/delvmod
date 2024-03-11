@@ -17,7 +17,8 @@
 #
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
-import gtk,editors
+from gi.repository import Gtk
+import editors
 MAGPIE_WARN = """This patch is currently in Magpie format. Saving it will
 change the format to mag.py format, which is not compatible with Magpie. 
 Proceed?
@@ -40,12 +41,12 @@ class PatchEditor(editors.Editor):
         self.menu_bar = ifc.get_widget("<main>")
         pbox.pack_start(self.menu_bar, False, True, 0)
         hbox = Gtk.HBox(False,0)
-        hbox.pack_start(Gtk.Label("Patch Format:", True, True, 0),False,True,0)
+        hbox.pack_start(Gtk.Label("Patch Format:"),False,True,0)
         self.patch_format_box = Gtk.Entry()
         self.patch_format_box.set_editable(False)
         hbox.pack_start(self.patch_format_box, True,True,0)
         pbox.pack_start(hbox,False)
-        pbox.pack_start(Gtk.Label("Patch Information", True, True, 0),False,True,0)
+        pbox.pack_start(Gtk.Label("Patch Information"),False,True,0)
         sw = Gtk.ScrolledWindow()
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.textbox = Gtk.TextView()

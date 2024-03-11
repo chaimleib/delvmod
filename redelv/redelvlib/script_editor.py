@@ -18,8 +18,8 @@
 #
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
+from gi.repository import Gtk, Pango
 import csv
-import gtk, pango
 import editors
 import delv.store
 import sys, traceback
@@ -74,7 +74,7 @@ class ScriptEditor(editors.Editor):
         sw.add(self.text_view)
         pbox.pack_start(sw, True, True, 0)
         hbox = Gtk.HBox(False,0)
-        hbox.pack_start(Gtk.Label("Status:", True, True, 0), False, True, 0)
+        hbox.pack_start(Gtk.Label("Status:"), False, True, 0)
         self.asm_status = Gtk.Entry()
         self.asm_status.set_editable(False)
         self.asm_status.set_text("Disassembling binary... ")

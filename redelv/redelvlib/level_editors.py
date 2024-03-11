@@ -26,11 +26,11 @@
 # Ambrosia Software, Inc. 
 # This file addresses sundry storage types used within Delver Archives,
 # and as such is mostly a helper for other parts of delv. 
+from gi.repository import Gtk, Gdk, GdkPixbuf
 import delv.util, delv.archive, delv.store, delv.library
 import delv.colormap, delv.level
 import editors
 import cStringIO as StringIO
-from gi.repository import Gtk
 import operator, re
 
 class SearchCriterion(object):
@@ -269,30 +269,30 @@ class PropListEditor(editors.Editor):
 
 
         hbox = Gtk.HBox(False,0)
-        #hbox.pack_start(Gtk.Label("Search:", True, True, 0))
+        #hbox.pack_start(Gtk.Label("Search:"), True, True, 0)
 
-        hbox.pack_start(Gtk.Label("Search by... Index:", True, True, 0))
+        hbox.pack_start(Gtk.Label("Search by... Index:"), True, True, 0)
         self.search_index = Gtk.Entry()
         self.search_index.set_width_chars(6)
         self.search_index.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 11)))
         hbox.pack_start(self.search_index, True, True, 0)
 
-        hbox.pack_start(Gtk.Label("Flags:", True, True, 0))
+        hbox.pack_start(Gtk.Label("Flags:"), True, True, 0)
         self.search_flags = Gtk.Entry()
         self.search_flags.set_width_chars(6)
         self.search_flags.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 1)))
         hbox.pack_start(self.search_flags, True, True, 0)
 
-        hbox.pack_start(Gtk.Label("PropType:", True, True, 0))
+        hbox.pack_start(Gtk.Label("PropType:"), True, True, 0)
         self.search_proptype = Gtk.Entry()
         self.search_proptype.set_width_chars(12)
         self.search_proptype.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 2)))
         hbox.pack_start(self.search_proptype, True, True, 0)
 
-        hbox.pack_start(Gtk.Label("Location:", True, True, 0))
+        hbox.pack_start(Gtk.Label("Location:"), True, True, 0)
         self.search_location = Gtk.Entry()
         self.search_location.set_width_chars(8)
         self.search_location.connect("changed", self.criterion_change,
@@ -300,28 +300,28 @@ class PropListEditor(editors.Editor):
         hbox.pack_start(self.search_location, True, True, 0)
 
 
-        hbox.pack_start(Gtk.Label("Aspect:", True, True, 0))
+        hbox.pack_start(Gtk.Label("Aspect:"), True, True, 0)
         self.search_aspect = Gtk.Entry()
         self.search_aspect.set_width_chars(4)
         self.search_aspect.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 5)))
         hbox.pack_start(self.search_aspect, True, True, 0)
 
-        hbox.pack_start(Gtk.Label("d1:", True, True, 0))
+        hbox.pack_start(Gtk.Label("d1:"), True, True, 0)
         self.search_d1 = Gtk.Entry()
         self.search_d1.set_width_chars(6)
         self.search_d1.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 6)))
         hbox.pack_start(self.search_d1, True, True, 0)
 
-        hbox.pack_start(Gtk.Label("d2:", True, True, 0))
+        hbox.pack_start(Gtk.Label("d2:"), True, True, 0)
         self.search_d2 = Gtk.Entry()
         self.search_d2.set_width_chars(6)
         self.search_d2.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 7)))
         hbox.pack_start(self.search_d2, True, True, 0)
 
-        hbox.pack_start(Gtk.Label("d3:", True, True, 0))
+        hbox.pack_start(Gtk.Label("d3:"), True, True, 0)
         self.search_d3 = Gtk.Entry()
         self.search_d3.set_width_chars(8)
         self.search_d3.connect("changed", self.criterion_change,
@@ -668,7 +668,7 @@ class MapEditor(editors.Editor):
  
         hbox = Gtk.HBox(False,0)
 
-        hbox.pack_start(Gtk.Label("Cursor:", True, True, 0),False,True,0)
+        hbox.pack_start(Gtk.Label("Cursor:"), False, True, 0)
         self.w_xpos = Gtk.Entry()
         self.w_xpos.set_width_chars(4)
         self.w_xpos.set_editable(False)
@@ -678,43 +678,43 @@ class MapEditor(editors.Editor):
         self.w_ypos.set_editable(False)
         hbox.pack_start(self.w_ypos,False,True,0)
 
-        hbox.pack_start(Gtk.Label("Map Data:", True, True, 0),False,True,0)
+        hbox.pack_start(Gtk.Label("Map Data:"), False, True, 0)
         self.w_mapdata = Gtk.Entry()
         self.w_mapdata.set_width_chars(6)
         self.w_mapdata.set_editable(False)
         hbox.pack_start(self.w_mapdata,False,True,0)
 
-        hbox.pack_start(Gtk.Label("Name:", True, True, 0),False,True,0)
+        hbox.pack_start(Gtk.Label("Name:"), False, True, 0)
         self.w_name = Gtk.Entry()
         self.w_name.set_editable(False)
         hbox.pack_start(self.w_name,False,True,0)
 
-        hbox.pack_start(Gtk.Label("Attr:", True, True, 0),False,True,0)
+        hbox.pack_start(Gtk.Label("Attr:"), False, True, 0)
         self.w_attr = Gtk.Entry()
         self.w_attr.set_width_chars(10)
         self.w_attr.set_editable(False)
         hbox.pack_start(self.w_attr,True, True, 0)
 
-        hbox.pack_start(Gtk.Label("Faux Prop:", True, True, 0),False,True,0)
+        hbox.pack_start(Gtk.Label("Faux Prop:"), False, True, 0)
         self.w_faux = Gtk.Entry()
         self.w_faux.set_width_chars(9)
         self.w_faux.set_editable(False)
         hbox.pack_start(self.w_faux,True, True, 0)
 
-        hbox.pack_start(Gtk.Label("FP Tile:", True, True, 0),False,True,0)
+        hbox.pack_start(Gtk.Label("FP Tile:"), False, True, 0)
         self.w_fauxtile = Gtk.Entry()
         self.w_fauxtile.set_width_chars(6)
 
         self.w_fauxtile.set_editable(False)
         hbox.pack_start(self.w_fauxtile,True, True, 0)
 
-        hbox.pack_start(Gtk.Label("FP Attr:", True, True, 0),False,True,0)
+        hbox.pack_start(Gtk.Label("FP Attr:"), False, True, 0)
         self.w_fauxattr = Gtk.Entry()
         self.w_fauxattr.set_width_chars(10)
         self.w_fauxattr.set_editable(False)
         hbox.pack_start(self.w_fauxattr,True, True, 0)
 
-        hbox.pack_start(Gtk.Label("FP Offs:", True, True, 0),False,True,0)
+        hbox.pack_start(Gtk.Label("FP Offs:"), False, True, 0)
         self.w_fauxoffs = Gtk.Entry()
         self.w_fauxoffs.set_width_chars(5)
         self.w_fauxoffs.set_editable(False)

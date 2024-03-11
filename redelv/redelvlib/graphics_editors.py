@@ -18,8 +18,8 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
 
+from gi.repository import Gtk, Gdk, GObject
 import editors
-import gtk,gobject
 import delv
 import delv.graphics
 
@@ -63,7 +63,7 @@ class GraphicsEditor(editors.Editor):
         self.flags.set_editable(False)
         if self.has_flags:
             hbox = Gtk.HBox(False,0)
-            hbox.pack_start(Gtk.Label("Flags:", True, True, 0),True,True,0)
+            hbox.pack_start(Gtk.Label("Flags:"), True, True, 0)
             hbox.pack_start(self.flags,False,True,0)
             pbox.pack_start(hbox,False,True,0)
 

@@ -16,9 +16,14 @@
 #
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GdkPixbuf, GObject
+import os, sys, tempfile, subprocess, datetime
+import json
+import images, editgui
 import delv
 import delv.archive, delv.library
-from gi.repository import GObject
 
 version = '0.2.2'
 PATCHINFO = """Created with redelv %s, based on the delv library."""%version
@@ -44,11 +49,6 @@ ABOUT_TEXT = """<span font_family="monospace">
 delv version %s, redelv version %s
 """%(delv.version,version)
 
-import gi
-gi.require_version('Gtk', '3.0')
-import gtk, os, sys, gobject, tempfile, subprocess, datetime
-import json
-import images, editgui
 DEFAULT_PREFS = {# Command that will play sounds:
                    'play_sound_cmd': 'mplayer %s', 
                    # Enter the command for your hex editor here, e.g. ghex
