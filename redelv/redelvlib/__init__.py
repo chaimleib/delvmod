@@ -18,7 +18,7 @@
 # Ambrosia Software, Inc. 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, GObject
+from gi.repository import Gtk, Gdk, GdkPixbuf, GObject
 import os, sys, tempfile, subprocess, datetime
 import json
 import images, editgui
@@ -138,7 +138,7 @@ class ReDelv(object):
         self.file_get_info_window = None
 
         # Make the main window
-        self.clipboard = Gtk.clipboard_get()
+        self.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         self.window = Gtk.Window(Gtk.WindowType.TOPLEVEL)
         self.window.set_default_size(480,512)
         self.window.set_title("redelv - [No File Open]")

@@ -19,7 +19,7 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
 import delv.ddasm
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import editors
 class ScheduleEditor(editors.Editor):
     name = "Schedule Editor"
@@ -195,13 +195,14 @@ class ScheduleEditor(editors.Editor):
         row = row[-1] if row else '0'
         itr = tm.get_iter(row)
         if tm.get_value(itr,2):
-            Gtk.clipboard_get().set_text(
+            Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).set_text(
                 ','.join([tm.get_value(itr,n) for n in xrange(9)]))
     def edit_paste(self, *argv):
         tm,row = self.data_view.get_selection().get_selected_rows()
         row = row[-1] if row else '0'
         itr = tm.get_iter(row)
-        data = Gtk.clipboard_get().wait_for_text().split(',')
+        data = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)\
+                .wait_for_text().split(',')
         if tm.get_value(itr,2):
             for n,v in enumerate(data[2:],2):
                 self.tree_data.set_value(itr, n, v)
