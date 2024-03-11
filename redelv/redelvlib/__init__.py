@@ -18,7 +18,7 @@
 # Ambrosia Software, Inc. 
 import delv
 import delv.archive, delv.library
-import gobject
+from gi.repository import GObject
 
 version = '0.2.2'
 PATCHINFO = """Created with redelv %s, based on the delv library."""%version
@@ -44,8 +44,8 @@ ABOUT_TEXT = """<span font_family="monospace">
 delv version %s, redelv version %s
 """%(delv.version,version)
 
-import pygtk
-pygtk.require('2.0')
+import gi
+gi.require_version('Gtk', '3.0')
 import gtk, os, sys, gobject, tempfile, subprocess, datetime
 import json
 import images, editgui
@@ -72,20 +72,20 @@ DEFAULT_PREFS = {# Command that will play sounds:
                    }
 PREFS_PATH = os.path.expanduser('~/.redelv')
 
-class AskNewResourceBox(gtk.Dialog):
+class AskNewResourceBox(Gtk.Dialog):
     def __init__(self,redelv,prompt="Create a new resource:"):
         self.redelv=redelv
-        gtk.Dialog.__init__(self)
-        v = gtk.Label(prompt)
-        self.vbox.pack_start(v)
+        GObject.GObject.__init__(self)
+        v = Gtk.Label(label=prompt)
+        self.vbox.pack_start(v, True, True, 0)
         v.show()
-        self.e = gtk.Entry(max=6)
+        self.e = Gtk.Entry(max=6)
         self.e.set_text("0x%04X"%self.redelv.get_new_resid(self.redelv.current_subindex_id))
-        self.vbox.pack_start(self.e)
+        self.vbox.pack_start(self.e, True, True, 0)
         self.e.show()
         #self.resid = 
         #self.name = 
-        self.add_buttons(gtk.STOCK_NEW, 1, gtk.STOCK_CANCEL, 0)
+        self.add_buttons(Gtk.STOCK_NEW, 1, Gtk.STOCK_CANCEL, 0)
 
         self.vbox.show()
     def get_value(self):
@@ -123,9 +123,9 @@ class ReDelv(object):
         self.resourcechange = []
         self.archive = None
         self.library = None
-        #gobject.type_register(editgui.Receiver)
-        #gobject.signal_new("filechange", editgui.Receiver, 
-        #    gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+        #GObject.type_register(editgui.Receiver)
+        #GObject.signal_new("filechange", editgui.Receiver, 
+        #    GObject.SignalFlags.RUN_FIRST, None, ())
         # Windows and globals
         self._unsaved = False
         self.opened_file = None
@@ -138,15 +138,15 @@ class ReDelv(object):
         self.file_get_info_window = None
 
         # Make the main window
-        self.clipboard = gtk.clipboard_get()
-        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        self.clipboard = Gtk.clipboard_get()
+        self.window = Gtk.Window(Gtk.WindowType.TOPLEVEL)
         self.window.set_default_size(480,512)
         self.window.set_title("redelv - [No File Open]")
-        self.window.set_icon(gtk.gdk.pixbuf_new_from_file(images.icon_path))
+        self.window.set_icon(GdkPixbuf.Pixbuf.new_from_file(images.icon_path))
         
         self.window.connect("delete_event", self.delete_event)
         self.window.connect("destroy", self.destroy)
-        self.mvbox = gtk.VBox(homogeneous=False,spacing=0)
+        self.mvbox = Gtk.VBox(homogeneous=False,spacing=0)
         self.window.add(self.mvbox)
 
         # Make the menu
@@ -237,21 +237,21 @@ class ReDelv(object):
             ("/_Help",           None,          None,           0, "<Branch>"),
             ("/Help/About",      None,          self.menu_about, 0, None),
         )
-        accel = gtk.AccelGroup()
-        ifc = gtk.ItemFactory(gtk.MenuBar, "<main>", accel)
+        accel = Gtk.AccelGroup()
+        ifc = Gtk.ItemFactory(Gtk.MenuBar, "<main>", accel)
         self.window.add_accel_group(accel)
         ifc.create_items(menu_items)
         self.menu_bar = ifc.get_widget("<main>")
         self.mvbox.pack_start(self.menu_bar, False, True, 0)
 
         # Make the data tree
-        self.data_view = gtk.TreeView()
-        dc1 = gtk.TreeViewColumn()
+        self.data_view = Gtk.TreeView()
+        dc1 = Gtk.TreeViewColumn()
         dc1.set_title("Subindex") # Would it be so much to ask for this to be
         # in the constructor...
-        dc2 = gtk.TreeViewColumn()
+        dc2 = Gtk.TreeViewColumn()
         dc2.set_title("Size")
-        dc3 = gtk.TreeViewColumn()
+        dc3 = Gtk.TreeViewColumn()
         dc3.set_title("Description")
         
         # Seriously it's like GUI programming is designed to be as clunky
@@ -262,21 +262,21 @@ class ReDelv(object):
         # GUI stuff???
         # and why are all the RAD tools broken?! They could at least plaster
         # over this cruft...
-        c =gtk.CellRendererText();dc1.pack_start(c,True);
+        c =Gtk.CellRendererText();dc1.pack_start(c,True);
         dc1.add_attribute(c,"text",0)
-        c =gtk.CellRendererText();dc2.pack_start(c,True);
+        c =Gtk.CellRendererText();dc2.pack_start(c,True);
         dc2.add_attribute(c,"text",1)
-        c =gtk.CellRendererText();dc3.pack_start(c,True);
+        c =Gtk.CellRendererText();dc3.pack_start(c,True);
         dc3.add_attribute(c,"text",2)         
         self.data_view.append_column(dc1)
         self.data_view.append_column(dc2)
         self.data_view.append_column(dc3)
 
-        self.tree_data = gtk.TreeStore(str,str,str,int,int)
+        self.tree_data = Gtk.TreeStore(str,str,str,int,int)
         self.data_view.set_model(self.tree_data)
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC,gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
         sw.add(self.data_view)
         self.mvbox.pack_start(sw, True, True, 0)
 
@@ -292,7 +292,7 @@ class ReDelv(object):
         if len(sys.argv) > 2: self.underlay_archive(
             delv.archive.Scenario(sys.argv[2]))
     def main(self):
-        gtk.main()
+        Gtk.main()
     def refresh_tree(self): 
         "Change the tree to reflect current data."
         print "WARNING: TreeView may be out of date."
@@ -348,24 +348,24 @@ class ReDelv(object):
         self.underlay_archive(delv.archive.Scenario(path))
     def ask_open_path(self,msg="Select a file..."):
         if self.is_unsaved() and self.warn_unsaved_changes(): return
-        chooser = gtk.FileChooserDialog(title=msg,
-                  action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                  buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                           gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        chooser = Gtk.FileChooserDialog(title=msg,
+                  action=Gtk.FileChooserAction.OPEN,
+                  buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,
+                           Gtk.STOCK_OPEN,Gtk.ResponseType.OK))
         response = chooser.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             rv= chooser.get_filename()
         else: rv= None
         chooser.destroy()
         return rv
     def menu_open(self, widget, data=None):
         if self.is_unsaved() and self.warn_unsaved_changes(): return
-        chooser = gtk.FileChooserDialog(title="Select a Delver Archive...",
-                  action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                  buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                           gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        chooser = Gtk.FileChooserDialog(title="Select a Delver Archive...",
+                  action=Gtk.FileChooserAction.OPEN,
+                  buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,
+                           Gtk.STOCK_OPEN,Gtk.ResponseType.OK))
         response = chooser.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             self.open_file(chooser.get_filename())
 
         chooser.destroy()
@@ -453,7 +453,7 @@ class ReDelv(object):
             return
     def menu_import(self, widget, data=None):
         if self.is_unsaved() and self.warn_unsaved_changes(): return
-        self.exported_directory = self.ask_dir_path(gtk.STOCK_OPEN)
+        self.exported_directory = self.ask_dir_path(Gtk.STOCK_OPEN)
         if not self.exported_directory: return
         try:
             # The string is a buffer so we can overwrite in place.
@@ -469,17 +469,17 @@ class ReDelv(object):
 
     def menu_about(self, widget, data=None):
         if not self.aboutbox:
-            self.aboutbox = gtk.Window(gtk.WINDOW_TOPLEVEL)
+            self.aboutbox = Gtk.Window(Gtk.WindowType.TOPLEVEL)
             self.aboutbox.set_title("About redelv")
             self.aboutbox.set_icon(
-                gtk.gdk.pixbuf_new_from_file(images.icon_path))
+                GdkPixbuf.Pixbuf.new_from_file(images.icon_path))
             self.aboutbox.connect("delete_event", 
                 (lambda *x: self.aboutbox.hide() or True))
-            pbox = gtk.HBox(False,0)
-            im = gtk.Image(); im.set_from_file(images.logo_path)
+            pbox = Gtk.HBox(False,0)
+            im = Gtk.Image(); im.set_from_file(images.logo_path)
             pbox.pack_start(im,True,True,10)
             self.aboutbox.add(pbox)
-            ab = gtk.Label(); ab.set_markup(ABOUT_TEXT)
+            ab = Gtk.Label(); ab.set_markup(ABOUT_TEXT)
             pbox.pack_start(ab,True,True,10)
         self.aboutbox.show_all()
             
@@ -489,12 +489,12 @@ class ReDelv(object):
     def menu_get_info(self, widget, data=None):
         if not self.file_get_info_window:
              self.file_get_info_window = editgui.FileInfo(
-                 self, gtk.WINDOW_TOPLEVEL)
+                 self, Gtk.WindowType.TOPLEVEL)
         self.file_get_info_window.show_all()
     def menu_file_metadata(self, widget, data=None):
         if not self.file_metadata_window:
              self.file_metadata_window = editgui.FileMetadata(
-                 self, gtk.WINDOW_TOPLEVEL)
+                 self, Gtk.WindowType.TOPLEVEL)
         self.file_metadata_window.show_all()
     def menu_create_index(self, widget, data=None):
         return None
@@ -645,10 +645,10 @@ class ReDelv(object):
         self.hex_editors_open[self.current_resource_id] = (p,temp,mtime)
         # turns out bless is a replacer rather than an overwriter...
         if self.timeout_sid is None:
-            self.timeout_sid = gobject.timeout_add(300, self.file_mon_timer)
-        #gfile =  gio.File(path=temp.name)
+            self.timeout_sid = GObject.timeout_add(300, self.file_mon_timer)
+        #gfile =  Gio.File.new_for_path(temp.name)
         #monitor =gfile.monitor_file(
-        #    gio.FILE_MONITOR_NONE, None)
+        #    Gio.FileMonitorFlags.NONE, None)
         #monitor = gfile.monitor_file()
         #monitor.connect("changed", self.hex_editor_changed, 
         #    (self.current_resource, temp,gfile))
@@ -734,55 +734,55 @@ class ReDelv(object):
         return None
 
     def destroy(self, widget, data=None):
-        gtk.main_quit()
+        Gtk.main_quit()
     def delete_event(self, widget, event, data=None):
         if not self.is_unsaved(): return False
         return self.warn_unsaved_changes()
 
      # helpers
     def warn_unsaved_changes(self):
-        dialog = gtk.MessageDialog(self.window, 
-            gtk.DIALOG_MODAL , 
-            gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(self.window, 
+            Gtk.DialogFlags.MODAL , 
+            Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
             "This action will lose unsaved changes; are you sure?")
-        rv= gtk.RESPONSE_YES != dialog.run()
+        rv= Gtk.ResponseType.YES != dialog.run()
         dialog.destroy()
         return rv
     def error_message(self, message):
-        dialog = gtk.MessageDialog(self.window, 
-            gtk.DIALOG_MODAL , 
-            gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
+        dialog = Gtk.MessageDialog(self.window, 
+            Gtk.DialogFlags.MODAL , 
+            Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
             message)
         dialog.run()
         dialog.destroy()
     def info_message(self, message):
-        dialog = gtk.MessageDialog(self.window, 
-            gtk.DIALOG_MODAL , 
-            gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+        dialog = Gtk.MessageDialog(self.window, 
+            Gtk.DialogFlags.MODAL , 
+            Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
             message)
         dialog.run()
         dialog.destroy()
-    def ask_dir_path(self,button=gtk.STOCK_SAVE):
-        chooser = gtk.FileChooserDialog(
+    def ask_dir_path(self,button=Gtk.STOCK_SAVE):
+        chooser = Gtk.FileChooserDialog(
                   title="Select import/export directory...",
-                  action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                  buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                           button,gtk.RESPONSE_OK))
+                  action=Gtk.FileChooserAction.SELECT_FOLDER,
+                  buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,
+                           button,Gtk.ResponseType.OK))
         response = chooser.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             rv =chooser.get_filename()
         else:
             rv = None
         chooser.destroy()
         return rv
     def ask_save_path(self, cname="Untitled Scenario"):
-        chooser = gtk.FileChooserDialog(title="Select destination...",
-                  action=gtk.FILE_CHOOSER_ACTION_SAVE,
-                  buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                           gtk.STOCK_SAVE,gtk.RESPONSE_OK))
+        chooser = Gtk.FileChooserDialog(title="Select destination...",
+                  action=Gtk.FileChooserAction.SAVE,
+                  buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,
+                           Gtk.STOCK_SAVE,Gtk.ResponseType.OK))
         chooser.set_current_name(cname)
         response = chooser.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             rv =chooser.get_filename()
         else:
             rv = None
@@ -790,7 +790,7 @@ class ReDelv(object):
         return rv
         
     def open_file(self, path,directory=False):
-        self.tree_data = gtk.TreeStore(str,str,str,int,int)
+        self.tree_data = Gtk.TreeStore(str,str,str,int,int)
         self.data_view.set_model(self.tree_data)
         try:
             self.archive = delv.archive.Scenario(path, 

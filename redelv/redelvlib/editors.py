@@ -22,7 +22,7 @@ import sys, tempfile, os, subprocess
 MSG_NO_UNDERLAY = """Couldn't create library; if you are editing a saved game, 
 you need to underlay a scenario before opening resources that use library
 facilities (e.g. refer to props or tiles.) Exception was: %s"""
-class Editor(gtk.Window):
+class Editor(Gtk.Window):
     name = "Unspecified Editor"
     co_object = None
     icon = images.icon_path
@@ -61,7 +61,7 @@ class Editor(gtk.Window):
                                 shell=True)
         mtime = os.path.getmtime(self.external_editor_tempfile.name)
         self.external_editor = proc,mtime,self.external_editor_tempfile.name
-        self.file_monitor_sid = gobject.timeout_add(300,self.file_mon_timer)
+        self.file_monitor_sid = GObject.timeout_add(300,self.file_mon_timer)
         self.file_monitor_cb_data = cb_data
         self.queued_change = None
         self.file_monitor_read_cb = read_cb
@@ -96,7 +96,7 @@ class Editor(gtk.Window):
     def __del__(self):
         self.redelv.unregister_editor(self)
     def __init__(self, redelv, resource, canonical=True, *argv, **argk):
-        gtk.Window.__init__(self,gtk.WINDOW_TOPLEVEL, *argv,**argk)
+        GObject.GObject.__init__(self,Gtk.WindowType.TOPLEVEL, *argv,**argk)
         self.redelv = redelv
         self.external_editor = None
         self.external_editor_tempfile = None
@@ -115,7 +115,7 @@ class Editor(gtk.Window):
             self._unsaved = False
             self.connect("delete_event", self.delete_event)
             self.set_icon(
-                    gtk.gdk.pixbuf_new_from_file(self.icon))
+                    GdkPixbuf.Pixbuf.new_from_file(self.icon))
             self.editor_setup()
         except delv.util.LibraryIncomplete,e:
             self.redelv.error_message(MSG_NO_UNDERLAY%repr(e))
@@ -130,57 +130,57 @@ class Editor(gtk.Window):
     def cleanup(self):
         pass
     def gui_setup(self):
-        self.add(gtk.Label("[Unimplemented]"))
+        self.add(Gtk.Label(label="[Unimplemented]"))
     def warn_unsaved_changes(self):
         return self.ask_unsaved()
     def ask_unsaved(self):
-        dialog = gtk.MessageDialog(self, 
-            gtk.DIALOG_MODAL , 
-            gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(self, 
+            Gtk.DialogFlags.MODAL , 
+            Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
             "You will lose unsaved changes to this resource; are you sure?")
-        rv= gtk.RESPONSE_YES != dialog.run()
+        rv= Gtk.ResponseType.YES != dialog.run()
         dialog.destroy()
         return rv
     def editor_setup(self):
         print "The unimplemented editor is running, which is probably bad..."
     def ask_open_path(self,msg="Select a file..."):
         if self.is_unsaved() and self.warn_unsaved_changes(): return
-        chooser = gtk.FileChooserDialog(title=msg,
-                  action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                  buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                           gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        chooser = Gtk.FileChooserDialog(title=msg,
+                  action=Gtk.FileChooserAction.OPEN,
+                  buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,
+                           Gtk.STOCK_OPEN,Gtk.ResponseType.OK))
         response = chooser.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             rv= chooser.get_filename()
         else: rv= None
         chooser.destroy()
         return rv
     def yn_ask(self,prompt="Are you sure?"):
-        dialog = gtk.MessageDialog(self, 
-            gtk.DIALOG_MODAL , 
-            gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(self, 
+            Gtk.DialogFlags.MODAL , 
+            Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
             prompt)
-        rv = gtk.RESPONSE_YES == dialog.run()
+        rv = Gtk.ResponseType.YES == dialog.run()
         dialog.destroy()
         return rv
 
     def ask_save_path(self,msg="Select destination...",default="Untitled"):
-        chooser = gtk.FileChooserDialog(title=msg,
-                  action=gtk.FILE_CHOOSER_ACTION_SAVE,
-                  buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
-                           gtk.STOCK_SAVE,gtk.RESPONSE_OK))
+        chooser = Gtk.FileChooserDialog(title=msg,
+                  action=Gtk.FileChooserAction.SAVE,
+                  buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,
+                           Gtk.STOCK_SAVE,Gtk.ResponseType.OK))
         chooser.set_current_name(default)
         response = chooser.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             rv =chooser.get_filename()
         else:
             rv = None
         chooser.destroy()
         return rv 
     def error_message(self, message):
-        dialog = gtk.MessageDialog(self, 
-            gtk.DIALOG_MODAL , 
-            gtk.MESSAGE_ERROR, gtk.BUTTONS_OK,
+        dialog = Gtk.MessageDialog(self, 
+            Gtk.DialogFlags.MODAL , 
+            Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
             message)
         dialog.run()
         dialog.destroy()

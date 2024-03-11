@@ -30,7 +30,7 @@ import delv.util, delv.archive, delv.store, delv.library
 import delv.colormap, delv.level
 import editors
 import cStringIO as StringIO
-import gtk
+from gi.repository import Gtk
 import operator, re
 
 class SearchCriterion(object):
@@ -110,7 +110,7 @@ class PropListEditor(editors.Editor):
     default_size = 800,600
     co_object = delv.level.PropList
     def gui_setup(self):
-        pbox = gtk.VBox(False,0)
+        pbox = Gtk.VBox(False,0)
         self.search_criteria = {}
         self.set_default_size(*self.default_size)
 
@@ -135,128 +135,128 @@ class PropListEditor(editors.Editor):
             #("/Select/Scroll to Selected","<control>F",None,0,None),
             )
 
-        accel = gtk.AccelGroup()
-        ifc = gtk.ItemFactory(gtk.MenuBar, "<main>", accel)
+        accel = Gtk.AccelGroup()
+        ifc = Gtk.ItemFactory(Gtk.MenuBar, "<main>", accel)
         self.add_accel_group(accel)
         ifc.create_items(menu_items)
         self.menu_bar = ifc.get_widget("<main>")
         pbox.pack_start(self.menu_bar, False, True, 0)
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC,gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
 
-        self.data_view = gtk.TreeView()
-        self.data_view.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.data_view = Gtk.TreeView()
+        self.data_view.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Index")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',False)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",0)
         self.data_view.append_column(dc)
         
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Flags")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_flags)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",1)
         self.data_view.append_column(dc)
         
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Free")
-        c = gtk.CellRendererToggle() 
+        c = Gtk.CellRendererToggle() 
         #c.connect('toggled', self.editor_callback_free)
         dc.pack_start(c,True)
         dc.add_attribute(c,"active",12)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Prop Type")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_proptype)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",2)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Location")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_location)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",3)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Rotate?")
-        c = gtk.CellRendererToggle() 
+        c = Gtk.CellRendererToggle() 
         #c.set_activatable(True)
         #c.connect('toggled', self.editor_callback_rotate)
         dc.pack_start(c,True)
         dc.add_attribute(c,"active",4)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Aspect")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_aspect)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",5)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("D1")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_d1)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",6)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("D2")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_d2)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",7)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("D3")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_d3)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",8)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Prop Reference")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_propref)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",9)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Storage")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_storage)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",10)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Unknown")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',False)
         #c.connect('edited', self.editor_callback_u)
         dc.pack_start(c,True)
@@ -268,71 +268,71 @@ class PropListEditor(editors.Editor):
         pbox.pack_start(sw, True, True, 5)
 
 
-        hbox = gtk.HBox(False,0)
-        #hbox.pack_start(gtk.Label("Search:"))
+        hbox = Gtk.HBox(False,0)
+        #hbox.pack_start(Gtk.Label("Search:", True, True, 0))
 
-        hbox.pack_start(gtk.Label("Search by... Index:"))
-        self.search_index = gtk.Entry()
+        hbox.pack_start(Gtk.Label("Search by... Index:", True, True, 0))
+        self.search_index = Gtk.Entry()
         self.search_index.set_width_chars(6)
         self.search_index.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 11)))
-        hbox.pack_start(self.search_index)
+        hbox.pack_start(self.search_index, True, True, 0)
 
-        hbox.pack_start(gtk.Label("Flags:"))
-        self.search_flags = gtk.Entry()
+        hbox.pack_start(Gtk.Label("Flags:", True, True, 0))
+        self.search_flags = Gtk.Entry()
         self.search_flags.set_width_chars(6)
         self.search_flags.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 1)))
-        hbox.pack_start(self.search_flags)
+        hbox.pack_start(self.search_flags, True, True, 0)
 
-        hbox.pack_start(gtk.Label("PropType:"))
-        self.search_proptype = gtk.Entry()
+        hbox.pack_start(Gtk.Label("PropType:", True, True, 0))
+        self.search_proptype = Gtk.Entry()
         self.search_proptype.set_width_chars(12)
         self.search_proptype.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 2)))
-        hbox.pack_start(self.search_proptype)
+        hbox.pack_start(self.search_proptype, True, True, 0)
 
-        hbox.pack_start(gtk.Label("Location:"))
-        self.search_location = gtk.Entry()
+        hbox.pack_start(Gtk.Label("Location:", True, True, 0))
+        self.search_location = Gtk.Entry()
         self.search_location.set_width_chars(8)
         self.search_location.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 3)))
-        hbox.pack_start(self.search_location)
+        hbox.pack_start(self.search_location, True, True, 0)
 
 
-        hbox.pack_start(gtk.Label("Aspect:"))
-        self.search_aspect = gtk.Entry()
+        hbox.pack_start(Gtk.Label("Aspect:", True, True, 0))
+        self.search_aspect = Gtk.Entry()
         self.search_aspect.set_width_chars(4)
         self.search_aspect.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 5)))
-        hbox.pack_start(self.search_aspect)
+        hbox.pack_start(self.search_aspect, True, True, 0)
 
-        hbox.pack_start(gtk.Label("d1:"))
-        self.search_d1 = gtk.Entry()
+        hbox.pack_start(Gtk.Label("d1:", True, True, 0))
+        self.search_d1 = Gtk.Entry()
         self.search_d1.set_width_chars(6)
         self.search_d1.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 6)))
-        hbox.pack_start(self.search_d1)
+        hbox.pack_start(self.search_d1, True, True, 0)
 
-        hbox.pack_start(gtk.Label("d2:"))
-        self.search_d2 = gtk.Entry()
+        hbox.pack_start(Gtk.Label("d2:", True, True, 0))
+        self.search_d2 = Gtk.Entry()
         self.search_d2.set_width_chars(6)
         self.search_d2.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 7)))
-        hbox.pack_start(self.search_d2)
+        hbox.pack_start(self.search_d2, True, True, 0)
 
-        hbox.pack_start(gtk.Label("d3:"))
-        self.search_d3 = gtk.Entry()
+        hbox.pack_start(Gtk.Label("d3:", True, True, 0))
+        self.search_d3 = Gtk.Entry()
         self.search_d3.set_width_chars(8)
         self.search_d3.connect("changed", self.criterion_change,
             (lambda i: self.tree_data.get_value(i, 8)))
 
-        hbox.pack_start(self.search_d3)
+        hbox.pack_start(self.search_d3, True, True, 0)
 
-        #self.searchbutton = gtk.Button("Search")
-        #hbox.pack_start(self.searchbutton)
-        #self.showall = gtk.Button("Show All")
-        #hbox.pack_start(self.showall)
+        #self.searchbutton = Gtk.Button("Search")
+        #hbox.pack_start(self.searchbutton, True, True, 0)
+        #self.showall = Gtk.Button("Show All")
+        #hbox.pack_start(self.showall, True, True, 0)
         pbox.pack_start(hbox, False, True, 0)
         self.add(pbox)
     def file_save(self, *argv):
@@ -359,7 +359,7 @@ class PropListEditor(editors.Editor):
             self.lmap = self.library.get_object(self.res.resid - 0x0100)
         else: self.lmap = None
         self.props = self.canonical_object
-        self.tree_data = gtk.ListStore(str,str,str,str,bool,str,
+        self.tree_data = Gtk.ListStore(str,str,str,str,bool,str,
             str,str,str,str,str,int,bool,str)
         self.tree_filter = self.tree_data.filter_new()
         self.tree_filter.set_visible_func(self.search_filter)
@@ -613,7 +613,7 @@ class MapEditor(editors.Editor):
     def gui_setup(self): 
         self.mouse_position = 0,0
 
-        pbox = gtk.VBox(False,0)
+        pbox = Gtk.VBox(False,0)
         self.set_default_size(*self.default_size)
         menu_items = (
             ("/File/Save Resource", "<control>S", None, 0, None),
@@ -644,84 +644,84 @@ class MapEditor(editors.Editor):
             ("/Windows/Stamps",     "<control>M", None, 0, None),
             ("/Windows/Map Boundaries", None,     None, 0, None),
             )
-        accel = gtk.AccelGroup()
-        ifc = gtk.ItemFactory(gtk.MenuBar, "<main>", accel)
+        accel = Gtk.AccelGroup()
+        ifc = Gtk.ItemFactory(Gtk.MenuBar, "<main>", accel)
         self.add_accel_group(accel)
         ifc.create_items(menu_items)
         self.menu_bar = ifc.get_widget("<main>")
         pbox.pack_start(self.menu_bar, False, True, 0)
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC,gtk.POLICY_AUTOMATIC)
-        self.display = gtk.Image()
-        self.eventbox = gtk.EventBox()
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
+        self.display = Gtk.Image()
+        self.eventbox = Gtk.EventBox()
         self.eventbox.add_events(
-            gtk.gdk.POINTER_MOTION_MASK|gtk.gdk.BUTTON_PRESS)
+            Gdk.EventMask.POINTER_MOTION_MASK|Gdk.EventType.BUTTON_PRESS)
         self.eventbox.connect("motion-notify-event", self.mouse_movement)
         self.eventbox.connect("button-press-event", self.mouse_click)
         self.eventbox.add(self.display)
-        self.sbox = gtk.Fixed()
+        self.sbox = Gtk.Fixed()
         self.sbox.put(self.eventbox, 0,0)
         sw.add_with_viewport(self.sbox)
         pbox.pack_start(sw, True, True, 0)
         self.sw = sw
  
-        hbox = gtk.HBox(False,0)
+        hbox = Gtk.HBox(False,0)
 
-        hbox.pack_start(gtk.Label("Cursor:"),False,True,0)
-        self.w_xpos = gtk.Entry()
+        hbox.pack_start(Gtk.Label("Cursor:", True, True, 0),False,True,0)
+        self.w_xpos = Gtk.Entry()
         self.w_xpos.set_width_chars(4)
         self.w_xpos.set_editable(False)
         hbox.pack_start(self.w_xpos,False,True,0)
-        self.w_ypos = gtk.Entry()
+        self.w_ypos = Gtk.Entry()
         self.w_ypos.set_width_chars(4)
         self.w_ypos.set_editable(False)
         hbox.pack_start(self.w_ypos,False,True,0)
 
-        hbox.pack_start(gtk.Label("Map Data:"),False,True,0)
-        self.w_mapdata = gtk.Entry()
+        hbox.pack_start(Gtk.Label("Map Data:", True, True, 0),False,True,0)
+        self.w_mapdata = Gtk.Entry()
         self.w_mapdata.set_width_chars(6)
         self.w_mapdata.set_editable(False)
         hbox.pack_start(self.w_mapdata,False,True,0)
 
-        hbox.pack_start(gtk.Label("Name:"),False,True,0)
-        self.w_name = gtk.Entry()
+        hbox.pack_start(Gtk.Label("Name:", True, True, 0),False,True,0)
+        self.w_name = Gtk.Entry()
         self.w_name.set_editable(False)
         hbox.pack_start(self.w_name,False,True,0)
 
-        hbox.pack_start(gtk.Label("Attr:"),False,True,0)
-        self.w_attr = gtk.Entry()
+        hbox.pack_start(Gtk.Label("Attr:", True, True, 0),False,True,0)
+        self.w_attr = Gtk.Entry()
         self.w_attr.set_width_chars(10)
         self.w_attr.set_editable(False)
         hbox.pack_start(self.w_attr,True, True, 0)
 
-        hbox.pack_start(gtk.Label("Faux Prop:"),False,True,0)
-        self.w_faux = gtk.Entry()
+        hbox.pack_start(Gtk.Label("Faux Prop:", True, True, 0),False,True,0)
+        self.w_faux = Gtk.Entry()
         self.w_faux.set_width_chars(9)
         self.w_faux.set_editable(False)
         hbox.pack_start(self.w_faux,True, True, 0)
 
-        hbox.pack_start(gtk.Label("FP Tile:"),False,True,0)
-        self.w_fauxtile = gtk.Entry()
+        hbox.pack_start(Gtk.Label("FP Tile:", True, True, 0),False,True,0)
+        self.w_fauxtile = Gtk.Entry()
         self.w_fauxtile.set_width_chars(6)
 
         self.w_fauxtile.set_editable(False)
         hbox.pack_start(self.w_fauxtile,True, True, 0)
 
-        hbox.pack_start(gtk.Label("FP Attr:"),False,True,0)
-        self.w_fauxattr = gtk.Entry()
+        hbox.pack_start(Gtk.Label("FP Attr:", True, True, 0),False,True,0)
+        self.w_fauxattr = Gtk.Entry()
         self.w_fauxattr.set_width_chars(10)
         self.w_fauxattr.set_editable(False)
         hbox.pack_start(self.w_fauxattr,True, True, 0)
 
-        hbox.pack_start(gtk.Label("FP Offs:"),False,True,0)
-        self.w_fauxoffs = gtk.Entry()
+        hbox.pack_start(Gtk.Label("FP Offs:", True, True, 0),False,True,0)
+        self.w_fauxoffs = Gtk.Entry()
         self.w_fauxoffs.set_width_chars(5)
         self.w_fauxoffs.set_editable(False)
         hbox.pack_start(self.w_fauxoffs,True, True, 0)
         pbox.pack_start(hbox, False, True, 0)
 
-        self.w_props = gtk.Entry()
+        self.w_props = Gtk.Entry()
         self.w_props.set_width_chars(80)
         self.w_props.set_editable(False)
         pbox.pack_start(self.w_props, False, True, 0)
@@ -742,13 +742,13 @@ class MapEditor(editors.Editor):
         self.selection = None
         self.library = self.redelv.get_library()
         self.load()
-        self.pixmap = gtk.gdk.Pixmap(None, 
+        self.pixmap = Gdk.Pixmap(None, 
             self.lmap.width*32, self.lmap.height*32,
-                gtk.gdk.visual_get_system().depth)
+                Gdk.visual_get_system().depth)
         print 0,0,self.lmap.width*32, self.lmap.height*32
-        self.gc = self.pixmap.new_gc(function=gtk.gdk.COPY)
-        self.gc.set_foreground(gtk.gdk.Color(pixel=0x00000000))
-        #self.gc.set_background(gtk.gdk.Color(255,0,0))
+        self.gc = self.pixmap.new_gc(function=Gdk.COPY)
+        self.gc.set_foreground(Gdk.Color(pixel=0x00000000))
+        #self.gc.set_background(Gdk.Color(255,0,0))
         self.pixmap.draw_rectangle(self.gc, True, 
             0,0,self.lmap.width*32,self.lmap.height*32)
         #self.view_rect=0,0,self.sw.allocation.width,self.sw.allocation.height
@@ -797,7 +797,7 @@ class MapEditor(editors.Editor):
         else: 
             self.gc.set_clip_mask(None)
         self.pixmap.draw_indexed_image(self.gc, x*32-xo, y*32-yo, 32, 32,
-            gtk.gdk.RGB_DITHER_NORMAL, tile.get_image(rotated),
+            Gdk.RGB_DITHER_NORMAL, tile.get_image(rotated),
             32, pal)
         if tile.fauxprop:
             fauxprop = self.library.get_prop(tile.fauxprop)
@@ -957,9 +957,9 @@ class MapEditor(editors.Editor):
         pbuf = self.get_pixbuf_from_pixmap()
         pbuf.save(path, "png", {})
     def get_pixbuf_from_pixmap(self):
-        pbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, 
+        pbuf = GdkPixbuf.Pixbuf(GdkPixbuf.Colorspace.RGB, False, 8, 
             self.lmap.width*32,self.lmap.height*32)
-        pbuf.get_from_drawable(self.pixmap, gtk.gdk.colormap_get_system(),
+        pbuf.get_from_drawable(self.pixmap, Gdk.colormap_get_system(),
             0,0,0,0,self.lmap.width*32,self.lmap.height*32)
         return pbuf
     def open_props(self, *argv):

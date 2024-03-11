@@ -19,7 +19,7 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
 import delv.ddasm
-import gtk
+from gi.repository import Gtk
 import editors
 class ScheduleEditor(editors.Editor):
     name = "Schedule Editor"
@@ -28,7 +28,7 @@ class ScheduleEditor(editors.Editor):
         self.library = self.redelv.get_library()
         self.load()
     def gui_setup(self):
-        pbox = gtk.VBox(False,0)
+        pbox = Gtk.VBox(False,0)
         self.set_default_size(*self.default_size)
         menu_items = (
             #("/File/Import CSV", "<control>I", self.file_import, 0, None),
@@ -41,97 +41,97 @@ class ScheduleEditor(editors.Editor):
             ("/Edit/Delete Entry", None, self.edit_delete, 0, None),
             ("/Edit/Insert New Entry", None, self.edit_insert, 0, None),
             ("/Edit/Clear", None, self.edit_clear, 0, None),)
-        accel = gtk.AccelGroup()
-        ifc = gtk.ItemFactory(gtk.MenuBar, "<main>", accel)
+        accel = Gtk.AccelGroup()
+        ifc = Gtk.ItemFactory(Gtk.MenuBar, "<main>", accel)
         self.add_accel_group(accel)
         ifc.create_items(menu_items)
         self.menu_bar = ifc.get_widget("<main>")
         pbox.pack_start(self.menu_bar, False, True, 0)
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC,gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
 
-        self.data_view = gtk.TreeView()
+        self.data_view = Gtk.TreeView()
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Character ID")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',False)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",0)
         self.data_view.append_column(dc)
         
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Name")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',False)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",1)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Hour")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_cb_hour)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",2)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Mode")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_cb_mode)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",3)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Data")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_cb_data)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",4)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Level")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_cb_level)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",5)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Level Name")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',False)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",6)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("X")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_cb_x)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",7)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Y")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_cb_y)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",8)
         self.data_view.append_column(dc)
 
-        self.tree_data = gtk.TreeStore(str,str, str,str,str,str,str,str,str)
+        self.tree_data = Gtk.TreeStore(str,str, str,str,str,str,str,str,str)
         self.data_view.set_model(self.tree_data)
 
         sw.add(self.data_view)
@@ -187,7 +187,7 @@ class ScheduleEditor(editors.Editor):
         self.edit_delete()
         self.set_unsaved()
     def edit_clear(self, *argv):
-        self.tree_data = gtk.TreeStore(str,str, str,str,str,str,str,str,str)
+        self.tree_data = Gtk.TreeStore(str,str, str,str,str,str,str,str,str)
         self.data_view.set_model(self.tree_data)  
         self.set_unsaved()
     def edit_copy(self, *argv):
@@ -195,13 +195,13 @@ class ScheduleEditor(editors.Editor):
         row = row[-1] if row else '0'
         itr = tm.get_iter(row)
         if tm.get_value(itr,2):
-            gtk.clipboard_get().set_text(
+            Gtk.clipboard_get().set_text(
                 ','.join([tm.get_value(itr,n) for n in xrange(9)]))
     def edit_paste(self, *argv):
         tm,row = self.data_view.get_selection().get_selected_rows()
         row = row[-1] if row else '0'
         itr = tm.get_iter(row)
-        data = gtk.clipboard_get().wait_for_text().split(',')
+        data = Gtk.clipboard_get().wait_for_text().split(',')
         if tm.get_value(itr,2):
             for n,v in enumerate(data[2:],2):
                 self.tree_data.set_value(itr, n, v)

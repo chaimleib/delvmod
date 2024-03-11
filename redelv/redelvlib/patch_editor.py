@@ -27,28 +27,28 @@ class PatchEditor(editors.Editor):
     default_size = 512,320
     def gui_setup(self):
         self.set_default_size(*self.default_size)
-        pbox = gtk.VBox(False,0)
+        pbox = Gtk.VBox(False,0)
         menu_items = (
             ("/File/Import", "<control>I", self.file_import, 0, None),
             ("/File/Export", "<control>E", self.file_export, 0, None),
             ("/File/Save Resource", "<control>S", self.file_save, 0, None),
             ("/File/Revert", None, self.load, 0, None),)
-        accel = gtk.AccelGroup()
-        ifc = gtk.ItemFactory(gtk.MenuBar, "<main>", accel)
+        accel = Gtk.AccelGroup()
+        ifc = Gtk.ItemFactory(Gtk.MenuBar, "<main>", accel)
         self.add_accel_group(accel)
         ifc.create_items(menu_items)
         self.menu_bar = ifc.get_widget("<main>")
         pbox.pack_start(self.menu_bar, False, True, 0)
-        hbox = gtk.HBox(False,0)
-        hbox.pack_start(gtk.Label("Patch Format:"),False,True,0)
-        self.patch_format_box = gtk.Entry()
+        hbox = Gtk.HBox(False,0)
+        hbox.pack_start(Gtk.Label("Patch Format:", True, True, 0),False,True,0)
+        self.patch_format_box = Gtk.Entry()
         self.patch_format_box.set_editable(False)
         hbox.pack_start(self.patch_format_box, True,True,0)
         pbox.pack_start(hbox,False)
-        pbox.pack_start(gtk.Label("Patch Information"),False,True,0)
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.textbox = gtk.TextView()
+        pbox.pack_start(Gtk.Label("Patch Information", True, True, 0),False,True,0)
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self.textbox = Gtk.TextView()
         self.textbox.set_editable(True)
         sw.add(self.textbox)
         self.textbox.get_buffer().connect("changed",self.changed)

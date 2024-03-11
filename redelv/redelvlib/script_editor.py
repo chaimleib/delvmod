@@ -32,7 +32,7 @@ class ScriptEditor(editors.Editor):
     default_size = 680,512
     icon = images.script_path
     def gui_setup(self): 
-        pbox = gtk.VBox(False,0)
+        pbox = Gtk.VBox(False,0)
         self.set_default_size(*self.default_size)
         menu_items = (
             ("/File/Import Text", "<control>I", self.file_import, 0, None),
@@ -55,35 +55,35 @@ class ScriptEditor(editors.Editor):
             #("/Edit/Copy", "<control>C", self.edit_copy, 0, None),
             #("/Edit/Paste","<control>V", self.edit_paste, 0, None),
             )
-        accel = gtk.AccelGroup()
-        ifc = gtk.ItemFactory(gtk.MenuBar, "<main>", accel)
+        accel = Gtk.AccelGroup()
+        ifc = Gtk.ItemFactory(Gtk.MenuBar, "<main>", accel)
         self.add_accel_group(accel)
         ifc.create_items(menu_items)
         self.menu_bar = ifc.get_widget("<main>")
         pbox.pack_start(self.menu_bar, False, True, 0)
 
-        self.text_buf = gtk.TextBuffer()
+        self.text_buf = Gtk.TextBuffer()
         self.text_buf.set_text(" Nothing Loaded ".center(78,';'))
-        self.text_view = gtk.TextView()
+        self.text_view = Gtk.TextView()
         self.text_view.set_buffer(self.text_buf)
-        self.text_view.set_wrap_mode(gtk.WRAP_CHAR)
-        fontdesc = pango.FontDescription("monospace 10")
+        self.text_view.set_wrap_mode(Gtk.WrapMode.CHAR)
+        fontdesc = Pango.FontDescription("monospace 10")
         self.text_view.modify_font(fontdesc)
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC,gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
         sw.add(self.text_view)
         pbox.pack_start(sw, True, True, 0)
-        hbox = gtk.HBox(False,0)
-        hbox.pack_start(gtk.Label("Status:"), False, True, 0)
-        self.asm_status = gtk.Entry()
+        hbox = Gtk.HBox(False,0)
+        hbox.pack_start(Gtk.Label("Status:", True, True, 0), False, True, 0)
+        self.asm_status = Gtk.Entry()
         self.asm_status.set_editable(False)
         self.asm_status.set_text("Disassembling binary... ")
         hbox.pack_start(self.asm_status, True, True, 0)
-        self.auto_assemble = gtk.ToggleButton(
+        self.auto_assemble = Gtk.ToggleButton(
             "Auto-Assemble") 
         self.auto_assemble.set_active(True)
         hbox.pack_start(self.auto_assemble, False, True, 0)
-        self.save_source = gtk.ToggleButton(
+        self.save_source = Gtk.ToggleButton(
             "Auto-save Source") 
         self.save_source.set_active(True)
         hbox.pack_start(self.save_source, False, True, 0)
@@ -96,14 +96,14 @@ class ScriptEditor(editors.Editor):
         if not self.assembler:
             self.errorstream = StringIO()
             self.asm_status.set_text("Preparing assembler...")
-            while gtk.events_pending(): gtk.main_iteration()
+            while Gtk.events_pending(): Gtk.main_iteration()
             self.assembler = delv.rdasm.Assembler(
                                      message_stream=self.errorstream,
                                      filename="<res 0x%04X>"%self.res.resid,
                                      )
             # check to make sure that we can assemble this file correctly
             self.asm_status.set_text("Checking cycle validity... ")
-            while gtk.events_pending(): gtk.main_iteration()
+            while Gtk.events_pending(): Gtk.main_iteration()
         if not self.cycle_check:
             obin = self.assembler.assemble(self.original_disassembly)
             if self.canonical_object.data != obin:
@@ -122,7 +122,7 @@ class ScriptEditor(editors.Editor):
             else:
                 self.asm_status.set_text("Passed validation check; ready.")
             self.cycle_check = True
-            while gtk.events_pending(): gtk.main_iteration()
+            while Gtk.events_pending(): Gtk.main_iteration()
                 
 
         return self.assembler
@@ -139,8 +139,8 @@ class ScriptEditor(editors.Editor):
         except urllib2.HTTPError:
             self.asm_status.set_text(
                 "ERROR: Could not find canonical sources for this resource.")
-            #message = gtk.MessageDialog(type=gtk.MESSAGE_ERROR, 
-            #                            buttons=gtk.BUTTONS_OK)
+            #message = Gtk.MessageDialog(type=Gtk.MessageType.ERROR, 
+            #                            buttons=Gtk.ButtonsType.OK)
             #message.set_markup(
             #    "Could not find canonical sources for this resource.")
             #message.run()
@@ -256,7 +256,7 @@ class ScriptEditor(editors.Editor):
             return
         src = str(self.text_buf.get_text(*self.text_buf.get_bounds()))
         self.asm_status.set_text("Assembling source of %d bytes..."%len(src))
-        while gtk.events_pending(): gtk.main_iteration()
+        while Gtk.events_pending(): Gtk.main_iteration()
         av = self.get_assembler().assemble(src)
         self.asm_status.set_text("Assembled successfully; %d bytes."%len(av))
         self.res.set_data(av)

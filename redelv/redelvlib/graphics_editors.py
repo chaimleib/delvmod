@@ -30,7 +30,7 @@ class GraphicsEditor(editors.Editor):
     default_size=320,320
     def gui_setup(self):
         self.set_default_size(*self.default_size)
-        pbox = gtk.VBox(False,0)
+        pbox = Gtk.VBox(False,0)
         menu_items = (
             ("/File/Import", "<control>I", self.file_import, 0, None),
             ("/File/Export RGB", None, self.file_export, 0, None),
@@ -43,27 +43,27 @@ class GraphicsEditor(editors.Editor):
             ("/Edit/Clear", None, self.edit_clear, 0, None),
             ("/Edit/Open in External Editor","<control>G",self.edit_external,
               0,None))
-        accel = gtk.AccelGroup()
-        ifc = gtk.ItemFactory(gtk.MenuBar, "<main>", accel)
+        accel = Gtk.AccelGroup()
+        ifc = Gtk.ItemFactory(Gtk.MenuBar, "<main>", accel)
         self.add_accel_group(accel)
         ifc.create_items(menu_items)
         self.menu_bar = ifc.get_widget("<main>")
         pbox.pack_start(self.menu_bar, False, True, 0)
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC,gtk.POLICY_AUTOMATIC)
-        self.display = gtk.Image()
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
+        self.display = Gtk.Image()
         sw.add_with_viewport(self.display)
         pbox.pack_start(sw, True, True, 10)
 
-        self.toggle_palette = gtk.ToggleButton("Run Palette Animation")
+        self.toggle_palette = Gtk.ToggleButton("Run Palette Animation")
         pbox.pack_start(self.toggle_palette, False,True,0)
         self.toggle_palette.connect("toggled", self.palette_toggled)
-        self.flags = gtk.Entry()
+        self.flags = Gtk.Entry()
         self.flags.set_editable(False)
         if self.has_flags:
-            hbox = gtk.HBox(False,0)
-            hbox.pack_start(gtk.Label("Flags:"),True,True,0)
+            hbox = Gtk.HBox(False,0)
+            hbox.pack_start(Gtk.Label("Flags:", True, True, 0),True,True,0)
             hbox.pack_start(self.flags,False,True,0)
             pbox.pack_start(hbox,False,True,0)
 
@@ -84,7 +84,7 @@ class GraphicsEditor(editors.Editor):
         
     def cleanup(self):
         if self.animation_sid is not None:
-            gobject.source_remove(self.animation_sid)
+            GObject.source_remove(self.animation_sid)
     def palette_toggled(self, *argv):
         newstate = self.toggle_palette.get_active()
         print "Palette animation:",newstate
@@ -94,17 +94,17 @@ class GraphicsEditor(editors.Editor):
                 self.toggle_palette.set_active(False)
                 return
             self.pal_n = 0
-            self.animation_sid = gobject.timeout_add(
+            self.animation_sid = GObject.timeout_add(
                 100, self.animation_timer)
         else:
             if self.animation_sid is not None:
-                gobject.source_remove(self.animation_sid)
+                GObject.source_remove(self.animation_sid)
             self.animation_sid = None
     def animation_timer(self):
         gc = self.pixmap.new_gc()
         self.pixmap.draw_indexed_image(gc, 
             0, 0, self.image.logical_width,self.image.logical_height,
-            gtk.gdk.RGB_DITHER_NORMAL, 
+            Gdk.RGB_DITHER_NORMAL, 
             str(self.image.get_logical_image()), 
             self.image.logical_width, 
             delv.colormap.animated_rgb24[self.pal_n%8])
@@ -122,14 +122,14 @@ class GraphicsEditor(editors.Editor):
         self.set_title(self.name + " - %04X"%self.res.resid)
         data = self.image.get_logical_image()
         self.edited = None
-        self.pixmap = gtk.gdk.Pixmap(None,
+        self.pixmap = Gdk.Pixmap(None,
             self.image.logical_width,self.image.logical_height,
-                gtk.gdk.visual_get_system().depth)
+                Gdk.visual_get_system().depth)
         # Requiring a graphics context makes it "easier!" :/
         gc = self.pixmap.new_gc()
         self.pixmap.draw_indexed_image(gc, 
             0, 0, self.image.logical_width,self.image.logical_height,
-            gtk.gdk.RGB_DITHER_NORMAL, 
+            Gdk.RGB_DITHER_NORMAL, 
             str(data), self.image.logical_width, delv.colormap.rgb24)
         self.display.set_from_pixmap(self.pixmap,None)
         self.flags.set_text("0x%02X"%self.image.flags)
@@ -148,19 +148,19 @@ class GraphicsEditor(editors.Editor):
         self.set_saved()
         self.load_image()
     def get_pixbuf_from_pixmap(self):
-        pbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, 
+        pbuf = GdkPixbuf.Pixbuf(GdkPixbuf.Colorspace.RGB, False, 8, 
             self.image.logical_width,self.image.logical_height)
-        pbuf.get_from_drawable(self.pixmap, gtk.gdk.colormap_get_system(),
+        pbuf.get_from_drawable(self.pixmap, Gdk.colormap_get_system(),
             0,0,0,0,self.image.logical_width,self.image.logical_height)
         return pbuf
     def load_image_from_path(self,path,*argv):
         pil_img = self.Image.open(path)
-        self.pixmap = gtk.gdk.Pixmap(None, pil_img.size[0], pil_img.size[1],
-           gtk.gdk.visual_get_system().depth)
+        self.pixmap = Gdk.Pixmap(None, pil_img.size[0], pil_img.size[1],
+           Gdk.visual_get_system().depth)
         gc = self.pixmap.new_gc()
         print pil_img.size, len(pil_img.tostring())
         self.pixmap.draw_indexed_image(gc, 0,0,pil_img.size[0], 
-           pil_img.size[1], gtk.gdk.RGB_DITHER_NORMAL, 
+           pil_img.size[1], Gdk.RGB_DITHER_NORMAL, 
            pil_img.tostring(),
            pil_img.size[0], delv.colormap.rgb24)
         self.set_unsaved()
@@ -171,7 +171,7 @@ class GraphicsEditor(editors.Editor):
         try:
             path = self.ask_open_path()
             if not path: return
-            pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
         except Exception,e:
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
@@ -229,7 +229,7 @@ class GraphicsEditor(editors.Editor):
         self.edit_clear()
     def edit_clear(self, *args):
         gc = self.pixmap.new_gc()
-        gc.set_foreground(gtk.gdk.Color(pixel=0x00))
+        gc.set_foreground(Gdk.Color(pixel=0x00))
         self.pixmap.draw_rectangle(gc, True,0,0,
             self.image.height,self.image.width)
         self.set_unsaved()

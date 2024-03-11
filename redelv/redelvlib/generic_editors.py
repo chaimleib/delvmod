@@ -19,7 +19,7 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
 import csv
-import gtk
+from gi.repository import Gtk
 import editors
 import delv.store
 class HexEditor(editors.Editor):
@@ -31,7 +31,7 @@ class TileNameListEditor(editors.Editor):
     def editor_setup(self):
         self.load()
     def gui_setup(self):
-        pbox = gtk.VBox(False,0)
+        pbox = Gtk.VBox(False,0)
         self.set_default_size(*self.default_size)
         menu_items = (
             ("/File/Import CSV", "<control>I", self.file_import, 0, None),
@@ -44,51 +44,51 @@ class TileNameListEditor(editors.Editor):
             ("/Edit/Delete Entry", None, self.edit_delete, 0, None),
             ("/Edit/Insert New Entry", None, self.edit_insert, 0, None),
             ("/Edit/Clear", None, self.edit_clear, 0, None),)
-        accel = gtk.AccelGroup()
-        ifc = gtk.ItemFactory(gtk.MenuBar, "<main>", accel)
+        accel = Gtk.AccelGroup()
+        ifc = Gtk.ItemFactory(Gtk.MenuBar, "<main>", accel)
         self.add_accel_group(accel)
         ifc.create_items(menu_items)
         self.menu_bar = ifc.get_widget("<main>")
         pbox.pack_start(self.menu_bar, False, True, 0)
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC,gtk.POLICY_AUTOMATIC)
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
 
-        self.data_view = gtk.TreeView()
-        dc = gtk.TreeViewColumn()
+        self.data_view = Gtk.TreeView()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Tile Index Cutoff")
-        c = gtk.CellRendererText()
+        c = Gtk.CellRendererText()
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_cutoff)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",0)
         self.data_view.append_column(dc)
         
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Tile Name Code")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         c.set_property('editable',True)
         c.connect('edited', self.editor_callback_namecode)
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",1)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Singular")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",2)
         self.data_view.append_column(dc)
 
-        dc = gtk.TreeViewColumn()
+        dc = Gtk.TreeViewColumn()
         dc.set_title("Plural")
-        c = gtk.CellRendererText() 
+        c = Gtk.CellRendererText() 
         dc.pack_start(c,True)
         dc.add_attribute(c,"text",3)
         self.data_view.append_column(dc)
 
 
-        self.tree_data = gtk.ListStore(str,str,str,str,int)
+        self.tree_data = Gtk.ListStore(str,str,str,str,int)
         self.data_view.set_model(self.tree_data)
 
         sw.add(self.data_view)
@@ -103,7 +103,7 @@ class TileNameListEditor(editors.Editor):
         self.tree_data.set_value(itr, 0, "0x%04X"%ival)
         self.tree_data.set_value(itr, 4, ival)
 
-        self.tree_data.set_sort_column_id(4, gtk.SORT_ASCENDING)
+        self.tree_data.set_sort_column_id(4, Gtk.SortType.ASCENDING)
         self.set_unsaved()
     def editor_callback_namecode(self, renderer, path, new_text):
         itr = self.tree_data.get_iter(path)
@@ -133,7 +133,7 @@ class TileNameListEditor(editors.Editor):
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
             return
-        self.tree_data = gtk.ListStore(str,str,str,str,int)
+        self.tree_data = Gtk.ListStore(str,str,str,str,int)
         self.data_view.set_model(self.tree_data)        
         for cutoff, name in csvfile:
             cutoff = int(cutoff[2:],16)
@@ -175,7 +175,7 @@ class TileNameListEditor(editors.Editor):
     def edit_paste(self, *argv):
         pass
     def edit_clear(self, *argv):
-        self.tree_data = gtk.ListStore(str,str,str,str,int)
+        self.tree_data = Gtk.ListStore(str,str,str,str,int)
         self.data_view.set_model(self.tree_data)  
         self.set_unsaved()
     def edit_delete(self, *argv):

@@ -20,7 +20,7 @@
 # Ambrosia Software, Inc. 
 # FIXME
 import csv
-import gtk
+from gi.repository import Gtk
 import editors
 
 def int_parser(s):
