@@ -170,7 +170,7 @@ class Array(list, _PrintOuter):
     def printout(self, out, level):
         print('\t'*level, "Array", file=out)
         for n,item in enumerate(self):
-            print('\t'*(level+1), "%3d:"%n, item, file=out))
+            print('\t'*(level+1), "%3d:"%n, item, file=out)
 class CharacterNameArray(Array):
     override_dref = 0x0201
 
