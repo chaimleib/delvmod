@@ -219,7 +219,7 @@ class ScriptEditor(editors.Editor):
             path = self.ask_open_path()
             if not path: return
             data = open(path,'rb').read()
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
             return
@@ -233,14 +233,14 @@ class ScriptEditor(editors.Editor):
         if not path.endswith(".rdasm"): path += ".rdasm"
         try:
             open(path,'rb').write("EXPORT TEST")
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
             return
     def edit_syntax(self, *args):
         #try:
         #    av = self.assemble()
-        #except delv.script.AssemblerError, e:
+        #except delv.script.AssemblerError as e:
         #    self.error_message(str(e))
              # except syntax errors blah:
         self.asm_status.set_text("Not implemented yet. Just try it and see.")

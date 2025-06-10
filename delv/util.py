@@ -40,7 +40,7 @@ from sys import stderr
 class dref(object):
     def __init__(self,resid,offset,length=None):
         self.resid = resid
-        #print "%04X %04X / %s"%(resid,offset,length)
+        #print("%04X %04X / %s"%(resid,offset,length))
         self.offset = offset
         self.length=None
     def load_from_library(self,library,TF=None):
@@ -99,9 +99,9 @@ def bits_pack(target, value, size, index,debug=False):
     startbyte = index // 8
     endbyte = (index+size+7) // 8
     section = bytes_to_bits(target[startbyte:endbyte])
-    #if debug:print "BEFORE", ''.join(["%01d"%b for b in section])
+    #if debug:print("BEFORE", ''.join(["%01d"%b for b in section]))
     section[bit_index:bit_index+size] = int_to_bits(value,size)
-    #if debug:print "AFTER ", ''.join(["%01d"%b for b in section])
+    #if debug:print("AFTER ", ''.join(["%01d"%b for b in section]))
     target[startbyte:endbyte] = bits_to_bytes(section)
 
 def ncbits_pack(target, value, *fields):
@@ -341,7 +341,7 @@ class BinaryHandler(object):
             offset = self.read_uint16()
             return dref(resid,offset)
         else:
-            print >> stderr, repr(self), "==0x%02X"%ty, repr(self.file)
+            print(repr(self), "==0x%02X"%ty, repr(self.file), file=stderr)
             assert False
     def write_atom(self, v, offset=None):
         if offset is not None: self.seek(offset)

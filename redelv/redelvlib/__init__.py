@@ -26,7 +26,7 @@ import delv
 import delv.archive, delv.library
 
 version = '0.2.2'
-PATCHINFO = """Created with redelv %s, based on the delv library."""%version
+PATCHINFO = """Created with redelv {}, based on the delv library.""".format(version)
 MSG_NO_UNDERLAY = """Couldn't create library; if you are editing a saved game, 
 you need to underlay a scenario. Exception was: %s"""
 ABOUT_TEXT = """<span font_family="monospace">
@@ -46,8 +46,8 @@ ABOUT_TEXT = """<span font_family="monospace">
  <i>Cythera</i> and <i>Delver</i> are trademarks of either Glenn Andreas or Ambrosia Software, Inc. 
  redelv is copyright 2015-16 Bryce Schroeder, bryce.schroeder@gmail.com, <a href="http://www.bryce.pw/">bryce.pw</a>
  Based on the <a href="http://www.ferazelhosting.net/wiki/delv">delv</a> Python module. Repository: <a href="https://github.com/BryceSchroeder/delvmod/">GitHub</a> 
-delv version %s, redelv version %s
-"""%(delv.version,version)
+delv version {}, redelv version {}
+""".format(delv.version, version)
 
 DEFAULT_PREFS = {# Command that will play sounds:
                    'play_sound_cmd': 'mplayer %s', 
@@ -94,7 +94,7 @@ class AskNewResourceBox(Gtk.Dialog):
 class ReDelv(object):
     def get_new_resid(self, si):
         if si == 0: return 0
-        for r in xrange(1,254): 
+        for r in range(1,254):
             if not self.archive.get((si,r)): return ((si+1)<<8)|r
         return ((si+1)<<8)
 
@@ -295,7 +295,7 @@ class ReDelv(object):
         Gtk.main()
     def refresh_tree(self): 
         "Change the tree to reflect current data."
-        print "WARNING: TreeView may be out of date."
+        print("WARNING: TreeView may be out of date.")
         return
 
     def underlay_archive(self, archive):
@@ -383,12 +383,12 @@ class ReDelv(object):
             of = open(rv, 'wb')
             of.write(buf)
             of.close()
-        except Exception,e:
+        except Exception as e:
             self.error_message("Unable to write '%s': %s"%(
                 os.path.basename(self.opened_file), repr(e)))
             return
     def menu_save_as(self, widget, data=None):
-        print "save as"
+        print("save as")
         if not self.archive: 
             self.error_message("There is nothing to save.")
             return
@@ -402,7 +402,7 @@ class ReDelv(object):
             of.write(buf)
             of.close()
             self.set_saved()
-        except Exception,e:
+        except Exception as e:
             self.error_message("Unable to write '%s': %s"%(
                 os.path.basename(self.opened_file), repr(e)))
             return
@@ -420,8 +420,8 @@ class ReDelv(object):
             of.write(buf)
             of.close()
             self.set_saved()
-            print "Saved."
-        except Exception,e:
+            print("Saved.")
+        except Exception as e:
             self.error_message("Unable to write '%s': %s"%(
                 os.path.basename(self.opened_file), repr(e)))
             return
@@ -436,7 +436,7 @@ class ReDelv(object):
             # The string is a buffer so we can overwrite in place.
             self.archive.to_path(self.exported_directory)
             self.set_saved()
-        except Exception,e:
+        except Exception as e:
             self.error_message("Unable to export to '%s': %s"%(
                 self.exported_directory, repr(e)))
             return
@@ -447,7 +447,7 @@ class ReDelv(object):
             # The string is a buffer so we can overwrite in place.
             self.archive.to_path(self.exported_directory)
             self.set_saved()
-        except Exception,e:
+        except Exception as e:
             self.error_message("Unable to export to '%s': %s"%(
                 self.exported_directory, repr(e)))
             return
@@ -459,7 +459,7 @@ class ReDelv(object):
             # The string is a buffer so we can overwrite in place.
             self.open_file(self.exported_directory)
             self.set_saved()
-        except Exception,e:
+        except Exception as e:
             self.error_message("Unable to export to '%s': %s"%(
                 self.exported_directory, repr(e)))
             return
@@ -484,7 +484,7 @@ class ReDelv(object):
         self.aboutbox.show_all()
             
     def menu_quit(self, widget, data=None):
-        print "Quitting"
+        print("Quitting")
         if not self.delete_event(widget, None, data): self.destroy(None)
     def menu_get_info(self, widget, data=None):
         if not self.file_get_info_window:
@@ -499,7 +499,7 @@ class ReDelv(object):
     def menu_create_index(self, widget, data=None):
         return None
     def menu_delete(self, widget, data=None):
-        print "Delete"
+        print("Delete")
         return None
     def menu_duplicate(self, widget, data=None):
         if not self.current_resource_id: return
@@ -532,7 +532,7 @@ class ReDelv(object):
         res.set_data('\x00')
         self.tree_data.clear()
         self.archive.add_gui_tree()
-        print "New resource", choice, new_resid, res
+        print("New resource", choice, new_resid, res)
         self.set_unsaved()
         return None
     def menu_export_resource(self, widget, data=None):
@@ -554,7 +554,7 @@ class ReDelv(object):
         if not patch_base: return
         try:
             self.base_archive = delv.archive.Scenario(patch_base)
-        except Exception, e:
+        except Exception as e:
             self.error_message("'%s' doesn't seem to be a valid archive: %s"%(
                 os.path.basename(path), repr(e)))
             return
@@ -576,7 +576,8 @@ class ReDelv(object):
         newpatch.patch_info(self.preferences['default_patch_info'])
         newpatch.diff(self.base_archive, self.archive)
         newpatch.to_path(self.patch_output_path)
-        print "Saved patch with %d resources"%len(newpatch.resources())
+        resource_count = len(newpatch.resources())
+        print("Saved patch with {} resources".format(resource_count))
         
     def menu_save_patch_as(self, widget, data=None):
         patch_output_path = self.ask_save_path("Untitled Patch")
@@ -588,7 +589,7 @@ class ReDelv(object):
         if not patch_path: return
         try: 
             patch = delv.archive.Patch(patch_path)
-        except Exception, e:
+        except Exception as e:
             self.error_message("'%s' doesn't seem to be a valid archive: %s"%(
                 os.path.basename(patch_path), repr(e)))
             return
@@ -631,7 +632,7 @@ class ReDelv(object):
                      self.current_resource_id))
             return
 
-        print "Using external hex editor", self.preferences['hex_editor_cmd']
+        print("Using external hex editor", self.preferences['hex_editor_cmd'])
         temp = tempfile.NamedTemporaryFile('w+b',
             prefix="redelv",
             suffix="resid%04X"%self.current_resource_id)
@@ -659,7 +660,7 @@ class ReDelv(object):
             return False
         terminated = []
         for res,tfile in self.queued_changes:
-            print "implemented queued change to", res.resid
+            print("implemented queued change to", res.resid)
             tfile = open(tfile.name,'r+b')
             res.set_data(tfile.read())
             self.get_library().purge_cache(res.resid)
@@ -676,12 +677,12 @@ class ReDelv(object):
         for rid, (process, tempf, mtime) in self.hex_editors_open.items():
             if process.poll() is not None:
                 terminated.append(rid)
-                print "finished watching external editor for ", rid
+                print("finished watching external editor for ", rid)
                 continue
             new_mtime = os.path.getmtime(tempf.name)
             if new_mtime != mtime:
                 self.set_unsaved()
-                print "external editor changed file", rid, mtime, new_mtime
+                print("external editor changed file", rid, mtime, new_mtime)
                 self.queued_changes.append((
                      self.get_library().get_resource(rid), tempf))
                 self.hex_editors_open[rid] = (process, tempf, new_mtime)
@@ -693,7 +694,7 @@ class ReDelv(object):
     def signal_resource_saved(self, resid):
         if not self.hex_editors_open.has_key(resid):
             return
-        print "Sending changes to an external editor for", resid
+        print("Sending changes to an external editor for", resid)
         process, tempf, mtime = self.hex_editors_open[resid]
         tempf.seek(0)
         tempf.write(self.library.get_resource(resid).get_data())
@@ -796,7 +797,7 @@ class ReDelv(object):
             self.archive = delv.archive.Scenario(path, 
                 gui_treestore=self.tree_data)
             self.library = None
-        except Exception, e:
+        except Exception as e:
             self.error_message("'%s' doesn't seem to be a valid archive: %s"%(
                 os.path.basename(path), repr(e)))
             return
@@ -818,7 +819,7 @@ class ReDelv(object):
         try:
             if not self.library:
                 self.library=delv.library.Library(self.underlay,self.archive) 
-        except Exception,e:
+        except Exception as e:
             self.error_message(MSG_NO_UNDERLAY%repr(e))
         return self.library
     def register_editor(self, editor):

@@ -65,6 +65,6 @@ class ScheduleList(store.Store):
                 dest.write_uint16(scripting)
                 dest.write_uint8(level)
                 dest.write_xy24(x,y)
-        #print dest.tell(), "bytes written"
+        #print(dest.tell(), "bytes written")
 
 

@@ -129,7 +129,7 @@ class TileNameListEditor(editors.Editor):
             path = self.ask_open_path()
             if not path: return
             csvfile = csv.reader(open(path,'rb'))
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
             return
@@ -148,14 +148,14 @@ class TileNameListEditor(editors.Editor):
         if not path: return
         try:
             csvfile = csv.writer(open(path,'wb'))
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
             return
         itr = self.tree_data.get_iter_first()
         while itr:
             csvfile.writerow([
-                self.tree_data.get_value(itr, n) for n in xrange(2)])
+                self.tree_data.get_value(itr, n) for n in range(2)])
             itr = self.tree_data.iter_next(itr) #barbaric... what is this C++
         
     def file_save(self, *argv):

@@ -28,7 +28,7 @@ class Editor(Gtk.Window):
     co_object = None
     icon = images.icon_path
     def load(self):
-        print "An editor class isn't overloading load():",repr(self.__class__)
+        print("An editor class isn't overloading load():",repr(self.__class__))
     def set_saved(self):
         if self._unsaved: self.set_title(self.get_title()[10:])
         self.redelv.signal_resource_saved(self.res.resid)
@@ -72,21 +72,21 @@ class Editor(Gtk.Window):
         new_mtime = os.path.getmtime(name)
 
         if mtime != new_mtime:
-            print "Changed by external editor", mtime, new_mtime
+            print("Changed by external editor", mtime, new_mtime)
             self.queued_change = self.file_monitor_read_cb
             self.external_editor = proc, new_mtime, name
             return True
 
         if proc.poll() is not None:
             if not self.queued_change:
-                print "External editor has finished."
+                print("External editor has finished.")
                 self.external_editor = None
                 self.external_editor_tempfile = None
                 return False
             return True
 
         if self.queued_change and mtime == new_mtime:
-            print "Implemented change", mtime, new_mtime
+            print("Implemented change", mtime, new_mtime)
             self.queued_change(name, self.file_monitor_cb_data)
             self.queued_change = None
             return True
@@ -118,7 +118,7 @@ class Editor(Gtk.Window):
             self.set_icon(
                     GdkPixbuf.Pixbuf.new_from_file(self.icon))
             self.editor_setup()
-        except delv.util.LibraryIncomplete,e:
+        except delv.util.LibraryIncomplete as e:
             self.redelv.error_message(MSG_NO_UNDERLAY%repr(e))
             sys.exit(-1)
         self.redelv.register_editor(self)
@@ -143,7 +143,7 @@ class Editor(Gtk.Window):
         dialog.destroy()
         return rv
     def editor_setup(self):
-        print "The unimplemented editor is running, which is probably bad..."
+        print("The unimplemented editor is running, which is probably bad...")
     def ask_open_path(self,msg="Select a file..."):
         if self.is_unsaved() and self.warn_unsaved_changes(): return
         chooser = Gtk.FileChooserDialog(title=msg,

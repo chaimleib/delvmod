@@ -62,7 +62,7 @@ _EDITORS_FOR_SUBINDEX = {
     144: sound_editors.SoundEditor,
     254: patch_editor.PatchEditor,
 }
-for n in xrange(0x7F): _EDITORS_FOR_SUBINDEX[n] = script_editor.ScriptEditor
+for n in range(0x7F): _EDITORS_FOR_SUBINDEX[n] = script_editor.ScriptEditor
 del _EDITORS_FOR_SUBINDEX[3]
 
 def editor_for_name(name):

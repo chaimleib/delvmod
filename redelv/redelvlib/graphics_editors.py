@@ -87,7 +87,7 @@ class GraphicsEditor(editors.Editor):
             GObject.source_remove(self.animation_sid)
     def palette_toggled(self, *argv):
         newstate = self.toggle_palette.get_active()
-        print "Palette animation:",newstate
+        print("Palette animation:",newstate)
         if newstate:
             if self.is_unsaved():
                 self.error_message("Save your changes, or revert them, first.")
@@ -140,8 +140,8 @@ class GraphicsEditor(editors.Editor):
             self.image.logical_height)
         # Iterating over pixels! This is barbaric!
         pixels = bytearray()
-        for y in xrange(self.image.logical_height):
-            for x in xrange(self.image.logical_width):
+        for y in range(self.image.logical_height):
+            for x in range(self.image.logical_width):
                 pixels+=chr(delv.colormap.colormatch_rgb24(img.get_pixel(x,y)))
         self.image.set_image(pixels)
         self.res.set_data(self.image.get_data())
@@ -158,7 +158,7 @@ class GraphicsEditor(editors.Editor):
         self.pixmap = Gdk.Pixmap(None, pil_img.size[0], pil_img.size[1],
            Gdk.visual_get_system().depth)
         gc = self.pixmap.new_gc()
-        print pil_img.size, len(pil_img.tostring())
+        print(pil_img.size, len(pil_img.tostring()))
         self.pixmap.draw_indexed_image(gc, 0,0,pil_img.size[0], 
            pil_img.size[1], Gdk.RGB_DITHER_NORMAL, 
            pil_img.tostring(),
@@ -172,7 +172,7 @@ class GraphicsEditor(editors.Editor):
             path = self.ask_open_path()
             if not path: return
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
-        except Exception,e:
+        except Exception as e:
             self.error_message("Couldn't open '%s': %s"%(path,
                 repr(e)))
             return

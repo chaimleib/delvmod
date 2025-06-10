@@ -43,10 +43,10 @@ class SearchCriterion(object):
         if self.remode:
             try:
                 self.re = re.compile(mode[1:])
-            except Exception,e:
+            except Exception as e:
                 # would like an error message but we'd have to give up on
                 # live updates of the search window...
-                print repr(e)#self.error_message(
+                print(repr(e))#self.error_message(
                 self.re = None
             return
 
@@ -464,8 +464,8 @@ class PropListEditor(editors.Editor):
                     '0x','').replace('$',''), 16)
             else:
                 d1 = int(new_text.strip().split()[0])
-        except Exception,e: 
-            print repr(e)
+        except Exception as e: 
+            print(repr(e))
             return
         if d1 < 0 or d1 > 255: return
         itr = self.tree_data.get_iter(
@@ -483,8 +483,8 @@ class PropListEditor(editors.Editor):
                     '0x','').replace('$',''), 16)
             else:
                 d2 = int(new_text.strip().split()[0])
-        except Exception,e: 
-            print repr(e)
+        except Exception as e: 
+            print(repr(e))
             return
         if d2 < 0 or d2 > 255: return
         itr = self.tree_data.get_iter(
@@ -502,8 +502,8 @@ class PropListEditor(editors.Editor):
                     '0x','').replace('$',''), 16)
             else:
                 d3 = int(new_text.strip().split()[0])
-        except Exception,e: 
-            print repr(e)
+        except Exception as e: 
+            print(repr(e))
             return
         if d3 < 0 or d3 > 0xFFFF: return
         itr = self.tree_data.get_iter(
@@ -745,7 +745,7 @@ class MapEditor(editors.Editor):
         self.pixmap = Gdk.Pixmap(None, 
             self.lmap.width*32, self.lmap.height*32,
                 Gdk.visual_get_system().depth)
-        print 0,0,self.lmap.width*32, self.lmap.height*32
+        print(0,0,self.lmap.width*32, self.lmap.height*32)
         self.gc = self.pixmap.new_gc(function=Gdk.COPY)
         self.gc.set_foreground(Gdk.Color(pixel=0x00000000))
         #self.gc.set_background(Gdk.Color(255,0,0))
@@ -809,11 +809,11 @@ class MapEditor(editors.Editor):
     # FIXME needs to incorporate faux props into the prop list and draw
     # them under the same priority system as listed props
     def draw_map(self,stop=None):
-        for y in xrange(stop[1] if stop else self.lmap.height):
-            for x in xrange(stop[0] if stop else self.lmap.width):
+        for y in range(stop[1] if stop else self.lmap.height):
+            for x in range(stop[0] if stop else self.lmap.width):
                 self.draw_tile(x,y,self.lmap.map_data[x+y*self.lmap.width])
-        for y in xrange(self.lmap.height):
-            for x in xrange(self.lmap.width):
+        for y in range(self.lmap.height):
+            for x in range(self.lmap.width):
                 if not self.props: continue
                 prpat = self.props.props_at((x,y))
                 visible = filter(lambda r:r.show_in_map(), prpat)[::-1]
