@@ -24,12 +24,9 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 	
 # Ambrosia Software, Inc. 
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+# from __future__ import absolute_import, division, print_function, unicode_literals
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import StringIO
 from . import util, version
 from . import rdasm_symbolics as symbolics
 INDENT = '    '

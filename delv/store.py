@@ -27,16 +27,13 @@
 # This file addresses sundry storage types used within Delver Archives,
 # and as such is mostly a helper for other parts of delv. 
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+# from __future__ import absolute_import, division, print_function, unicode_literals
 
 # FIXME this file has gotten seriously out of hand with copy-pasted junk;
 # it needs a more object-oriented refactoring
 
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import BytesIO as StringIO
+from io import BytesIO
 import array, bisect
 from . import util
 
@@ -77,7 +74,7 @@ class Store(object):
         if not self.checked_out: self.data = None
     def get_data(self):
         if self.checked_out or not self.data:
-            buf = StringIO.StringIO()
+            buf = BytesIO()
             bh = util.BinaryHandler(buf)
             self.write_to_bfile(bh)
             # I wonder why StringIO doesn't have a method that does this:

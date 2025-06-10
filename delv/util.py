@@ -25,15 +25,12 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+# from __future__ import absolute_import, division, print_function, unicode_literals
 
 def encode_int28(i):
     return i if i >= 0 else (0x0FFFFFFF+i+1)
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import BytesIO as StringIO
+from io import BytesIO
 import struct
 from sys import stderr
 
@@ -177,7 +174,7 @@ class BinaryHandler(object):
     def eof(self):
         rv = self.file.read(1)
         self.file.seek(-1, 1)
-        return rv is ''
+        return rv == ''
     def seek(self, *vargs, **kwargs):
         self.file.seek(*vargs, **kwargs)
     def cm_read(self,  *vargs, **kwargs):
@@ -224,7 +221,7 @@ class BinaryHandler(object):
         if hasattr(file, 'read') and hasattr(file, 'write'):
             self.file = file
         elif hasattr(file, '__getitem__'):
-            self.file = StringIO(file)
+            self.file = BytesIO(file)
         self._read = self.read
         if coverage_map:
             self.coverage_map = [0]*len(self)

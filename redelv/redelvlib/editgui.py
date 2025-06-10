@@ -21,14 +21,14 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
 import os, sys
-import images
-import graphics_editors
-import generic_editors
-import level_editors
-import patch_editor
-import sound_editors
-import script_editor
-import schedule_editor
+from . import images
+from . import graphics_editors
+from . import generic_editors
+from . import level_editors
+from . import patch_editor
+from . import sound_editors
+from . import script_editor
+from . import schedule_editor
 
 # hokey
 _EDITORS_BY_NAME = {
@@ -148,7 +148,7 @@ class FileInfo(Receiver):
             self.offset.set_text("0x%08X"%res.offset)
             self.encrypted.set_active(bool(res.canon_encryption))
             self.changed.set_active(bool(res.loaded))
-            
+
         else:
             self.set_title("Information")
             for field in [self.n,self.subindex,self.resource_id,
@@ -165,7 +165,7 @@ class FileMetadata(Receiver):
         self.redelv.filechange.append(self)
         self.connect("delete_event", (lambda *x: self.hide() or True))
 
-	pbox = Gtk.VBox(False,2)
+        pbox = Gtk.VBox(False,2)
         trow = Gtk.HBox(False,0)
         trow.pack_start(Gtk.Label("Scenario Title:"), False, True, 0)
         self.scenario_title = Gtk.Entry(255)
@@ -208,7 +208,7 @@ class FileMetadata(Receiver):
         self.source_string.set_editable(False)
         trow.pack_start(self.source_string,True,True,0)
         pbox.pack_start(trow,False,True,0)
- 	self.add(pbox)
+        self.add(pbox)
 
 
         self.scenario_title.connect("changed", self.edit_scenario_title)

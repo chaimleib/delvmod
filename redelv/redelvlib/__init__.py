@@ -21,7 +21,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf, GObject
 import os, sys, tempfile, subprocess, datetime
 import json
-import images, editgui
+from . import images, editgui
 import delv
 import delv.archive, delv.library
 

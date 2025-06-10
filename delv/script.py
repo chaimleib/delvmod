@@ -25,15 +25,12 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+# from __future__ import absolute_import, division, print_function, unicode_literals
 
 from . import store, util
 from .util import dref
 import sys
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import BytesIO as StringIO
+from io import BytesIO
 
 def rstr(x):
     return '"%s"'%repr(str(x))[1:-1].replace('"','\\"')
@@ -59,7 +56,7 @@ class _PrintOuter(object):
         self.stream.write(outstr)
         self.nl = '\n' in outstr
     def str_disassemble(self, indent):
-        p = StringIO()
+        p = BytesIO()
         self.disassemble(p, indent)
         return p.getvalue()
     def disassemble_atom(self, il, atom):
@@ -341,7 +338,7 @@ class DOPushData(DCVariableFieldOperation):
     def decode_length(self, data):
         return (data[1]<<8)|data[2]+3
     def decode(self):
-        s = util.BinaryHandler(StringIO(self.data[3:]))
+        s = util.BinaryHandler(BytesIO(self.data[3:]))
         self.contents = TypeFactory(self.script_context, s, 
              library=FauxLibrary(self.script_context.res),
              organic_offset=self.true_offset+3,only_local=True)
@@ -969,7 +966,7 @@ class Script(store.Store):
         print("-- Script Object from %s --"%repr(self.src), file=out)
         self.obj.disassemble(out, 1)
     def disassemble(self, target=None):
-        out = StringIO() if target is None else target
+        out = BytesIO() if target is None else target
         try:
             if not hasattr(self.obj, 'disassemble'):
                 print(self.str_disassemble_atom(self.obj), file=out)

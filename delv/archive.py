@@ -25,17 +25,14 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+# from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
 import os
 #import numpy as np
 import operator
 import json, string
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import BytesIO as StringIO
+from io import BytesIO
 from . import util
 from .hints import _RES_HINTS, _SCEN_HINTS
 
@@ -379,7 +376,7 @@ class Archive(object):
         self.source_string = "Loaded from file object %s"%src
     def from_string(self, src):
         """Load a delver archive from an indexable object."""
-        self.from_file(StringIO(src))
+        self.from_file(BytesIO(src))
         self.source_string = "Loaded from string"
     def from_path(self, path):
         """Load a Delver archive from a file system path."""
@@ -453,7 +450,7 @@ class Archive(object):
     def to_string(self):
         """Produces one (possibly very large) string with the 
            archive in it. Mainly here for front-end web stuff."""
-        stio = StringIO()
+        stio = BytesIO()
         self.to_file(stio)
         return stio.getvalue()
 

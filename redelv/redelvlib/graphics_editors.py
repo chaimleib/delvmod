@@ -19,7 +19,7 @@
 # Ambrosia Software, Inc. 
 
 from gi.repository import Gtk, Gdk, GObject
-import editors
+from . import editors
 import delv
 import delv.graphics
 

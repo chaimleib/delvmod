@@ -26,7 +26,7 @@
 # Ambrosia Software, Inc. 
 # Maps and prop lists. Convenience utilities for map visualization.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+# from __future__ import absolute_import, division, print_function, unicode_literals
 
 import array
 from . import store, util

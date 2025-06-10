@@ -25,7 +25,7 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+# from __future__ import absolute_import, division, print_function, unicode_literals
 
 from . import util
 
@@ -895,10 +895,7 @@ class LateLabel(object):
         ofile.write_uint32(self.form(labval))
 
 import parsley
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import BytesIO as StringIO
+from io import BytesIO
 import sys,os.path
 from . import util
 class Assembler(object):
@@ -1095,7 +1092,7 @@ class Assembler(object):
     def assemble(self,source):
         source = source.strip()
 
-        binfile = util.BinaryHandler(StringIO())
+        binfile = util.BinaryHandler(BytesIO())
         self.output_file = binfile
         callbacks = []
         parsed = self.Parser(source).program()
