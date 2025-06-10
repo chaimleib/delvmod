@@ -20,7 +20,7 @@
 # Ambrosia Software, Inc. 
 import csv
 from gi.repository import Gtk
-import editors
+from . import editors
 import delv.store
 class HexEditor(editors.Editor):
     name = "Unimplemented (Hex Editor)"

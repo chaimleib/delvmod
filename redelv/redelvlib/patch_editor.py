@@ -18,7 +18,7 @@
 # "Cythera" and "Delver" are trademarks of either Glenn Andreas or 
 # Ambrosia Software, Inc. 
 from gi.repository import Gtk
-import editors
+from . import editors
 MAGPIE_WARN = """This patch is currently in Magpie format. Saving it will
 change the format to mag.py format, which is not compatible with Magpie. 
 Proceed?

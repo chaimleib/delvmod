@@ -20,7 +20,7 @@
 # Ambrosia Software, Inc. 
 import delv.ddasm
 from gi.repository import Gtk, Gdk
-import editors
+from . import editors
 class ScheduleEditor(editors.Editor):
     name = "Schedule Editor"
     default_size = 620,400

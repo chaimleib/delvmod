@@ -29,8 +29,8 @@
 from gi.repository import Gtk, Gdk, GdkPixbuf
 import delv.util, delv.archive, delv.store, delv.library
 import delv.colormap, delv.level
-import editors
-import cStringIO as StringIO
+from . import editors
+from io import BytesIO
 import operator, re
 
 class SearchCriterion(object):

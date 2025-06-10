@@ -20,13 +20,13 @@
 # Ambrosia Software, Inc. 
 from gi.repository import Gtk, Pango
 import csv
-import editors
+from . import editors, images
 import delv.store
 import sys, traceback
-import images
 import delv.rdasm
-import urllib2
-from cStringIO import StringIO
+from urllib.request import urlopen
+from urllib.error import HTTPError
+from io import BytesIO
 class ScriptEditor(editors.Editor):
     name = "Scripting System Editor"
     default_size = 680,512
@@ -94,7 +94,7 @@ class ScriptEditor(editors.Editor):
 
     def get_assembler(self):
         if not self.assembler:
-            self.errorstream = StringIO()
+            self.errorstream = BytesIO()
             self.asm_status.set_text("Preparing assembler...")
             while Gtk.events_pending(): Gtk.main_iteration()
             self.assembler = delv.rdasm.Assembler(
@@ -133,10 +133,10 @@ class ScriptEditor(editors.Editor):
 
     def load_taucs(self, *argv):
         try:
-            data = urllib2.urlopen(
+            data = urlopen(
                 self.redelv.preferences['source_archive']%self.res.resid
                 ).read()
-        except urllib2.HTTPError:
+        except HTTPError:
             self.asm_status.set_text(
                 "ERROR: Could not find canonical sources for this resource.")
             #message = Gtk.MessageDialog(type=Gtk.MessageType.ERROR, 
