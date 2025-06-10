@@ -100,13 +100,15 @@ class ReDelv(object):
 
     def __init__(self):
         if os.path.exists(PREFS_PATH):
-            self.preferences = json.load(open(PREFS_PATH))
+            with open(PREFS_PATH, 'r') as f:
+                self.preferences = json.load(f)
             for key in DEFAULT_PREFS.keys():
                 if not self.preferences.has_key(key):
                     self.preferences[key] = DEFAULT_PREFS[key]
         else:
             self.preferences = DEFAULT_PREFS
-            json.dump(self.preferences, open(PREFS_PATH,'wb'),indent=True)
+            with open(PREFS_PATH, 'w') as f:
+                json.dump(self.preferences, f, indent=True)
         self.base_archive=None
         self.patch_base=None
         self.library = None
