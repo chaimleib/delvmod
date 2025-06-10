@@ -74,13 +74,19 @@ class Opcode(object):
             base += self.match()
         return base + ' -> %s(asm, %s)'%(self.true_name, self.parameterization())
     def match(self):
-        argname, _, _, argclass = inspect.getargspec(self.generate)
+        # argname, _, _, argclass = inspect.getargspec(self.generate)
+        argspec = inspect.getfullargspec(self.generate)
+        argname = argspec.args
+        argclass = argspec.defaults
         if not argclass: return ''
         p = ' space '.join([rule%binding for binding,rule in zip(argname[-len(argclass):],argclass)])
         return (' space ' if argclass[0].strip()[0] == "'" else ' required_space ')+p if p else p
 
     def parameterization(self):
-        argname, _, _, argclass = inspect.getargspec(self.generate)
+        # argname, _, _, argclass = inspect.getargspec(self.generate)
+        argspec = inspect.getfullargspec(self.generate)
+        argname = argspec.args
+        argclass = argspec.defaults
         if not argclass: return ''
         p = ', '.join(['%s=%s'%(binding,binding) for binding,rule in zip(
                              argname[-len(argclass):],argclass)])
