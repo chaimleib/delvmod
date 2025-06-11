@@ -148,7 +148,7 @@ class Library(object):
         return self.get_resource(mdref.resid).get_dref(mdref) 
     def purge_cache(self, resid):
         r = self.get_resource(resid)
-        if self.cache.has_key(r):
+        if r in self.cache:
             if self.cache[r].is_checked_out():
                 print("WARNING: Someone using %04X, and cache was purged."%(
                     resid))

@@ -137,7 +137,7 @@ class PropList(store.Store):
     def append(self, prop):
         self.props.append(prop)
         prop.index = len(self.props)-1
-        if not self.propsat.has_key(prop.loc): 
+        if prop.loc not in self.propsat:
             self.propsat[prop.loc] = []
         self.propsat[prop.loc].append(prop)
     def write_to_bfile(self, dest=None):
@@ -167,7 +167,7 @@ class PropList(store.Store):
             nprop = PropListEntry(flags, loc,
                 aspect, proptype,d3, propref, storeref,u,index)
             self.props.append(nprop)
-            if not self.propsat.has_key(loc): self.propsat[loc] = []
+            if loc not in self.propsat: self.propsat[loc] = []
             self.propsat[loc].append(nprop)
             index += 1
         #for prlist in self.propsat.values(): 

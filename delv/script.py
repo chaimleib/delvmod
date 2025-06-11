@@ -158,7 +158,7 @@ class Array(list, _PrintOuter):
             return
         self.pn(indent, "array [")
         for n,item in enumerate(self):
-            if False: #self.references.has_key(n): 
+            if False: #n in self.references:
                 self.p(indent, "#{ %4d: }# "%n)
                 self.disassemble_atom(indent+1,self.references[n])
                 self.pn(indent+1,'')

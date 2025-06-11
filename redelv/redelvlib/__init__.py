@@ -103,7 +103,7 @@ class ReDelv(object):
             with open(PREFS_PATH, 'r') as f:
                 self.preferences = json.load(f)
             for key in DEFAULT_PREFS.keys():
-                if not self.preferences.has_key(key):
+                if key not in self.preferences:
                     self.preferences[key] = DEFAULT_PREFS[key]
         else:
             self.preferences = DEFAULT_PREFS
@@ -666,13 +666,13 @@ class ReDelv(object):
             tfile = open(tfile.name,'r+b')
             res.set_data(tfile.read())
             self.get_library().purge_cache(res.resid)
-            if self.hex_editors_open.has_key(res.resid):
+            if res.resid in self.hex_editors_open:
                 process, oldfile, mtime = self.hex_editors_open[res.resid]
                 self.hex_editors_open[res.resid] = (process, tfile, 
                     os.path.getmtime(tfile.name))
             if self.preferences['instant_editor_propagation']:
                  # just be lazy, it's late
-                 if self.open_editors.has_key(res.resid):
+                 if res.resid in self.open_editors:
                      for editor in self.open_editors[res.resid]:
                          editor.revert()
         self.queued_changes = []
@@ -694,7 +694,7 @@ class ReDelv(object):
         return True
 
     def signal_resource_saved(self, resid):
-        if not self.hex_editors_open.has_key(resid):
+        if resid not in self.hex_editors_open:
             return
         print("Sending changes to an external editor for", resid)
         process, tempf, mtime = self.hex_editors_open[resid]
@@ -825,7 +825,7 @@ class ReDelv(object):
             self.error_message(MSG_NO_UNDERLAY%repr(e))
         return self.library
     def register_editor(self, editor):
-        if not self.open_editors.has_key(editor.res.resid):
+        if editor.res.resid not in self.open_editors:
             self.open_editors[editor.res.resid] = []
         self.open_editors[editor.res.resid].append(editor)
     def unregister_editor(self, editor):
