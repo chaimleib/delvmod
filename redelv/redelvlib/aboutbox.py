@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf
+from gi.repository import Gtk, GdkPixbuf, Gdk
 from . import images
 import delv
 
@@ -30,7 +30,7 @@ ABOUT_WEBSITE_LABEL = "Wiki"
 ABOUT_VERSION = """delv version {delv_version}, redelv version {redelv_version}""" # .format(delv_version="", redelv_version="")
 
 class AboutBox(Gtk.AboutDialog):
-    def __init__(self, version: str, *args, **kwargs):
+    def __init__(self, version: str, *args, **kwargs) -> None:
         super().__init__(
             *args,
             comments=ABOUT_COMMENTS,
@@ -53,4 +53,8 @@ class AboutBox(Gtk.AboutDialog):
         logo = GdkPixbuf.Pixbuf.new_from_file(images.logo_path)
         self.set_logo(logo)
 
-        self.connect("delete_event", self.hide)
+        self.connect("delete_event", self.on_hide)
+
+    def on_hide(self, widget: Gtk.Widget, event: Gdk.Event) -> bool:
+        widget.hide()
+        return True # do not destroy

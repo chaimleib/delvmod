@@ -21,7 +21,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib, Gio, Gdk, GdkPixbuf, GObject
 import os, sys, tempfile, subprocess, datetime
 import json
-from . import editgui, aboutbox, document
+from . import editgui, document
+from .aboutbox import AboutBox
 import delv
 import delv.archive, delv.library
 
@@ -154,7 +155,7 @@ class ReDelv(Gtk.Application):
         # self.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
         # Setup the menus
-        if "debug" in self.config: print("make the menu")
+        if "debug" in self.config: print("setup the menus")
         menu_xml_path = os.path.join(os.path.dirname(__file__), 'menubar.ui')
         builder = Gtk.Builder.new_from_file(menu_xml_path)
         # The app menu bears the name of the program.
@@ -428,7 +429,7 @@ class ReDelv(Gtk.Application):
     #
     def menu_about(self, widget, data=None):
         if not self.aboutbox:
-            self.aboutbox = aboutbox.AboutBox(version=version)
+            self.aboutbox = AboutBox(version=version)
         self.aboutbox.show_all()
     # def menu_get_info(self, widget, data=None):
     #     if not self.file_get_info_window:
