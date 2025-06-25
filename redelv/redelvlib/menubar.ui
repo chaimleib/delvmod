@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="app-menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Quit</attribute>
+        <attribute name="action">app.menu-quit</attribute>
+        <attribute name="accel">&lt;Primary&gt;q</attribute>
+      </item>
+    </section>
+  </menu>
+  <menu id="menubar">
+    <submenu>
+      <attribute name="label" translatable="yes">_File</attribute>
+      <section>
+      <!--   <item> -->
+      <!--     <attribute name="label" translatable="yes">_New</attribute> -->
+      <!--     <attribute name="action">app.menu_new</attribute> -->
+      <!--     <attribute name="accel">&lt;Primary&gt;n</attribute> -->
+      <!--   </item> -->
+        <item>
+          <attribute name="label" translatable="yes">_Open</attribute>
+          <attribute name="action">win.menu-open</attribute>
+          <attribute name="accel">&lt;Primary&gt;o</attribute>
+        </item>
+      <!--   <item> -->
+      <!--     <attribute name="label" translatable="yes">_Save</attribute> -->
+      <!--     <attribute name="action">win.menu_save</attribute> -->
+      <!--     <attribute name="accel">&lt;Primary&gt;s</attribute> -->
+      <!--   </item> -->
+      <!--   <item> -->
+      <!--     <attribute name="label" translatable="yes">_Save _Copy</attribute> -->
+      <!--     <attribute name="action">win.menu_save_copy</attribute> -->
+      <!--   </item> -->
+      <!--   <item> -->
+      <!--     <attribute name="label" translatable="yes">_Save _As</attribute> -->
+      <!--     <attribute name="action">win.menu_save_as</attribute> -->
+      <!--   </item> -->
+      </section>
+      <!-- <section> -->
+      <!--   <item> -->
+      <!--     <attribute name="label" translatable="yes">_Import</attribute> -->
+      <!--     <attribute name="action">app.menu_import</attribute> -->
+      <!--   </item> -->
+      <!--   <item> -->
+      <!--     <attribute name="label" translatable="yes">_Export</attribute> -->
+      <!--     <attribute name="action">win.menu_export</attribute> -->
+      <!--     <attribute name="accel">&lt;Primary&gt;e</attribute> -->
+      <!--   </item> -->
+      <!--   <item> -->
+      <!--     <attribute name="label" translatable="yes">_Export _As</attribute> -->
+      <!--     <attribute name="action">win.menu_export_as</attribute> -->
+      <!--   </item> -->
+      <!--   <item> -->
+      <!--     <attribute name="label" translatable="yes">_Underlay Scenario</attribute> -->
+      <!--     <attribute name="action">win.menu_underlay</attribute> -->
+      <!--     <attribute name="accel">&lt;Primary&gt;u</attribute> -->
+      <!--   </item> -->
+      <!-- </section> -->
+    </submenu>
+    <!-- <submenu> -->
+    <!--   <attribute name="label" translatable="yes">_Edit</attribute> -->
+    <!--   <section> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Get _Info</attribute> -->
+    <!--       <attribute name="action">win.menu_get_info</attribute> -->
+    <!--       <attribute name="accel">&lt;Primary&gt;i</attribute> -->
+    <!--     </item> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_File _Metadata</attribute> -->
+    <!--       <attribute name="action">win.menu_file_metadata</attribute> -->
+    <!--     </item> -->
+    <!--   </section> -->
+    <!--   <section> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Delete</attribute> -->
+    <!--       <attribute name="action">win.menu_delete</attribute> -->
+    <!--       <attribute name="accel">&lt;Primary&gt;k</attribute> -->
+    <!--     </item> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Create _Resource</attribute> -->
+    <!--       <attribute name="action">win.menu_create_resource</attribute> -->
+    <!--     </item> -->
+    <!--   </section> -->
+    <!--   <section> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Duplicate</attribute> -->
+    <!--       <attribute name="action">win.menu_duplicate</attribute> -->
+    <!--       <attribute name="accel">&lt;Primary&gt;d</attribute> -->
+    <!--     </item> -->
+    <!--   </section> -->
+    <!-- </submenu> -->
+    <!-- <submenu> -->
+    <!--   <attribute name="label" translatable="yes">_Patch</attribute> -->
+    <!--   <section> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Select _Base</attribute> -->
+    <!--       <attribute name="action">win.menu_select_base</attribute> -->
+    <!--     </item> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Save _Patch</attribute> -->
+    <!--       <attribute name="action">win.menu_save_patch</attribute> -->
+    <!--       <attribute name="accel">&lt;Primary&gt;t</attribute> -->
+    <!--     </item> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Save _Patch _As</attribute> -->
+    <!--       <attribute name="action">win.menu_save_patch_as</attribute> -->
+    <!--     </item> -->
+    <!--   </section> -->
+    <!--   <section> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Apply</attribute> -->
+    <!--       <attribute name="action">win.menu_apply</attribute> -->
+    <!--     </item> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Check _Compatibility</attribute> -->
+    <!--       <attribute name="action">win.menu_check_compatibility</attribute> -->
+    <!--     </item> -->
+    <!--   </section> -->
+    <!-- </submenu> -->
+    <!-- <submenu> -->
+    <!--   <attribute name="label" translatable="yes">_Tools</attribute> -->
+    <!--   <section> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Resource _Editor</attribute> -->
+    <!--       <attribute name="action">win.menu_resource_editor</attribute> -->
+    <!--       <attribute name="accel">&lt;Primary&gt;r</attribute> -->
+    <!--     </item> -->
+    <!--     <submenu> -->
+    <!--       <attribute name="label" translatable="yes">_Use Specific Editor</attribute> -->
+    <!--       <section> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Hex Editor</attribute> -->
+    <!--           <attribute name="action">win.menu_hex_editor</attribute> -->
+    <!--           <attribute name="accel">&lt;Primary&gt;h</attribute> -->
+    <!--         </item> -->
+    <!--       </section> -->
+    <!--       <section> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Tile Sheet</attribute> -->
+    <!--           <attribute name="action">win.specific_ed</attribute> -->
+    <!--           <attribute name="target">TileSheet</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Portrait</attribute> -->
+    <!--           <attribute name="action">win.specific_ed</attribute> -->
+    <!--           <attribute name="target">Portrait</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Landscape</attribute> -->
+    <!--           <attribute name="action">win.specific_ed</attribute> -->
+    <!--           <attribute name="target">Landscape</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Sized _Image</attribute> -->
+    <!--           <attribute name="action">win.specific_ed</attribute> -->
+    <!--           <attribute name="target">Sized</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Icon</attribute> -->
+    <!--           <attribute name="action">win.specific_ed</attribute> -->
+    <!--           <attribute name="target">Icon</attribute> -->
+    <!--         </item> -->
+    <!--       </section> -->
+    <!--       <section> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Prop List</attribute> -->
+    <!--           <attribute name="action">win.specific_ed</attribute> -->
+    <!--           <attribute name="target">PropList</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Map</attribute> -->
+    <!--           <attribute name="action">win.specific_ed</attribute> -->
+    <!--           <attribute name="target">Map</attribute> -->
+    <!--         </item> -->
+    <!--       </section> -->
+    <!--       <section> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Music</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Sound</attribute> -->
+    <!--           <attribute name="action">win.specific_ed</attribute> -->
+    <!--           <attribute name="target">Sound</attribute> -->
+    <!--         </item> -->
+    <!--       </section> -->
+    <!--       <section> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Script _Data</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Script</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_AI Script</attribute> -->
+    <!--         </item> -->
+    <!--       </section> -->
+    <!--       <section> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_String _List</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Symbols</attribute> -->
+    <!--         </item> -->
+    <!--       </section> -->
+    <!--       <section> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Patch</attribute> -->
+    <!--           <attribute name="action">win.specific_ed</attribute> -->
+    <!--           <attribute name="target">Patch</attribute> -->
+    <!--         </item> -->
+    <!--         <submenu> -->
+    <!--           <attribute name="label" translatable="yes">F0 Data Editors</attribute> -->
+    <!--           <section> -->
+    <!--             <item> -->
+    <!--               <attribute name="label" translatable="yes">_Tile Name List</attribute> -->
+    <!--               <attribute name="action">win.specific_ed</attribute> -->
+    <!--               <attribute name="target">TileNameList</attribute> -->
+    <!--             </item> -->
+    <!--             <item> -->
+    <!--               <attribute name="label" translatable="yes">_Schedule</attribute> -->
+    <!--               <attribute name="action">win.specific_ed</attribute> -->
+    <!--               <attribute name="target">ScheduleEditor</attribute> -->
+    <!--             </item> -->
+    <!--           </section> -->
+    <!--         </submenu> -->
+    <!--       </section> -->
+    <!--     </submenu>  -->
+    <!--   </section> -->
+    <!--   <section> -->
+    <!--     <item> -->
+    <!--       <attribute name="label" translatable="yes">_Image _Browser</attribute> -->
+    <!--       <attribute name="action">win.menu_image_browser</attribute> -->
+    <!--     </item> -->
+    <!--     <submenu> -->
+    <!--       <attribute name="label" translatable="yes">_High _Level _Editors</attribute> -->
+    <!--       <section> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Monsters</attribute> -->
+    <!--         </item> -->
+    <!--         <item> -->
+    <!--           <attribute name="label" translatable="yes">_Tiles</attribute> -->
+    <!--         </item> -->
+    <!--       </section> -->
+    <!--     </submenu> -->
+    <!--   </section> -->
+    <!-- </submenu> -->
+    <submenu>
+      <attribute name="label" translatable="yes">_Help</attribute>
+      <section>
+        <item>
+          <attribute name="label" translatable="yes">_About</attribute>
+          <attribute name="action">app.menu-about</attribute>
+        </item>
+      </section>
+    </submenu>
+  </menu>
+</interface>
