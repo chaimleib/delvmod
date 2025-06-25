@@ -135,9 +135,8 @@ class Document(Gtk.WindowGroup):
         # Make the data tree
         return window
 
-    def unsaved(self) -> bool:
-        return not self.fpath or self.changed
-
+    # fresh_document returns True if this is an unsaved document
+    # with no changes. Otherwise, it returns False.
     def fresh_document(self) -> bool:
         return not self.fpath and not self.changed
 
@@ -168,7 +167,7 @@ class Document(Gtk.WindowGroup):
     def delete_event(self) -> bool:
         if "debug" in self.config: print("Document.delete_event")
         veto: bool = False
-        if self.unsaved():
+        if self.changed:
             veto = self.warn_unsaved_changes()
         if not veto:
             documents.remove(self)
@@ -270,6 +269,10 @@ class Document(Gtk.WindowGroup):
         #t = self.temporary_data.append(None, ["131","42 Items", "Image Data"])
         #self.temporary_data.append(t, ["8E31","12 kB","Something"])
 
+    # open_file loads a file from the filesystem.
+    # If the current document is a fresh_document,
+    # the data is displayed in the current Document.
+    # Otherwise, the data is loaded into a new Document.
     def open_file(self, fpath, directory=False):
         if "debug" in self.config: print("Document.open_file")
         doc = self if self.fresh_document() else Document(
@@ -277,6 +280,8 @@ class Document(Gtk.WindowGroup):
             config=self.config,
             fpath=fpath
         )
+        if "debug" in self.config:
+            print(f"open_file: reusing fresh document: {self == doc}")
         try:
             doc.archive = delv.archive.Scenario(
                 fpath,
@@ -300,6 +305,7 @@ class Document(Gtk.WindowGroup):
         # for recp in self.filechange: recp.signal_filechange()
         # for recp in self.subindexchange: recp.signal_subindexchange()
         # for recp in self.resourcechange: recp.signal_resourcechange()
+
     def error_message(self, message:str):
         if "debug" in self.config: print("Document.error_message")
         dialog = Gtk.MessageDialog(

@@ -21,8 +21,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib, Gio, Gdk, GdkPixbuf, GObject
 import os, sys, tempfile, subprocess, datetime
 import json
-from . import editgui, document
+from . import editgui
 from .aboutbox import AboutBox
+from .document import documents, Document
 import delv
 import delv.archive, delv.library
 
@@ -129,7 +130,6 @@ class ReDelv(Gtk.Application):
         self.config: dict[str, str] = {
             "debug": "y",
         }
-        self.documents: list = []
         self.add_main_option(
             "debug",
                 ord("d"),
@@ -188,12 +188,12 @@ class ReDelv(Gtk.Application):
 
     def do_activate(self) -> None:
         if "debug" in self.config: print("ReDelv.do_activate")
-        if len(document.documents) == 0:
-            document.Document(
+        if len(documents) == 0:
+            Document(
                 application=self,
                 config=self.config
             )
-        document.documents[-1].present()
+        documents[-1].present()
             # self.window.connect("delete_event", self.delete_event)
             # self.window.connect("destroy", self.on_quit)
             # accel = Gtk.AccelGroup()
@@ -250,7 +250,7 @@ class ReDelv(Gtk.Application):
 
     def menu_quit(self, action, param) -> None:
         if "debug" in self.config: print("ReDelv.menu_quit")
-        for doc in self.documents:
+        for doc in documents:
             if doc.delete_event():
                 return
         self.on_quit(action, param)
