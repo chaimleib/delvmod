@@ -14,15 +14,17 @@ def error(msg:str) -> None:
 class ReDelvWindow(Gtk.ApplicationWindow):
     def __init__(
         self,
+        application: Gtk.Application,
         config: dict[str, str],
         title: str,
         tree_data: Gtk.TreeStore,
         *args,
         **kwargs
     ) -> None:
-        super().__init__(title=title, *args, **kwargs)
+        super().__init__(application=application, title=title, *args, **kwargs)
         self.config: dict[str, str] = config
-        if "debug" in self.config: print("ReDelvWindow.__init__")
+        if "debug" in self.config:
+            print(f"ReDelvWindow.__init__(title={repr(title)})")
         self.set_default_size(480, 512)
         self.tree_data = tree_data
 
@@ -30,12 +32,6 @@ class ReDelvWindow(Gtk.ApplicationWindow):
         self.mvbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add(self.mvbox)
         self.mvbox.show()
-
-        ## Test label
-        # lbl_variant = GLib.Variant.new_string("Hello world!")
-        # self.label = Gtk.Label(label=lbl_variant.get_string(), margin=30)
-        # self.mvbox.add(self.label)
-        # self.label.show()
 
         self.set_icon(GdkPixbuf.Pixbuf.new_from_file(images.icon_path))
 
@@ -70,10 +66,6 @@ class ReDelvWindow(Gtk.ApplicationWindow):
         return view
 
 class Document(Gtk.WindowGroup):
-    # new_document_count says how many new documents have been created so far.
-    # This affects the window title, where fpath is not provided.
-    new_document_count: int = 0
-
     def __init__(
         self,
         config: dict[str, str],
@@ -97,8 +89,7 @@ class Document(Gtk.WindowGroup):
         # it gets saved.
         self.new_id: int = 0
         if not self.fpath:
-            Document.new_document_count += 1
-            self.new_id = Document.new_document_count
+            self.new_id = max_new_id() + 1
         # changed: Whether the document has changed since the last open or save.
         self.changed: bool = False
         # tree_data: model for the TreeView of the main window.
@@ -129,6 +120,8 @@ class Document(Gtk.WindowGroup):
         window.connect("delete_event", self.delete_event)
         window.tree_view.connect("cursor-changed", self.cursor_changed)
         window.tree_view.connect("row-activated", self.row_activated)
+        if not self.fpath:
+            self.refresh_titles()
 
         # self.window.connect("destroy", self.on_quit)
 
@@ -144,12 +137,27 @@ class Document(Gtk.WindowGroup):
     def title(self) -> str:
         if self.fpath:
             name = path.basename(self.fpath)
-        elif self.new_id == 1:
-            # There's no need to number the new documents if there is only one.
+        elif max_new_id() == 1:
+            # There's no need to number the new document if there is only one.
             name = "New Document"
         else:
-            name = f"New Document {Document.new_document_count}"
+            name = f"New Document {self.new_id}"
         return f"•  {name}" if self.changed else name
+
+    # refresh_titles finds the document with the first placeholder name and
+    # updates its window title, if needed.
+    def refresh_titles(self) -> None:
+        for doc in documents:
+            # The only window that would change is New Document number 1.
+            # That's only relevant before it gets saved to the FS.
+            # That's also only relevant after the window gets initialized.
+            if doc.new_id == 1 and not doc.fpath and hasattr(doc, 'window'):
+                old_title = doc.window.get_title()
+                new_title = doc.title()
+                if old_title != new_title:
+                    print(f'window {repr(old_title)} -> {repr(new_title)}')
+                    doc.window.set_title(new_title)
+                return
 
     def set_unsaved(self) -> None:
         self.window.set_title(self.title())
@@ -171,6 +179,7 @@ class Document(Gtk.WindowGroup):
             veto = self.warn_unsaved_changes()
         if not veto:
             documents.remove(self)
+            self.refresh_titles()
         return veto
 
     # warn_unsaved_changes should be called if the Document is about to be lost.
@@ -191,7 +200,7 @@ class Document(Gtk.WindowGroup):
         return rv
 
     # load replaces open_file
-    def load(self):
+    def load(self) -> None:
         if "debug" in self.config: print("Document.load")
         try:
             self.archive = delv.archive.Scenario(
@@ -208,7 +217,12 @@ class Document(Gtk.WindowGroup):
         # else: self.set_open_file(path)
         self.set_saved()
 
-    def row_activated(self, tree_view, path, column):
+    def row_activated(
+        self,
+        tree_view: Gtk.TreeView,
+        path: Gtk.TreePath,
+        column: Gtk.TreeViewColumn
+    ) -> None:
         if "debug" in self.config: print("Document.row_activated")
         self.cursor_changed(tree_view)
         # if self.current_resource: self.menu_resource_editor(None)
@@ -218,7 +232,7 @@ class Document(Gtk.WindowGroup):
         else:
             tree_view.expand_row(path, False)
 
-    def cursor_changed(self, tree_view):
+    def cursor_changed(self, tree_view: Gtk.TreeView) -> None:
         if "debug" in self.config: print("Document.cursor_changed")
         model, rows = tree_view.get_selection().get_selected_rows()
         row = rows[-1]
@@ -242,16 +256,16 @@ class Document(Gtk.WindowGroup):
 
     def get_library(self):
         if "debug" in self.config: print("ReDelv.get_library")
-        try:
-            if not self.library:
+        if not self.library:
+            try:
                 self.library = delv.library.Library(
                     self.underlay,
                     self.archive
                 ) 
-        except Exception as e:
-            self.error_message(
-                f"Couldn't create library; if you are editing a saved game, you need to underlay a scenario.\nException was: {repr(e)}"
-            )
+            except Exception as e:
+                self.error_message(
+                    f"Couldn't create library; if you are editing a saved game, you need to underlay a scenario.\nException was: {repr(e)}"
+                )
         return self.library
 
     def menu_open(self, widget, data=None) -> None:
@@ -273,7 +287,7 @@ class Document(Gtk.WindowGroup):
     # If the current document is a fresh_document,
     # the data is displayed in the current Document.
     # Otherwise, the data is loaded into a new Document.
-    def open_file(self, fpath, directory=False):
+    def open_file(self, fpath, directory: bool = False) -> None:
         if "debug" in self.config: print("Document.open_file")
         doc = self if self.fresh_document() else Document(
             application=self.application,
@@ -298,7 +312,7 @@ class Document(Gtk.WindowGroup):
         if directory: doc.set_open_directory(fpath)
         doc.set_saved()
 
-    def set_open_directory(self, fpath: str):
+    def set_open_directory(self, fpath: str) -> None:
         if "debug" in self.config: print("ReDelv.set_open_directory")
         self.exported_directory = fpath
 
@@ -306,7 +320,7 @@ class Document(Gtk.WindowGroup):
         # for recp in self.subindexchange: recp.signal_subindexchange()
         # for recp in self.resourcechange: recp.signal_resourcechange()
 
-    def error_message(self, message:str):
+    def error_message(self, message: str) -> None:
         if "debug" in self.config: print("Document.error_message")
         dialog = Gtk.MessageDialog(
             parent=self.window, 
@@ -319,3 +333,5 @@ class Document(Gtk.WindowGroup):
         dialog.destroy()
 
 documents: list[Document] = []
+def max_new_id() -> int:
+    return max(doc.new_id for doc in documents)
