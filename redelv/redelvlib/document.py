@@ -124,8 +124,8 @@ class Document(Gtk.WindowGroup):
             self.refresh_titles()
 
         # self.window.connect("destroy", self.on_quit)
+        self.add_window(window)
 
-        # Make the data tree
         return window
 
     # fresh_document returns True if this is an unsaved document
@@ -180,6 +180,7 @@ class Document(Gtk.WindowGroup):
         if not veto:
             documents.remove(self)
             self.refresh_titles()
+            self.remove_window(self.window)
         return veto
 
     # warn_unsaved_changes should be called if the Document is about to be lost.
@@ -270,18 +271,8 @@ class Document(Gtk.WindowGroup):
 
     def menu_open(self, widget, data=None) -> None:
         if "debug" in self.config: print("Document.menu_open")
-        chooser = Gtk.FileChooserDialog(
-            title="Select a Delver Archive...",
-            action=Gtk.FileChooserAction.OPEN
-        )
-        chooser.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
-        chooser.add_button(Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
-        response = chooser.run()
-        if response == Gtk.ResponseType.OK:
-            self.open_file(chooser.get_filename())
-        chooser.destroy()
-        #t = self.temporary_data.append(None, ["131","42 Items", "Image Data"])
-        #self.temporary_data.append(t, ["8E31","12 kB","Something"])
+        fpath = self.ask_open_path(msg = "Select a Delver Archive...")
+        if fpath: self.open_file(fpath)
 
     # open_file loads a file from the filesystem.
     # If the current document is a fresh_document,
@@ -320,6 +311,21 @@ class Document(Gtk.WindowGroup):
         # for recp in self.subindexchange: recp.signal_subindexchange()
         # for recp in self.resourcechange: recp.signal_resourcechange()
 
+    def ask_open_path(self, msg: str = "Select a file...") -> str | None:
+        if "debug" in self.config: print("Document.ask_open_path")
+        if self.changed and self.warn_unsaved_changes(): return
+        chooser = Gtk.FileChooserDialog(
+            title=msg,
+            action=Gtk.FileChooserAction.OPEN
+        )
+        chooser.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+        chooser.add_button(Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        self.add_window(chooser)
+        response = chooser.run()
+        rv = chooser.get_filename() if response == Gtk.ResponseType.OK else None
+        chooser.destroy()
+        return rv
+
     def error_message(self, message: str) -> None:
         if "debug" in self.config: print("Document.error_message")
         dialog = Gtk.MessageDialog(
@@ -329,6 +335,7 @@ class Document(Gtk.WindowGroup):
             message_type=Gtk.MessageType.ERROR,
             text=message
         )
+        self.add_window(dialog)
         dialog.run()
         dialog.destroy()
 
