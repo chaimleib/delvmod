@@ -99,6 +99,7 @@ class Document(Gtk.WindowGroup):
 
         doc_actions = {
             "menu-open": self.menu_open,
+            "menu-underlay": self.menu_underlay,
         }
         for name, callback in doc_actions.items():
             action = Gio.SimpleAction.new(name, None)
@@ -255,7 +256,7 @@ class Document(Gtk.WindowGroup):
         # for recp in self.subindexchange: recp.signal_subindexchange()
         # for recp in self.resourcechange: recp.signal_resourcechange()
 
-    def get_library(self):
+    def get_library(self) -> delv.library.Library | None:
         if "debug" in self.config: print("ReDelv.get_library")
         if not self.library:
             try:
@@ -310,6 +311,16 @@ class Document(Gtk.WindowGroup):
         # for recp in self.filechange: recp.signal_filechange()
         # for recp in self.subindexchange: recp.signal_subindexchange()
         # for recp in self.resourcechange: recp.signal_resourcechange()
+
+    # An underlay scenario is required to edit a saved game.
+    def menu_underlay(self, widget, data=None) -> None:
+        if "debug" in self.config: print("Document.menu_underlay")
+        fpath = self.ask_open_path("Select a scenario to underlay...")
+        if fpath: self.underlay_archive(delv.archive.Scenario(fpath))
+
+    def underlay_archive(self, archive: delv.archive.Archive) -> None:
+        if "debug" in self.config: print("Document.underlay_archive")
+        self.underlay = archive
 
     def ask_open_path(self, msg: str = "Select a file...") -> str | None:
         if "debug" in self.config: print("Document.ask_open_path")
