@@ -66,8 +66,8 @@ PREFS_PATH = os.path.expanduser('~/.redelv')
 #         #self.resid = 
 #         #self.name = 
 #         self.add_buttons(Gtk.STOCK_NEW, 1, Gtk.STOCK_CANCEL, 0)
-#
 #         self.vbox.show()
+
 #     def get_value(self):
 #         return int(self.e.get_text().replace('0x',''),16)
 
@@ -194,55 +194,6 @@ class ReDelv(Gtk.Application):
                 config=self.config
             )
         documents[-1].present()
-            # self.window.connect("delete_event", self.delete_event)
-            # self.window.connect("destroy", self.on_quit)
-            # accel = Gtk.AccelGroup()
-            # ifc = Gtk.ItemFactory(Gtk.MenuBar, "<main>", accel)
-            # self.window.add_accel_group(accel)
-            # ifc.create_items(menu_items)
-            # self.menu_bar = ifc.get_widget("<main>")
-            # self.mvbox.pack_start(self.menu_bar, False, True, 0)
-
-            # # Make the data tree
-            # if "debug" in self.config: print("make the data tree")
-            # self.data_view = Gtk.TreeView()
-            # dc1 = Gtk.TreeViewColumn()
-            # dc1.set_title("Subindex") # Would it be so much to ask for this to be
-            # # in the constructor...
-            # dc2 = Gtk.TreeViewColumn()
-            # dc2.set_title("Size")
-            # dc3 = Gtk.TreeViewColumn()
-            # dc3.set_title("Description")
-            #
-            # # Seriously it's like GUI programming is designed to be as clunky
-            # # and non-functional as possible in the quest for generality
-            # # Why is there no truly native python gui kit? It's the most popular
-            # # language in the world now...
-            # # Aren't we ready to move beyond the state machine model for building
-            # # GUI stuff???
-            # # and why are all the RAD tools broken?! They could at least plaster
-            # # over this cruft...
-            # c =Gtk.CellRendererText();dc1.pack_start(c,True);
-            # dc1.add_attribute(c,"text",0)
-            # c =Gtk.CellRendererText();dc2.pack_start(c,True);
-            # dc2.add_attribute(c,"text",1)
-            # c =Gtk.CellRendererText();dc3.pack_start(c,True);
-            # dc3.add_attribute(c,"text",2)         
-            # self.data_view.append_column(dc1)
-            # self.data_view.append_column(dc2)
-            # self.data_view.append_column(dc3)
-            #
-            # self.tree_data = Gtk.TreeStore(str,str,str,int,int)
-            # self.data_view.set_model(self.tree_data)
-            #
-            # sw = Gtk.ScrolledWindow()
-            # sw.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
-            # sw.add(self.data_view)
-            # self.mvbox.pack_start(sw, True, True, 0)
-            #
-            # self.data_view.connect("cursor-changed", self.cursor_changed)
-            # self.data_view.connect("row-activated", self.row_activated)
-            # self.window.show_all()
 
     def on_quit(self, action, param) -> None:
         if "debug" in self.config: print("ReDelv.on_quit")
@@ -261,27 +212,7 @@ class ReDelv(Gtk.Application):
     # def set_savedstate(self, v):
     #     if v: self.set_saved()
     #     else: self.set_unsaved()
-    # def ask_open_path(self,msg="Select a file..."):
-    #     if self.is_unsaved() and self.warn_unsaved_changes(): return
-    #     chooser = Gtk.FileChooserDialog(title=msg,
-    #               action=Gtk.FileChooserAction.OPEN,
-    #               buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,
-    #                        Gtk.STOCK_OPEN,Gtk.ResponseType.OK))
-    #     response = chooser.run()
-    #     if response == Gtk.ResponseType.OK:
-    #         rv= chooser.get_filename()
-    #     else: rv= None
-    #     chooser.destroy()
-    #     return rv
     #
-    # # Underlay
-    # def menu_underlay(self, *argv):
-    #     path = self.ask_open_path("Select a scenario to underlay...")
-    #     if not path: return
-    #     self.underlay_archive(delv.archive.Scenario(path))
-    # def underlay_archive(self, archive):
-    #     if "debug" in self.config: print("ReDelv.underlay_archive")
-    #     self.underlay = archive
 
     # def refresh_tree(self): 
     #     "Change the tree to reflect current data."
@@ -289,35 +220,12 @@ class ReDelv(Gtk.Application):
     #     return
 
     # Callbacks
-    # def row_activated(self, w, path, *argv):
-    #     self.cursor_changed(w)
-    #     if self.current_resource: self.menu_resource_editor(None)
-    #     elif self.data_view.row_expanded(path): 
-    #         self.data_view.collapse_row(path)
-    #     else:
-    #         self.data_view.expand_row(path,False)
-    # def cursor_changed(self, w, d=None):
-    #     tm,crow = self.data_view.get_selection().get_selected_rows()
-    #     crow = crow[-1]
-    #     si = tm.get_value(tm.get_iter(crow), 3)
-    #     rn = tm.get_value(tm.get_iter(crow), 4)
-    #     if rn < 0:
-    #         self.current_resource = None
-    #         self.current_resource_id = 0
-    #     else:
-    #         self.current_resource_id = delv.archive.resid(si,rn)
-    #         self.current_resource = self.get_library().get_resource(
-    #             self.current_resource_id)
-    #     self.current_subindex_id = si
-    #
-    #     for recp in self.subindexchange: recp.signal_subindexchange()
-    #     for recp in self.resourcechange: recp.signal_resourcechange()
-    #
     # def menu_new(self, widget, data=None):
     #     #for recp in self.filechange: recp.signal_filechange()
     #     #for recp in self.subindexchange: recp.signal_subindexchange()
     #     #for recp in self.resourcechange: recp.signal_resourcechange()
     #     return None
+    #
     # def menu_open(self, widget, data=None) -> None:
     #     chooser = Gtk.FileChooserDialog(
     #         title="Select a Delver Archive...",
@@ -331,6 +239,7 @@ class ReDelv(Gtk.Application):
     #     chooser.destroy()
         #t = self.temporary_data.append(None, ["131","42 Items", "Image Data"])
         #self.temporary_data.append(t, ["8E31","12 kB","Something"])
+
     # def menu_save_copy(self, widget, data=None):
     #     if not self.archive: 
     #         self.error_message("There is nothing to save.")
@@ -346,6 +255,7 @@ class ReDelv(Gtk.Application):
     #         self.error_message("Unable to write '%s': %s"%(
     #             os.path.basename(self.opened_file), repr(e)))
     #         return
+
     # def menu_save_as(self, widget, data=None):
     #     if "debug" in self.config: print("ReDelv.menu_save_as")
     #     if not self.archive: 
@@ -366,6 +276,7 @@ class ReDelv(Gtk.Application):
     #             os.path.basename(self.opened_file), repr(e)))
     #         return
     #     self.set_open_file(rv)
+
     # def menu_save(self, widget, data=None):
     #     if "debug" in self.config: print("ReDelv.menu_save")
     #     if not self.archive: 
@@ -385,6 +296,7 @@ class ReDelv(Gtk.Application):
     #         self.error_message("Unable to write '%s': %s"%(
     #             os.path.basename(self.opened_file), repr(e)))
     #         return
+
     # def menu_export(self, widget, data=None):
     #     if not self.archive: 
     #         self.error_message("There is nothing to export.")
@@ -400,6 +312,7 @@ class ReDelv(Gtk.Application):
     #         self.error_message("Unable to export to '%s': %s"%(
     #             self.exported_directory, repr(e)))
     #         return
+
     # def menu_export_as(self, widget, data=None):
     #     self.exported_directory = self.ask_dir_path()
     #     if not self.exported_directory: return
@@ -411,6 +324,7 @@ class ReDelv(Gtk.Application):
     #         self.error_message("Unable to export to '%s': %s"%(
     #             self.exported_directory, repr(e)))
     #         return
+
     # def menu_import(self, widget, data=None):
     #     if self.is_unsaved() and self.warn_unsaved_changes(): return
     #     self.exported_directory = self.ask_dir_path(Gtk.STOCK_OPEN)
@@ -431,21 +345,26 @@ class ReDelv(Gtk.Application):
         if not self.aboutbox:
             self.aboutbox = AboutBox(version=version)
         self.aboutbox.show_all()
+
     # def menu_get_info(self, widget, data=None):
     #     if not self.file_get_info_window:
     #          self.file_get_info_window = editgui.FileInfo(
     #              self, Gtk.WindowType.TOPLEVEL)
     #     self.file_get_info_window.show_all()
+
     # def menu_file_metadata(self, widget, data=None):
     #     if not self.file_metadata_window:
     #          self.file_metadata_window = editgui.FileMetadata(
     #              self, Gtk.WindowType.TOPLEVEL)
     #     self.file_metadata_window.show_all()
+
     # def menu_create_index(self, widget, data=None):
     #     return None
+
     # def menu_delete(self, widget, data=None):
     #     print("Delete")
     #     return None
+
     # def menu_duplicate(self, widget, data=None):
     #     if not self.current_resource_id: return
     #     askbox = AskNewResourceBox(self, 
@@ -462,8 +381,7 @@ class ReDelv(Gtk.Application):
     #     self.tree_data.clear()
     #     self.archive.add_gui_tree()
     #     self.set_unsaved()
-    #
-    #
+
     # def menu_create_resource(self, widget, data=None):
     #     askbox = AskNewResourceBox(self)
     #     #self.window.emit("filechange")
@@ -480,19 +398,25 @@ class ReDelv(Gtk.Application):
     #     print("New resource", choice, new_resid, res)
     #     self.set_unsaved()
     #     return None
+
     # def menu_export_resource(self, widget, data=None):
     #     return None
+
     # def menu_import_resource(self, widget, data=None):
     #     return None
+
     # def menu_cut(self, widget, data=None):
     #     return None
+
     # def menu_copy(self, widget, data=None):
     #     if self.current_resource:
     #         self.clipboard.set_text("Resource:%04X"%(self.current_resource_id))
     #     else:
     #         self.clipboard.set_text("Subindex:%d"%(self.current_subindex_id))
+
     # def menu_paste(self, widget, data=None):
     #     return None
+
     # def menu_select_base(self, widget, data=None):
     #     patch_base = self.ask_open_path(
     #         "Select patch basis (Unmodified scenario)")
@@ -505,6 +429,7 @@ class ReDelv(Gtk.Application):
     #         return
     #     self.patch_base = patch_base
     #
+
     # def menu_save_patch(self, widget, data=None):
     #     if not self.base_archive:
     #         self.error_message(
@@ -523,7 +448,7 @@ class ReDelv(Gtk.Application):
     #     newpatch.to_path(self.patch_output_path)
     #     resource_count = len(newpatch.resources())
     #     print("Saved patch with {} resources".format(resource_count))
-    #
+
     # def menu_save_patch_as(self, widget, data=None):
     #     patch_output_path = self.ask_save_path("Untitled Patch")
     #     if not patch_output_path: return
@@ -546,6 +471,7 @@ class ReDelv(Gtk.Application):
     #     self.refresh_tree()
     #
     #     delv.archive.Patch(patch_path)
+
     # def specific_ed(self, which="Hex"):
     #     if "debug" in self.config: print("ReDelv.specific_ed(%s)"%which)
     #     if self.current_resource:
@@ -553,11 +479,13 @@ class ReDelv(Gtk.Application):
     #             self, self.current_resource,canonical=False).show_all()
     #     else:
     #         self.error_message("No resource is selected.")
+
     # def open_editor(self, resid):
     #     ed = editgui.editor_for_resource(resid)(
     #             self,self.get_library().get_resource(resid))
     #     ed.show_all()
     #     return ed
+
     # def menu_resource_editor(self, widget, data=None):
     #     if self.current_resource:
     #         #editgui.editor_for_subindex(self.current_subindex_id)(
@@ -566,8 +494,9 @@ class ReDelv(Gtk.Application):
     #             self,self.current_resource).show_all()
     #     else:
     #         self.error_message("No resource is selected.")
+
     # #def menu_image_editor(self, *argv):
-    #
+
     # def menu_hex_editor(self, widget, data=None):
     #     if not self.current_resource:
     #         self.error_message("No resource is selected.")
@@ -600,6 +529,7 @@ class ReDelv(Gtk.Application):
     #     #monitor.connect("changed", self.hex_editor_changed, 
     #     #    (self.current_resource, temp,gfile))
     #     #self.specific_ed("Hex")
+
     # def file_mon_timer(self):
     #     if "debug" in self.config: print("ReDelv.file_mon_timer")
     #     if not self.hex_editors_open:
@@ -637,7 +567,7 @@ class ReDelv(Gtk.Application):
     #         del self.hex_editors_open[rid]
     #         del self.tempfile_references[rid]
     #     return True
-    #
+
     # def signal_resource_saved(self, resid):
     #     if "debug" in self.config: print("ReDelv.signal_resource_saved")
     #     if resid not in self.hex_editors_open:
@@ -649,9 +579,10 @@ class ReDelv(Gtk.Application):
     #     tempf.flush()
     #     self.hex_editors_open[resid] = (
     #         process, tempf, os.path.getmtime(tempf.name))
+
     # def menu_image_browser(self, widget, data=None):
     #     return None
-    #
+
     # def menu_check_compatibility(self,widget,data=None):
     #     if not self.archive or not self.archive.get(0xFFFF):
     #         self.error_message("No patch is open; open one with File:Open.")
@@ -677,20 +608,12 @@ class ReDelv(Gtk.Application):
     #         self.info_message(
     #             "Incompatible: applying both patches may result in errors.")
     #
-    #
+
     # # stub
     # def menu_(self, widget, data=None):
     #     return None
 
     #  # helpers
-    # def error_message(self, message):
-    #     if "debug" in self.config: print("ReDelv.error_message")
-    #     dialog = Gtk.MessageDialog(self.window, 
-    #         Gtk.DialogFlags.MODAL , 
-    #         Gtk.MessageType.ERROR, Gtk.ButtonsType.OK,
-    #         message)
-    #     dialog.run()
-    #     dialog.destroy()
     # def info_message(self, message):
     #     if "debug" in self.config: print("ReDelv.info_message")
     #     dialog = Gtk.MessageDialog(self.window, 
@@ -713,6 +636,7 @@ class ReDelv(Gtk.Application):
     #         rv = None
     #     chooser.destroy()
     #     return rv
+
     # def ask_save_path(self, cname="Untitled Scenario"):
     #     if "debug" in self.config: print("ReDelv.ask_save_path")
     #     chooser = Gtk.FileChooserDialog(title="Select destination...",
@@ -727,10 +651,11 @@ class ReDelv(Gtk.Application):
     #         rv = None
     #     chooser.destroy()
     #     return rv
-    #
+
     # def send_resourcechange(self):
     #     if "debug" in self.config: print("ReDelv.send_resourcechange")
     #     for recp in self.resourcechange: recp.signal_resourcechange()
+
     # def get_library(self):
     #     if "debug" in self.config: print("ReDelv.get_library")
     #     try:
@@ -739,14 +664,17 @@ class ReDelv(Gtk.Application):
     #     except Exception as e:
     #         self.error_message(MSG_NO_UNDERLAY%repr(e))
     #     return self.library
+
     # def register_editor(self, editor):
     #     if "debug" in self.config: print("ReDelv.register_editor")
     #     if editor.res.resid not in self.open_editors:
     #         self.open_editors[editor.res.resid] = []
     #     self.open_editors[editor.res.resid].append(editor)
+
     # def unregister_editor(self, editor):
     #     if "debug" in self.config: print("ReDelv.unregister_editor")
     #     self.open_editors[editor.res.resid].remove(editor)
+
     # def get_registered_editors(self, resid):
     #     if "debug" in self.config: print("ReDelv.get_registered_editors")
     #     return self.open_editors.get(resid, [])
