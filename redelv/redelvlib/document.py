@@ -239,8 +239,8 @@ class Document(Gtk.WindowGroup):
         model, rows = tree_view.get_selection().get_selected_rows()
         row = rows[-1]
         subindex = model.get_value(model.get_iter(row), 3)
-        resource_id = model.get_value(model.get_iter(row), 4)
-        if resource_id < 0:
+        resource_number = model.get_value(model.get_iter(row), 4)
+        if resource_number < 0:
             self.current_resource = None
             self.current_resource_id = 0
             self.current_subindex_id = subindex
@@ -250,7 +250,7 @@ class Document(Gtk.WindowGroup):
             error("cursor_changed: failed to get library")
             return
         self.current_subindex_id = subindex
-        self.current_resource_id = delv.archive.resid(subindex, resource_id)
+        self.current_resource_id = delv.archive.resid(subindex, resource_number)
         self.current_resource = library.get_resource(self.current_resource_id)
 
         # for recp in self.subindexchange: recp.signal_subindexchange()
