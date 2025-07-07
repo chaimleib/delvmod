@@ -114,7 +114,6 @@ class ReDelv(Gtk.Application):
         # self.current_resource = None
         # self.current_resource_id = 0
         # self.current_subindex_id = 0
-        self.aboutbox: None | Gtk.AboutDialog = None
         # self.file_metadata_window = None
         # self.file_get_info_window = None
         self.config: dict[str, str] = {
@@ -343,10 +342,10 @@ class ReDelv(Gtk.Application):
     #     for recp in self.filechange: recp.signal_filechange()
     #     for recp in self.subindexchange: recp.signal_subindexchange()
     #     for recp in self.resourcechange: recp.signal_resourcechange()
-    #
+
     def menu_about(self, widget, data=None):
-        if not self.aboutbox:
-            self.aboutbox = AboutBox(version=version)
+        if not hasattr(self, 'aboutbox'):
+            self.aboutbox: AboutBox = AboutBox(version=version)
         self.aboutbox.show_all()
 
     # def menu_get_info(self, widget, data=None):
