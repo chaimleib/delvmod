@@ -21,6 +21,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib, Gio, Gdk, GdkPixbuf, GObject
 import os, sys, tempfile, subprocess, datetime
 import json
+from typing import Any, Optional
+
 from . import editgui
 from .aboutbox import AboutBox
 from .document import documents, Document
@@ -78,18 +80,6 @@ class ReDelv(Gtk.Application):
     #         if not self.archive.get((si,r)): return ((si+1)<<8)|r
     #     return ((si+1)<<8)
 
-    def load_prefs(self):
-        if os.path.exists(PREFS_PATH):
-            with open(PREFS_PATH, 'r') as f:
-                self.preferences = json.load(f)
-            for key in DEFAULT_PREFS.keys():
-                if key not in self.preferences:
-                    self.preferences[key] = DEFAULT_PREFS[key]
-        else:
-            self.preferences = DEFAULT_PREFS
-            with open(PREFS_PATH, 'w') as f:
-                json.dump(self.preferences, f, indent=True)
-
     def __init__(self, *args, **kwargs):
         super().__init__(
             *args,
@@ -97,7 +87,7 @@ class ReDelv(Gtk.Application):
             flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,#|Gio.ApplicationFlags.HANDLES_OPEN,
             **kwargs
         )
-        self.load_prefs()
+        self.preferences: dict[str, Any] = self.init_prefs()
         # self.base_archive=None
         # self.patch_base=None
         # self.library = None
@@ -138,6 +128,19 @@ class ReDelv(Gtk.Application):
                 "Debug",
                 None,
         )
+
+    def init_prefs(self) -> dict[str, Any]:
+        if os.path.exists(PREFS_PATH):
+            with open(PREFS_PATH, 'r') as f:
+                preferences = json.load(f)
+            for key in DEFAULT_PREFS.keys():
+                if key not in preferences:
+                    preferences[key] = DEFAULT_PREFS[key]
+        else:
+            preferences = DEFAULT_PREFS
+            with open(PREFS_PATH, 'w') as f:
+                json.dump(preferences, f, indent=True)
+        return preferences
 
     def do_startup(self) -> None:
         if "debug" in self.config: print("ReDelv.do_startup")
