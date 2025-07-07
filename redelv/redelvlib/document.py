@@ -7,48 +7,10 @@ from gi.repository import Gtk, Gio, GdkPixbuf
 
 import delv, delv.archive, delv.library
 from . import images
+from .redelvwindow import RedelvWindow
 
 def error(msg:str) -> None:
     print(msg, file=stderr)
-
-class ReDelvWindow(Gtk.ApplicationWindow):
-    def __init__(
-        self,
-        application: Gtk.Application,
-        config: dict[str, str],
-        title: str,
-        tree_data: Gtk.TreeStore,
-        *args,
-        **kwargs
-    ) -> None:
-        super().__init__(application=application, title=title, *args, **kwargs)
-        self.config: dict[str, str] = config
-        if "debug" in self.config:
-            print(f"ReDelvWindow.__init__(title={repr(title)})")
-        self.set_default_size(480, 512)
-        self.tree_data = tree_data
-
-        # Main content
-        self.mvbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.add(self.mvbox)
-        self.mvbox.show()
-
-        self.set_icon(GdkPixbuf.Pixbuf.new_from_file(images.icon_path))
-
-        # Set up the TreeView
-        self.tree_view: Gtk.TreeView = self.init_treeview()
-        sw = Gtk.ScrolledWindow(
-            child=self.tree_view,
-            hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-            vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-        )
-        self.mvbox.pack_start(
-            child=sw,
-            expand=True,
-            fill=True,
-            padding=0
-        )
-        self.show_all()
 
     def init_treeview(self) -> Gtk.TreeView:
         view = Gtk.TreeView(model=self.tree_data)
@@ -95,7 +57,11 @@ class Document(Gtk.WindowGroup):
         # tree_data: model for the TreeView of the main window.
         self.tree_data = Gtk.TreeStore(str, str, str, int, int)
         # window: The main document window.
-        self.window: ReDelvWindow = self.init_window()
+        self.window: RedelvWindow = self.init_window(
+            application=self.application,
+            config=self.config,
+            tree_data=self.tree_data
+        )
 
         doc_actions = {
             "menu-open": self.menu_open,
@@ -111,12 +77,17 @@ class Document(Gtk.WindowGroup):
         self.underlay: None | delv.archive.Archive = None
         if self.fpath: self.open_file(self.fpath)
 
-    def init_window(self) -> ReDelvWindow:
-        window = ReDelvWindow(
-            application=self.application,
-            config=self.config,
+    def init_window(
+        self,
+        application: Gtk.Application,
+        config: dict[str, str],
+        tree_data: Gtk.TreeStore
+    ) -> RedelvWindow:
+        window = RedelvWindow(
+            application=application,
+            config=config,
             title=self.title(),
-            tree_data=self.tree_data
+            tree_data=tree_data
         )
         window.connect("delete_event", self.delete_event)
         window.tree_view.connect("cursor-changed", self.cursor_changed)
@@ -257,7 +228,7 @@ class Document(Gtk.WindowGroup):
         # for recp in self.resourcechange: recp.signal_resourcechange()
 
     def get_library(self) -> delv.library.Library | None:
-        if "debug" in self.config: print("ReDelv.get_library")
+        if "debug" in self.config: print("Document.get_library")
         if not self.library:
             try:
                 self.library = delv.library.Library(
@@ -305,7 +276,7 @@ class Document(Gtk.WindowGroup):
         doc.set_saved()
 
     def set_open_directory(self, fpath: str) -> None:
-        if "debug" in self.config: print("ReDelv.set_open_directory")
+        if "debug" in self.config: print("Document.set_open_directory")
         self.exported_directory = fpath
 
         # for recp in self.filechange: recp.signal_filechange()
