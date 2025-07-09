@@ -56,4 +56,3 @@ class RedelvWindow(Gtk.ApplicationWindow):
             column.add_attribute(r, "text", i)
             view.append_column(column)
         return view
-

@@ -3,7 +3,9 @@ from os import path
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GdkPixbuf
+from gi.repository import Gtk, Gdk, Gio
+
+from typing import Callable
 
 import delv, delv.archive, delv.library
 from . import images
@@ -12,20 +14,8 @@ from .redelvwindow import RedelvWindow
 def error(msg:str) -> None:
     print(msg, file=stderr)
 
-    def init_treeview(self) -> Gtk.TreeView:
-        view = Gtk.TreeView(model=self.tree_data)
-        column_names = [
-            "Subindex",
-            "Size",
-            "Description"
-        ]
-        for i, name in enumerate(column_names):
-            column = Gtk.TreeViewColumn(name)
-            r = Gtk.CellRendererText()
-            column.pack_start(r, True)
-            column.add_attribute(r, "text", i)
-            view.append_column(column)
-        return view
+def as_delete_event_handler(f: Callable[[], bool]) -> Callable[[Gdk.Event, Gdk.EventType], bool]:
+    return lambda event, event_type: f()
 
 class Document(Gtk.WindowGroup):
     def __init__(
@@ -89,7 +79,7 @@ class Document(Gtk.WindowGroup):
             title=self.title(),
             tree_data=tree_data
         )
-        window.connect("delete_event", self.delete_event)
+        window.connect("delete_event", as_delete_event_handler(self.delete_event))
         window.tree_view.connect("cursor-changed", self.cursor_changed)
         window.tree_view.connect("row-activated", self.row_activated)
         if not self.fpath:

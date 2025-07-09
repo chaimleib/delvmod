@@ -173,7 +173,7 @@ class ReDelv(Gtk.Application):
         else:
             raise TypeError("expected #menubar to be a MenuModel")
 
-    def do_command_line(self, command_line) -> int:
+    def do_command_line(self, command_line: Gio.ApplicationCommandLine) -> int:
         options = command_line.get_options_dict().end().unpack()
         if "debug" in options:
             del self.config["debug"]
@@ -197,14 +197,14 @@ class ReDelv(Gtk.Application):
             )
         documents[-1].present()
 
-    def on_quit(self, action, param) -> None:
+    def on_quit(self, action: Gio.SimpleAction, param: Any) -> None:
         if "debug" in self.config: print("ReDelv.on_quit")
         self.quit()
 
-    def menu_quit(self, action, param) -> None:
+    def menu_quit(self, action: Gio.SimpleAction, param: Any) -> None:
         if "debug" in self.config: print("ReDelv.menu_quit")
         for doc in documents:
-            if doc.delete_event():
+            if doc.changed and doc.warn_unsaved_changes():
                 return
         self.on_quit(action, param)
 
@@ -343,7 +343,7 @@ class ReDelv(Gtk.Application):
     #     for recp in self.subindexchange: recp.signal_subindexchange()
     #     for recp in self.resourcechange: recp.signal_resourcechange()
 
-    def menu_about(self, widget, data=None):
+    def menu_about(self, widget: Gtk.Widget, event: Gdk.Event):
         if not hasattr(self, 'aboutbox'):
             self.aboutbox: AboutBox = AboutBox(version=version)
         self.aboutbox.show_all()
