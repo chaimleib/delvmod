@@ -5,7 +5,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, Gio
 
-from typing import Callable
+from typing import Any, Callable, Dict, Optional
 
 import delv, delv.archive, delv.library
 from . import images
@@ -20,15 +20,15 @@ def as_delete_event_handler(f: Callable[[], bool]) -> Callable[[Gdk.Event, Gdk.E
 class Document(Gtk.WindowGroup):
     def __init__(
         self,
-        config: dict[str, str],
+        preferences: Dict[str, Any],
         application: Gtk.Application,
         fpath: str = "", # empty means no file exists yet
         *args,
         **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.config: dict[str, str] = config
-        if "debug" in self.config: print("Document.__init__")
+        self.preferences: Dict[str, Any] = preferences
+        if self.preferences["debug"]: print("Document.__init__")
 
         documents.append(self)
         self.application: Gtk.Application = application
@@ -49,7 +49,7 @@ class Document(Gtk.WindowGroup):
         # window: The main document window.
         self.window: RedelvWindow = self.init_window(
             application=self.application,
-            config=self.config,
+            preferences=self.preferences,
             tree_data=self.tree_data
         )
 
@@ -62,20 +62,20 @@ class Document(Gtk.WindowGroup):
             action.connect("activate", callback)
             self.window.add_action(action)
 
-        self.library: None | delv.library.Library = None
-        self.archive: None | delv.archive.Archive = None
-        self.underlay: None | delv.archive.Archive = None
+        self.library: Optional[delv.library.Library] = None
+        self.archive: Optional[delv.archive.Archive] = None
+        self.underlay: Optional[delv.archive.Archive] = None
         if self.fpath: self.open_file(self.fpath)
 
     def init_window(
         self,
         application: Gtk.Application,
-        config: dict[str, str],
+        preferences: Dict[str, Any],
         tree_data: Gtk.TreeStore
     ) -> RedelvWindow:
         window = RedelvWindow(
             application=application,
-            config=config,
+            preferences=preferences,
             title=self.title(),
             tree_data=tree_data
         )
@@ -125,7 +125,7 @@ class Document(Gtk.WindowGroup):
         self.window.set_title(self.title())
         self.changed = True
 
-    def set_saved(self):
+    def set_saved(self) -> None:
         self.window.set_title(self.title())
         self.changed = False
 
@@ -135,7 +135,7 @@ class Document(Gtk.WindowGroup):
     # delete_event returns whether Document closure should be blocked.
     # If not, remove self from the documents list.
     def delete_event(self) -> bool:
-        if "debug" in self.config: print("Document.delete_event")
+        if self.preferences["debug"]: print("Document.delete_event")
         veto: bool = False
         if self.changed:
             veto = self.warn_unsaved_changes()
@@ -150,7 +150,7 @@ class Document(Gtk.WindowGroup):
     # returns whether Document closure should be blocked:
     # True if the user says No, and False if the user says Yes.
     def warn_unsaved_changes(self) -> bool:
-        if "debug" in self.config: print("Document.warn_unsaved_changes")
+        if self.preferences["debug"]: print("Document.warn_unsaved_changes")
         dialog = Gtk.MessageDialog(
             parent=self.window, 
             modal=True, 
@@ -164,7 +164,7 @@ class Document(Gtk.WindowGroup):
 
     # load replaces open_file
     def load(self) -> None:
-        if "debug" in self.config: print("Document.load")
+        if self.preferences["debug"]: print("Document.load")
         try:
             self.archive = delv.archive.Scenario(
                 path,
@@ -186,7 +186,7 @@ class Document(Gtk.WindowGroup):
         path: Gtk.TreePath,
         column: Gtk.TreeViewColumn
     ) -> None:
-        if "debug" in self.config: print("Document.row_activated")
+        if self.preferences["debug"]: print("Document.row_activated")
         self.cursor_changed(tree_view)
         # if self.current_resource: self.menu_resource_editor(None)
         # elif tree_view.row_expanded(path): 
@@ -196,7 +196,7 @@ class Document(Gtk.WindowGroup):
             tree_view.expand_row(path, False)
 
     def cursor_changed(self, tree_view: Gtk.TreeView) -> None:
-        if "debug" in self.config: print("Document.cursor_changed")
+        if self.preferences["debug"]: print("Document.cursor_changed")
         model, rows = tree_view.get_selection().get_selected_rows()
         row = rows[-1]
         subindex = model.get_value(model.get_iter(row), 3)
@@ -217,8 +217,8 @@ class Document(Gtk.WindowGroup):
         # for recp in self.subindexchange: recp.signal_subindexchange()
         # for recp in self.resourcechange: recp.signal_resourcechange()
 
-    def get_library(self) -> delv.library.Library | None:
-        if "debug" in self.config: print("Document.get_library")
+    def get_library(self) -> Optional[delv.library.Library]:
+        if self.preferences["debug"]: print("Document.get_library")
         if not self.library:
             try:
                 self.library = delv.library.Library(
@@ -232,7 +232,7 @@ class Document(Gtk.WindowGroup):
         return self.library
 
     def menu_open(self, widget, data=None) -> None:
-        if "debug" in self.config: print("Document.menu_open")
+        if self.preferences["debug"]: print("Document.menu_open")
         fpath = self.ask_open_path(msg = "Select a Delver Archive...")
         if fpath: self.open_file(fpath)
 
@@ -241,13 +241,13 @@ class Document(Gtk.WindowGroup):
     # the data is displayed in the current Document.
     # Otherwise, the data is loaded into a new Document.
     def open_file(self, fpath, directory: bool = False) -> None:
-        if "debug" in self.config: print("Document.open_file")
+        if self.preferences["debug"]: print("Document.open_file")
         doc = self if self.fresh_document() else Document(
             application=self.application,
-            config=self.config,
+            preferences=self.preferences,
             fpath=fpath
         )
-        if "debug" in self.config:
+        if self.preferences["debug"]:
             print(f"open_file: reusing fresh document: {self == doc}")
         try:
             doc.archive = delv.archive.Scenario(
@@ -266,7 +266,7 @@ class Document(Gtk.WindowGroup):
         doc.set_saved()
 
     def set_open_directory(self, fpath: str) -> None:
-        if "debug" in self.config: print("Document.set_open_directory")
+        if self.preferences["debug"]: print("Document.set_open_directory")
         self.exported_directory = fpath
 
         # for recp in self.filechange: recp.signal_filechange()
@@ -275,16 +275,16 @@ class Document(Gtk.WindowGroup):
 
     # An underlay scenario is required to edit a saved game.
     def menu_underlay(self, widget, data=None) -> None:
-        if "debug" in self.config: print("Document.menu_underlay")
+        if self.preferences["debug"]: print("Document.menu_underlay")
         fpath = self.ask_open_path("Select a scenario to underlay...")
         if fpath: self.underlay_archive(delv.archive.Scenario(fpath))
 
     def underlay_archive(self, archive: delv.archive.Archive) -> None:
-        if "debug" in self.config: print("Document.underlay_archive")
+        if self.preferences["debug"]: print("Document.underlay_archive")
         self.underlay = archive
 
     def ask_open_path(self, msg: str = "Select a file...") -> str | None:
-        if "debug" in self.config: print("Document.ask_open_path")
+        if self.preferences["debug"]: print("Document.ask_open_path")
         if self.changed and self.warn_unsaved_changes(): return
         chooser = Gtk.FileChooserDialog(
             title=msg,
@@ -299,7 +299,7 @@ class Document(Gtk.WindowGroup):
         return rv
 
     def error_message(self, message: str) -> None:
-        if "debug" in self.config: print("Document.error_message")
+        if self.preferences["debug"]: print("Document.error_message")
         dialog = Gtk.MessageDialog(
             parent=self.window, 
             modal=True,

@@ -1,21 +1,22 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
+from typing import Any, Dict
 from . import images
 
 class RedelvWindow(Gtk.ApplicationWindow):
     def __init__(
         self,
         application: Gtk.Application,
-        config: dict[str, str],
+        preferences: Dict[str, Any],
         title: str,
         tree_data: Gtk.TreeStore,
         *args,
         **kwargs
     ) -> None:
         super().__init__(application=application, title=title, *args, **kwargs)
-        self.config: dict[str, str] = config
-        if "debug" in self.config:
+        self.preferences: Dict[str, Any] = preferences
+        if self.preferences["debug"]:
             print(f"RedelvWindow.__init__(title={repr(title)})")
         self.set_default_size(480, 512)
         self.tree_data = tree_data
