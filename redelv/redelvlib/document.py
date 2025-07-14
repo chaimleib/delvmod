@@ -9,6 +9,7 @@ from typing import Any, Callable, Dict, Optional
 
 import delv, delv.archive, delv.library
 from . import images
+from .config import Config
 from .redelvwindow import RedelvWindow
 
 def error(msg:str) -> None:
@@ -20,15 +21,15 @@ def as_delete_event_handler(f: Callable[[], bool]) -> Callable[[Gdk.Event, Gdk.E
 class Document(Gtk.WindowGroup):
     def __init__(
         self,
-        preferences: Dict[str, Any],
+        cfg: Config,
         application: Gtk.Application,
         fpath: str = "", # empty means no file exists yet
         *args,
         **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.preferences: Dict[str, Any] = preferences
-        if self.preferences["debug"]: print("Document.__init__")
+        self.cfg: Config = cfg
+        if self.cfg.debug: print("Document.__init__")
 
         documents.append(self)
         self.application: Gtk.Application = application
@@ -49,7 +50,7 @@ class Document(Gtk.WindowGroup):
         # window: The main document window.
         self.window: RedelvWindow = self.init_window(
             application=self.application,
-            preferences=self.preferences,
+            cfg=self.cfg,
             tree_data=self.tree_data
         )
 
@@ -70,12 +71,12 @@ class Document(Gtk.WindowGroup):
     def init_window(
         self,
         application: Gtk.Application,
-        preferences: Dict[str, Any],
+        cfg: Config,
         tree_data: Gtk.TreeStore
     ) -> RedelvWindow:
         window = RedelvWindow(
             application=application,
-            preferences=preferences,
+            cfg=cfg,
             title=self.title(),
             tree_data=tree_data
         )
@@ -135,7 +136,7 @@ class Document(Gtk.WindowGroup):
     # delete_event returns whether Document closure should be blocked.
     # If not, remove self from the documents list.
     def delete_event(self) -> bool:
-        if self.preferences["debug"]: print("Document.delete_event")
+        if self.cfg.debug: print("Document.delete_event")
         veto: bool = False
         if self.changed:
             veto = self.warn_unsaved_changes()
@@ -150,7 +151,7 @@ class Document(Gtk.WindowGroup):
     # returns whether Document closure should be blocked:
     # True if the user says No, and False if the user says Yes.
     def warn_unsaved_changes(self) -> bool:
-        if self.preferences["debug"]: print("Document.warn_unsaved_changes")
+        if self.cfg.debug: print("Document.warn_unsaved_changes")
         dialog = Gtk.MessageDialog(
             parent=self.window, 
             modal=True, 
@@ -164,7 +165,7 @@ class Document(Gtk.WindowGroup):
 
     # load replaces open_file
     def load(self) -> None:
-        if self.preferences["debug"]: print("Document.load")
+        if self.cfg.debug: print("Document.load")
         try:
             self.archive = delv.archive.Scenario(
                 path,
@@ -186,7 +187,7 @@ class Document(Gtk.WindowGroup):
         path: Gtk.TreePath,
         column: Gtk.TreeViewColumn
     ) -> None:
-        if self.preferences["debug"]: print("Document.row_activated")
+        if self.cfg.debug: print("Document.row_activated")
         self.cursor_changed(tree_view)
         # if self.current_resource: self.menu_resource_editor(None)
         # elif tree_view.row_expanded(path): 
@@ -196,7 +197,7 @@ class Document(Gtk.WindowGroup):
             tree_view.expand_row(path, False)
 
     def cursor_changed(self, tree_view: Gtk.TreeView) -> None:
-        if self.preferences["debug"]: print("Document.cursor_changed")
+        if self.cfg.debug: print("Document.cursor_changed")
         model, rows = tree_view.get_selection().get_selected_rows()
         row = rows[-1]
         subindex = model.get_value(model.get_iter(row), 3)
@@ -218,7 +219,7 @@ class Document(Gtk.WindowGroup):
         # for recp in self.resourcechange: recp.signal_resourcechange()
 
     def get_library(self) -> Optional[delv.library.Library]:
-        if self.preferences["debug"]: print("Document.get_library")
+        if self.cfg.debug: print("Document.get_library")
         if not self.library:
             try:
                 self.library = delv.library.Library(
@@ -232,7 +233,7 @@ class Document(Gtk.WindowGroup):
         return self.library
 
     def menu_open(self, widget, data=None) -> None:
-        if self.preferences["debug"]: print("Document.menu_open")
+        if self.cfg.debug: print("Document.menu_open")
         fpath = self.ask_open_path(msg = "Select a Delver Archive...")
         if fpath: self.open_file(fpath)
 
@@ -241,13 +242,13 @@ class Document(Gtk.WindowGroup):
     # the data is displayed in the current Document.
     # Otherwise, the data is loaded into a new Document.
     def open_file(self, fpath, directory: bool = False) -> None:
-        if self.preferences["debug"]: print("Document.open_file")
+        if self.cfg.debug: print("Document.open_file")
         doc = self if self.fresh_document() else Document(
             application=self.application,
-            preferences=self.preferences,
+            cfg=self.cfg,
             fpath=fpath
         )
-        if self.preferences["debug"]:
+        if self.cfg.debug:
             print(f"open_file: reusing fresh document: {self == doc}")
         try:
             doc.archive = delv.archive.Scenario(
@@ -266,7 +267,7 @@ class Document(Gtk.WindowGroup):
         doc.set_saved()
 
     def set_open_directory(self, fpath: str) -> None:
-        if self.preferences["debug"]: print("Document.set_open_directory")
+        if self.cfg.debug: print("Document.set_open_directory")
         self.exported_directory = fpath
 
         # for recp in self.filechange: recp.signal_filechange()
@@ -275,16 +276,16 @@ class Document(Gtk.WindowGroup):
 
     # An underlay scenario is required to edit a saved game.
     def menu_underlay(self, widget, data=None) -> None:
-        if self.preferences["debug"]: print("Document.menu_underlay")
+        if self.cfg.debug: print("Document.menu_underlay")
         fpath = self.ask_open_path("Select a scenario to underlay...")
         if fpath: self.underlay_archive(delv.archive.Scenario(fpath))
 
     def underlay_archive(self, archive: delv.archive.Archive) -> None:
-        if self.preferences["debug"]: print("Document.underlay_archive")
+        if self.cfg.debug: print("Document.underlay_archive")
         self.underlay = archive
 
     def ask_open_path(self, msg: str = "Select a file...") -> str | None:
-        if self.preferences["debug"]: print("Document.ask_open_path")
+        if self.cfg.debug: print("Document.ask_open_path")
         if self.changed and self.warn_unsaved_changes(): return
         chooser = Gtk.FileChooserDialog(
             title=msg,
@@ -299,7 +300,7 @@ class Document(Gtk.WindowGroup):
         return rv
 
     def error_message(self, message: str) -> None:
-        if self.preferences["debug"]: print("Document.error_message")
+        if self.cfg.debug: print("Document.error_message")
         dialog = Gtk.MessageDialog(
             parent=self.window, 
             modal=True,

@@ -26,34 +26,12 @@ from typing import Any, Dict, Optional
 from . import editgui
 from .aboutbox import AboutBox
 from .document import documents, Document
+from .config import Config
 import delv
 import delv.archive, delv.library
 
 version = '0.2.2'
 PATCHINFO = """Created with redelv {}, based on the delv library.""".format(version)
-DEFAULT_PREFS = {
-    # Show debug messages
-    'debug': False,
-    # Command that will play sounds:
-    'play_sound_cmd': 'mplayer %s',
-    # Enter the command for your hex editor here, e.g. ghex
-    'hex_editor_cmd': 'bless %s',
-    'graphics_editor_cmd': 'gimp -n %s',
-    'audio_editor_cmd': 'audacity %s',
-    'assembly_editor_cmd': 'gedit --standalone %s',
-
-    # If True, when an external editor edits a file open in
-    # an active editor, propagate those changes immediately
-    # (this generally looks pretty cool, but it may hose your
-    #  unsaved changes if any.)
-    'instant_editor_propagation':True,
-
-    # This is the info to add to patches produced.
-    'default_patch_info':PATCHINFO,
-
-    # URL form to retrieve human-checked source code from
-    'source_archive': 'http://www.ferazelhosting.net/wiki/%04X?action=raw',
-}
 PREFS_PATH = os.path.expanduser('~/.redelv')
 
 # class AskNewResourceBox(Gtk.Dialog):
@@ -131,7 +109,7 @@ class ReDelv(Gtk.Application):
 
     def do_startup(self) -> None:
         Gtk.Application.do_startup(self)
-        self.init_prefs()
+        self.cfg: Config = Config.open_or_create(PREFS_PATH, PATCHINFO)
 
         # Prep the actions for the menu
         app_actions = {
@@ -161,51 +139,37 @@ class ReDelv(Gtk.Application):
         else:
             raise TypeError("expected #menubar to be a MenuModel")
 
-    # init_prefs loads from the file.
-    def init_prefs(self) -> None:
-        if os.path.exists(PREFS_PATH):
-            with open(PREFS_PATH, 'r') as f:
-                preferences = json.load(f)
-            for key in DEFAULT_PREFS.keys():
-                if key not in preferences:
-                    preferences[key] = DEFAULT_PREFS[key]
-        else:
-            preferences = DEFAULT_PREFS
-            with open(PREFS_PATH, 'w') as f:
-                json.dump(preferences, f, indent=True)
-        self.preferences: Dict[str, Any] = preferences
-
     # do_command_line parses the CLI arguments. It gets called after do_startup.
     def do_command_line(self, command_line: Gio.ApplicationCommandLine) -> int:
         options = command_line.get_options_dict().end().unpack()
         if 'debug' in options:
-            self.preferences['debug'] = options['debug']
-        if self.preferences['debug']:
+            self.cfg.debug = options['debug']
+        if self.cfg.debug:
             print('Debug mode')
         self.activate()
         return 0
 
     # def do_open(self, files, hint) -> None:
-    #     if self.preferences["debug"]: print("ReDelv.do_open")
+    #     if self.cfg.debug: print("ReDelv.do_open")
     #     if len(files) > 0: self.open_file(files[0])
     #     if len(files) > 1: self.underlay_archive(
     #         delv.archive.Scenario(files[1]))
 
     def do_activate(self) -> None:
-        if self.preferences["debug"]: print("ReDelv.do_activate")
+        if self.cfg.debug: print("ReDelv.do_activate")
         if len(documents) == 0:
             Document(
                 application=self,
-                preferences=self.preferences
+                cfg=self.cfg
             )
         documents[-1].present()
 
     def on_quit(self, action: Gio.SimpleAction, param: Any) -> None:
-        if self.preferences["debug"]: print("ReDelv.on_quit")
+        if self.cfg.debug: print("ReDelv.on_quit")
         self.quit()
 
     def menu_quit(self, action: Gio.SimpleAction, param: Any) -> None:
-        if self.preferences["debug"]: print("ReDelv.menu_quit")
+        if self.cfg.debug: print("ReDelv.menu_quit")
         for doc in documents:
             if doc.changed and doc.warn_unsaved_changes():
                 return
@@ -262,7 +226,7 @@ class ReDelv(Gtk.Application):
     #         return
 
     # def menu_save_as(self, widget, data=None):
-    #     if self.preferences["debug"]: print("ReDelv.menu_save_as")
+    #     if self.cfg.debug: print("ReDelv.menu_save_as")
     #     if not self.archive: 
     #         self.error_message("There is nothing to save.")
     #         return
@@ -283,7 +247,7 @@ class ReDelv(Gtk.Application):
     #     self.set_open_file(rv)
 
     # def menu_save(self, widget, data=None):
-    #     if self.preferences["debug"]: print("ReDelv.menu_save")
+    #     if self.cfg.debug: print("ReDelv.menu_save")
     #     if not self.archive: 
     #         self.error_message("There is nothing to save.")
     #         return
@@ -296,7 +260,7 @@ class ReDelv(Gtk.Application):
     #         of.write(buf)
     #         of.close()
     #         self.set_saved()
-    #         if self.preferences["debug"]: print("Saved.")
+    #         if self.cfg.debug: print("Saved.")
     #     except Exception as e:
     #         self.error_message("Unable to write '%s': %s"%(
     #             os.path.basename(self.opened_file), repr(e)))
@@ -478,7 +442,7 @@ class ReDelv(Gtk.Application):
     #     delv.archive.Patch(patch_path)
 
     # def specific_ed(self, which="Hex"):
-    #     if self.preferences["debug"]:
+    #     if self.cfg.debug:
     #         print(f"ReDelv.specific_ed({repr(which)})")
     #     if self.current_resource:
     #         editgui.editor_for_name(which)(
@@ -537,7 +501,7 @@ class ReDelv(Gtk.Application):
     #     #self.specific_ed("Hex")
 
     # def file_mon_timer(self):
-    #     if self.preferences["debug"]: print("ReDelv.file_mon_timer")
+    #     if self.cfg.debug: print("ReDelv.file_mon_timer")
     #     if not self.hex_editors_open:
     #         self.timeout_sid = None
     #         return False
@@ -575,7 +539,7 @@ class ReDelv(Gtk.Application):
     #     return True
 
     # def signal_resource_saved(self, resid):
-    #     if self.preferences["debug"]: print("ReDelv.signal_resource_saved")
+    #     if self.cfg.debug: print("ReDelv.signal_resource_saved")
     #     if resid not in self.hex_editors_open:
     #         return
     #     print("Sending changes to an external editor for", resid)
@@ -621,7 +585,7 @@ class ReDelv(Gtk.Application):
 
     #  # helpers
     # def info_message(self, message):
-    #     if self.preferences["debug"]: print("ReDelv.info_message")
+    #     if self.cfg.debug: print("ReDelv.info_message")
     #     dialog = Gtk.MessageDialog(self.window, 
     #         Gtk.DialogFlags.MODAL , 
     #         Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
@@ -629,7 +593,7 @@ class ReDelv(Gtk.Application):
     #     dialog.run()
     #     dialog.destroy()
     # def ask_dir_path(self,button=Gtk.STOCK_SAVE):
-    #     if self.preferences["debug"]: print("ReDelv.ask_dir_path")
+    #     if self.cfg.debug: print("ReDelv.ask_dir_path")
     #     chooser = Gtk.FileChooserDialog(
     #               title="Select import/export directory...",
     #               action=Gtk.FileChooserAction.SELECT_FOLDER,
@@ -644,7 +608,7 @@ class ReDelv(Gtk.Application):
     #     return rv
 
     # def ask_save_path(self, cname="Untitled Scenario"):
-    #     if self.preferences["debug"]: print("ReDelv.ask_save_path")
+    #     if self.cfg.debug: print("ReDelv.ask_save_path")
     #     chooser = Gtk.FileChooserDialog(title="Select destination...",
     #               action=Gtk.FileChooserAction.SAVE,
     #               buttons=(Gtk.STOCK_CANCEL,Gtk.ResponseType.CANCEL,
@@ -659,11 +623,11 @@ class ReDelv(Gtk.Application):
     #     return rv
 
     # def send_resourcechange(self):
-    #     if self.preferences["debug"]: print("ReDelv.send_resourcechange")
+    #     if self.cfg.debug: print("ReDelv.send_resourcechange")
     #     for recp in self.resourcechange: recp.signal_resourcechange()
 
     # def get_library(self):
-    #     if self.preferences["debug"]: print("ReDelv.get_library")
+    #     if self.cfg.debug: print("ReDelv.get_library")
     #     try:
     #         if not self.library:
     #             self.library=delv.library.Library(self.underlay,self.archive) 
@@ -672,15 +636,15 @@ class ReDelv(Gtk.Application):
     #     return self.library
 
     # def register_editor(self, editor):
-    #     if self.preferences["debug"]: print("ReDelv.register_editor")
+    #     if self.cfg.debug: print("ReDelv.register_editor")
     #     if editor.res.resid not in self.open_editors:
     #         self.open_editors[editor.res.resid] = []
     #     self.open_editors[editor.res.resid].append(editor)
 
     # def unregister_editor(self, editor):
-    #     if self.preferences["debug"]: print("ReDelv.unregister_editor")
+    #     if self.cfg.debug: print("ReDelv.unregister_editor")
     #     self.open_editors[editor.res.resid].remove(editor)
 
     # def get_registered_editors(self, resid):
-    #     if self.preferences["debug"]: print("ReDelv.get_registered_editors")
+    #     if self.cfg.debug: print("ReDelv.get_registered_editors")
     #     return self.open_editors.get(resid, [])
