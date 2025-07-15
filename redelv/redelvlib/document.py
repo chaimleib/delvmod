@@ -80,7 +80,9 @@ class Document(Gtk.WindowGroup):
             title=self.title(),
             tree_data=tree_data
         )
-        window.connect("delete_event", as_delete_event_handler(self.delete_event))
+        delete_handler = as_delete_event_handler(self.delete_event)
+        window.connect("delete_event", delete_handler)
+
         window.tree_view.connect("cursor-changed", self.cursor_changed)
         window.tree_view.connect("row-activated", self.row_activated)
         if not self.fpath:
