@@ -55,6 +55,7 @@ class Document(Gtk.WindowGroup):
         )
 
         doc_actions = {
+            "menu-new": self.menu_new,
             "menu-open": self.menu_open,
             "menu-underlay": self.menu_underlay,
         }
@@ -285,6 +286,17 @@ class Document(Gtk.WindowGroup):
     def underlay_archive(self, archive: delv.archive.Archive) -> None:
         if self.cfg.debug: print("Document.underlay_archive")
         self.underlay = archive
+
+    def menu_new(self, widget, data=None):
+        #for recp in self.filechange: recp.signal_filechange()
+        #for recp in self.subindexchange: recp.signal_subindexchange()
+        #for recp in self.resourcechange: recp.signal_resourcechange()
+        doc = Document(
+            application=self.application,
+            cfg=self.cfg
+        )
+        doc.present()
+        return None
 
     def ask_open_path(self, msg: str = "Select a file...") -> str | None:
         if self.cfg.debug: print("Document.ask_open_path")

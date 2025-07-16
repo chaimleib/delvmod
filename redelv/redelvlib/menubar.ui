@@ -13,11 +13,11 @@
     <submenu>
       <attribute name="label" translatable="yes">_File</attribute>
       <section>
-      <!--   <item> -->
-      <!--     <attribute name="label" translatable="yes">_New</attribute> -->
-      <!--     <attribute name="action">app.menu_new</attribute> -->
-      <!--     <attribute name="accel">&lt;Primary&gt;n</attribute> -->
-      <!--   </item> -->
+        <item>
+          <attribute name="label" translatable="yes">_New</attribute>
+          <attribute name="action">win.menu-new</attribute>
+          <attribute name="accel">&lt;Primary&gt;n</attribute>
+        </item>
         <item>
           <attribute name="label" translatable="yes">_Open</attribute>
           <attribute name="action">win.menu-open</attribute>
