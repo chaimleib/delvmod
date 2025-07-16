@@ -199,26 +199,6 @@ class ReDelv(Gtk.Application):
     #     return
 
     # Callbacks
-    # def menu_new(self, widget, data=None):
-    #     #for recp in self.filechange: recp.signal_filechange()
-    #     #for recp in self.subindexchange: recp.signal_subindexchange()
-    #     #for recp in self.resourcechange: recp.signal_resourcechange()
-    #     return None
-    #
-    # def menu_open(self, widget, data=None) -> None:
-    #     chooser = Gtk.FileChooserDialog(
-    #         title="Select a Delver Archive...",
-    #         action=Gtk.FileChooserAction.OPEN,
-    #     )
-    #     chooser.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
-    #     chooser.add_button(Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
-    #     response = chooser.run()
-    #     if response == Gtk.ResponseType.OK:
-    #         self.open_file(chooser.get_filename())
-    #     chooser.destroy()
-        #t = self.temporary_data.append(None, ["131","42 Items", "Image Data"])
-        #self.temporary_data.append(t, ["8E31","12 kB","Something"])
-
     # def menu_save_copy(self, widget, data=None):
     #     if not self.archive: 
     #         self.error_message("There is nothing to save.")
@@ -635,15 +615,6 @@ class ReDelv(Gtk.Application):
     # def send_resourcechange(self):
     #     if self.cfg.debug: print("ReDelv.send_resourcechange")
     #     for recp in self.resourcechange: recp.signal_resourcechange()
-
-    # def get_library(self):
-    #     if self.cfg.debug: print("ReDelv.get_library")
-    #     try:
-    #         if not self.library:
-    #             self.library=delv.library.Library(self.underlay,self.archive) 
-    #     except Exception as e:
-    #         self.error_message(MSG_NO_UNDERLAY%repr(e))
-    #     return self.library
 
     # def register_editor(self, editor):
     #     if self.cfg.debug: print("ReDelv.register_editor")

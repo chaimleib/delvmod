@@ -5,18 +5,15 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, Gio
 
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Optional
 
 import delv, delv.archive, delv.library
 from . import images
 from .config import Config
 from .redelvwindow import RedelvWindow
 
-def error(msg:str) -> None:
+def error(msg: str) -> None:
     print(msg, file=stderr)
-
-def as_delete_event_handler(f: Callable[[], bool]) -> Callable[[Gdk.Event, Gdk.EventType], bool]:
-    return lambda event, event_type: f()
 
 class Document(Gtk.WindowGroup):
     def __init__(
@@ -80,8 +77,9 @@ class Document(Gtk.WindowGroup):
             title=self.title(),
             tree_data=tree_data
         )
-        delete_handler = as_delete_event_handler(self.delete_event)
-        window.connect("delete_event", delete_handler)
+        def on_delete(event: Gdk.Event, event_type: Gdk.EventType) -> bool:
+            return self.delete_event()
+        window.connect("delete_event", on_delete)
 
         window.tree_view.connect("cursor-changed", self.cursor_changed)
         window.tree_view.connect("row-activated", self.row_activated)
@@ -135,7 +133,7 @@ class Document(Gtk.WindowGroup):
     def present(self) -> None:
         self.window.present()
 
-    def menu_close(self, widget, data=None) -> None:
+    def menu_close(self, widget: Gtk.Widget, data: Any = None) -> None:
         if self.delete_event():
             return
         self.window.destroy()
@@ -241,7 +239,7 @@ class Document(Gtk.WindowGroup):
                 )
         return self.library
 
-    def menu_open(self, widget, data=None) -> None:
+    def menu_open(self, widget: Gtk.Widget, data: Any = None) -> None:
         if self.cfg.debug: print("Document.menu_open")
         fpath = self.ask_open_path(msg = "Select a Delver Archive...")
         if fpath: self.open_file(fpath)
@@ -284,7 +282,7 @@ class Document(Gtk.WindowGroup):
         # for recp in self.resourcechange: recp.signal_resourcechange()
 
     # An underlay scenario is required to edit a saved game.
-    def menu_underlay(self, widget, data=None) -> None:
+    def menu_underlay(self, widget: Gtk.Widget, data: Any = None) -> None:
         if self.cfg.debug: print("Document.menu_underlay")
         fpath = self.ask_open_path("Select a scenario to underlay...")
         if fpath: self.underlay_archive(delv.archive.Scenario(fpath))
@@ -293,7 +291,7 @@ class Document(Gtk.WindowGroup):
         if self.cfg.debug: print("Document.underlay_archive")
         self.underlay = archive
 
-    def menu_new(self, widget, data=None):
+    def menu_new(self, widget: Gtk.Widget, data: Any = None) -> None:
         #for recp in self.filechange: recp.signal_filechange()
         #for recp in self.subindexchange: recp.signal_subindexchange()
         #for recp in self.resourcechange: recp.signal_resourcechange()
@@ -304,7 +302,7 @@ class Document(Gtk.WindowGroup):
         doc.present()
         return None
 
-    def ask_open_path(self, msg: str = "Select a file...") -> str | None:
+    def ask_open_path(self, msg: str = "Select a file...") -> Optional[str]:
         if self.cfg.debug: print("Document.ask_open_path")
         if self.changed and self.warn_unsaved_changes(): return
         chooser = Gtk.FileChooserDialog(
