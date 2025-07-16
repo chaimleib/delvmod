@@ -14,6 +14,11 @@
       <attribute name="label" translatable="yes">_File</attribute>
       <section>
         <item>
+          <attribute name="label" translatable="yes">_Close Window</attribute>
+          <attribute name="action">win.menu-close</attribute>
+          <attribute name="accel">&lt;Primary&gt;w</attribute>
+        </item>
+        <item>
           <attribute name="label" translatable="yes">_New</attribute>
           <attribute name="action">win.menu-new</attribute>
           <attribute name="accel">&lt;Primary&gt;n</attribute>

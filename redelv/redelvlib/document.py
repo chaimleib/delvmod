@@ -55,6 +55,7 @@ class Document(Gtk.WindowGroup):
         )
 
         doc_actions = {
+            "menu-close": self.menu_close,
             "menu-new": self.menu_new,
             "menu-open": self.menu_open,
             "menu-underlay": self.menu_underlay,
@@ -135,6 +136,13 @@ class Document(Gtk.WindowGroup):
 
     def present(self) -> None:
         self.window.present()
+
+    def menu_close(self, widget, data=None) -> None:
+        if self.delete_event():
+            return
+        self.window.destroy()
+        if len(documents) == 0:
+            self.application.quit()
 
     # delete_event returns whether Document closure should be blocked.
     # If not, remove self from the documents list.
