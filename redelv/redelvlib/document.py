@@ -23,7 +23,6 @@ class Document(Gtk.WindowGroup):
         self,
         cfg: Config,
         application: Gtk.Application,
-        fpath: str = "", # empty means no file exists yet
         *args,
         **kwargs
     ) -> None:
@@ -36,7 +35,7 @@ class Document(Gtk.WindowGroup):
         # fpath: The file path of the document.
         # Empty means the document exists in memory only
         # and has not been saved yet.
-        self.fpath: str = fpath
+        self.fpath: str = ""
         # new_id: If a new document is created, remembers which number
         # document it is. This gives a temporary title for the document until
         # it gets saved.
@@ -68,7 +67,6 @@ class Document(Gtk.WindowGroup):
         self.library: Optional[delv.library.Library] = None
         self.archive: Optional[delv.archive.Archive] = None
         self.underlay: Optional[delv.archive.Archive] = None
-        if self.fpath: self.open_file(self.fpath)
 
     def init_window(
         self,
@@ -252,7 +250,7 @@ class Document(Gtk.WindowGroup):
     # If the current document is a fresh_document,
     # the data is displayed in the current Document.
     # Otherwise, the data is loaded into a new Document.
-    def open_file(self, fpath, directory: bool = False) -> None:
+    def open_file(self, fpath: str, directory: bool = False) -> None:
         if self.cfg.debug: print("Document.open_file")
         doc = self if self.fresh_document() else Document(
             application=self.application,

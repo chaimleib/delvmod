@@ -21,7 +21,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib, Gio, Gdk, GdkPixbuf, GObject
 import os, sys, tempfile, subprocess, datetime
 import json
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Sequence
 
 from . import editgui
 from .aboutbox import AboutBox
@@ -146,14 +146,24 @@ class ReDelv(Gtk.Application):
             self.cfg.debug = options['debug']
         if self.cfg.debug:
             print('Debug mode')
+        files = command_line.get_arguments()[1:]
+        if len(files) > 2:
+            command_line.printerr_literal(
+                f"expected up to 2 file names, got {len(files)}"
+            )
+        if len(files) > 0:
+            doc = Document(
+                cfg=self.cfg,
+                application=self,
+            )
+            doc.open_file(files[0])
+            if len(files) > 1:
+                doc.underlay_archive(delv.archive.Scenario(files[1]))
+            def on_destroy(widget: Gtk.Widget) -> None:
+                command_line.done()
+            doc.window.connect("destroy", on_destroy)
         self.activate()
         return 0
-
-    # def do_open(self, files, hint) -> None:
-    #     if self.cfg.debug: print("ReDelv.do_open")
-    #     if len(files) > 0: self.open_file(files[0])
-    #     if len(files) > 1: self.underlay_archive(
-    #         delv.archive.Scenario(files[1]))
 
     def do_activate(self) -> None:
         if self.cfg.debug: print("ReDelv.do_activate")
