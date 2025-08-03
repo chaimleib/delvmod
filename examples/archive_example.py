@@ -88,8 +88,9 @@ archive[0xBC00] = "This file written by delv %s"%delv.version
 about_resource = archive.get(0xBC35, True)
 about_resource.hint_encryption(True)
 
-# A way to read/edit resource - as file-like objects (They have many 
-# helpful methods for reading/writing binary, see delv.util.BinaryHandler)
+# A way to read/edit resource - as file-like objects (They have many
+# helpful methods for reading/writing binary,
+# see delv.util.DelvReader and delv.util.DelvWriter)
 rfile = about_resource.as_file()
 rfile.write(ABOUT)
 

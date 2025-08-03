@@ -30,34 +30,46 @@
 def encode_int28(i):
     return i if i >= 0 else (0x0FFFFFFF+i+1)
 
-from io import BytesIO
+from io import BufferedReader, BufferedWriter, BytesIO
 import struct
 from sys import stderr
+from typing import Optional
 
 class dref(object):
-    def __init__(self,resid,offset,length=None):
-        self.resid = resid
+    def __init__(
+        self,
+        resid: int,
+        offset: int,
+        length: Optional[int] = None
+    ) -> None:
+        self.resid: int = resid
         #print("%04X %04X / %s"%(resid,offset,length))
-        self.offset = offset
-        self.length=None
-    def load_from_library(self,library,TF=None):
-        if TF:
-            return TF(library.get_dref(self))
-        else:
-            return library.get_dref(self)
-    def __str__(self):
+        self.offset: int = offset
+        self.length: Optional[int] = length
+
+    # def load_from_library(
+    #     self,
+    #     library: Library,
+    #     TF: Optional[Callable[['dref'], 'dref']] = None
+    # ) -> 'dref':
+    #     if TF:
+    #         return TF(library.get_dref(self))
+    #     else:
+    #         return library.get_dref(self)
+
+    def __str__(self) -> str:
         return "<dref 0x%04X:%04X %s>"%(self.resid,self.offset,self.length)
 
 
-def int_to_bits(value,size):
+def int_to_bits(value: int, size: int) -> bytearray:
     result = bytearray(size)
-    j =0 
+    j = 0
     for i in range(size-1,-1,-1):
         result[j] = (value >> i)&1
         j += 1
     return result
 
-def bytes_to_bits(src):
+def bytes_to_bits(src: int|bytearray) -> bytearray:
     src = bytearray(src) # Note that if src is an integer, a new empty bytearray is made.
     # this is not efficient, but it does at least make sense semantically.
     result = bytearray(len(src)*8)
@@ -68,7 +80,7 @@ def bytes_to_bits(src):
             ri += 1
     return result
 
-def bits_to_bytes(src):
+def bits_to_bytes(src: bytearray) -> bytearray:
     result = bytearray((len(src)+7)//8)
     byi = 0
     bi = 0
@@ -78,7 +90,10 @@ def bits_to_bytes(src):
         result[byte_index] |= bit << (7-bit_index)
     return result
 
-def bitstruct_pack(target, pairs):
+def bitstruct_pack(
+    target: bytearray,
+    pairs: list[tuple[int, list[tuple[int, int]]]]
+) -> None:
     b = bytes_to_bits(target)
     for value, fieldspec in pairs:
         for size, index in fieldspec[::-1]:
@@ -88,8 +103,13 @@ def bitstruct_pack(target, pairs):
     t =  bits_to_bytes(b)
     for x in range(len(t)): target[x]=t[x]
 
-
-def bits_pack(target, value, size, index,debug=False):
+def bits_pack(
+    target: bytearray,
+    value: int,
+    size: int,
+    index: int,
+    debug: bool = False
+) -> None:
     """Alter bytearray target so that size bits of target starting
        at index are replaced by value."""
     bit_index = index % 8
@@ -101,10 +121,14 @@ def bits_pack(target, value, size, index,debug=False):
     #if debug:print("AFTER ", ''.join(["%01d"%b for b in section]))
     target[startbyte:endbyte] = bits_to_bytes(section)
 
-def ncbits_pack(target, value, *fields):
+def ncbits_pack(
+    target: bytearray,
+    value: int,
+    *fields: tuple[int, int]
+) -> None:
     """Alter target to contain the value given, broken up into
        nonconsecutive bitfields using the same sematics as ncbits_of.
-       
+
        Look on this, ye coders, and repeat the sacred mantra:
           "Premature optimization is the root of all evil."
     """
@@ -117,15 +141,14 @@ def ncbits_pack(target, value, *fields):
         fieldbits = value & (0xFFFFFFFFFFFFFFFF >> (64-size))
         bits_pack(target, fieldbits, size, index)
         value >>= size
-    
 
-def ncbits_of(data, *fields):
+def ncbits_of(data: bytearray, *fields: tuple[int, int]) -> int:
     """Returns an integer bit field from the bytearray data, 
        the integer being made up of all the fields combined.
        Each field is a tuple in the format (size,index). 
        e.g. if  you had a bytearray foo of three bytes as follows:
-       
-         -----AB-, ---CDEFG, HI--JKL-   
+
+         -----AB-, ---CDEFG, HI--JKL-
 
        And you wanted to extract the bits ABCDEFGHIJKL as one
        12-bit integer, you'd say:
@@ -144,7 +167,7 @@ def ncbits_of(data, *fields):
         result |= bits_of(data, size, index)
     return result
 
-def bits_of(data, size, index):
+def bits_of(data: bytearray, size: int, index: int) -> int:
     "Read a slice of the bytearray data bitwise - indices in bits"
     byte_index = index // 8
     bit_index = index % 8
@@ -158,37 +181,58 @@ def bits_of(data, size, index):
         result = (result << 8) | data[byte_index]
     result >>= 8 - (bit_index + bit_size) % 8
     return result
-        
 
+S_offlen = struct.Struct('>LL')
+S_uint32 = struct.Struct('>L')
+S_sint32 = struct.Struct('>l')
+S_uint8 = struct.Struct('B')
+S_sint8 = struct.Struct('b')
+S_uint16 = struct.Struct('>H')
+S_sint16 = struct.Struct('>h')
 
-class BinaryHandler(object):
-    S_offlen = struct.Struct('>LL')
-    S_uint32 = struct.Struct('>L')
-    S_sint32 = struct.Struct('>l')
-    S_uint8 = struct.Struct('B')
-    S_sint8 = struct.Struct('b')
-    S_uint16 = struct.Struct('>H')
-    S_sint16 = struct.Struct('>h')
+class DelvReader(object):
+    file: BufferedReader|BytesIO
+    def __init__(
+        self,
+        file: BufferedReader|BytesIO|bytes|bytearray,
+        coverage_map: bool = False
+    ) -> None:
+        if type(file) is bytes or type(file) is bytearray:
+            self.file = BytesIO(file)
+        elif isinstance(file, BufferedReader) or isinstance(file, BytesIO):
+            self.file = file
+        else:
+            assert False, f"DelvReader: unknown file type {type(file)}"
+        self._read = self.read
+        if coverage_map:
+            self.coverage_map = [0]*len(self)
+            self.read = self.cm_read
+            self.readb = self.cm_readb
 
     # Wishing for a more elegant alternative
-    def eof(self):
+    def eof(self) -> bool:
         rv = self.file.read(1)
         self.file.seek(-1, 1)
         return rv == ''
-    def seek(self, *vargs, **kwargs):
+
+    def seek(self, *vargs, **kwargs) -> None:
         self.file.seek(*vargs, **kwargs)
-    def cm_read(self,  *vargs, **kwargs):
+
+    def cm_read(self,  *vargs, **kwargs) -> bytes:
         p = self.tell()
         rv = self.file.read(*vargs,**kwargs)
         self.coverage_map[p:p+len(rv)] = [1]*len(rv)
         return rv
-    def cm_readb(self, *vargs, **kwargs):
+
+    def cm_readb(self, *vargs, **kwargs) -> bytearray:
         return bytearray(self.cm_read(*vargs, **kwargs))
-    def cm_all(self):
-        return not 0 in self.coverage_map
-    def cm_unseen(self):
+
+    def cm_all(self) -> bool:
+        return 0 not in self.coverage_map
+
+    def cm_unseen(self) -> list[tuple[int, int]]:
         unseen = []
-        start=0
+        start = 0
         i = 0
         cm = self.coverage_map
         while i < len(cm):
@@ -199,134 +243,67 @@ class BinaryHandler(object):
                 unseen.append((start,i-start))
             i += 1
         return unseen
-    def read(self, *vargs, **kwargs):
+
+    def read(self, *vargs, **kwargs) -> bytes:
         return self.file.read(*vargs, **kwargs)
-    def readb(self, *vargs, **kwargs):
+
+    def readb(self, *vargs, **kwargs) -> bytearray:
         return bytearray(self.file.read(*vargs, **kwargs))
-    def write(self, *vargs, **kwargs):
-        self.file.write(*vargs, **kwargs)
-    def tell(self, *vargs, **kwargs):
+
+    def tell(self, *vargs, **kwargs) -> int:
         return self.file.tell(*vargs, **kwargs)
-    def __len__(self):
+
+    def __len__(self) -> int:
         p = self.tell()
         self.seek(0)
         # somewhere a Real Programmer is crying and doesn't know why
         length = len(self._read())
         self.seek(p)
         return length
-    def truncate(self, *vargs, **kwargs):
-        return self.file.truncate(*vargs,**kwargs)
 
-    def __init__(self, file, coverage_map=False):
-        if hasattr(file, 'read') and hasattr(file, 'write'):
-            self.file = file
-        elif hasattr(file, '__getitem__'):
-            self.file = BytesIO(file)
-        self._read = self.read
-        if coverage_map:
-            self.coverage_map = [0]*len(self)
-            self.read = self.cm_read
-            self.readb = self.cm_readb
-    def write_struct(self, s, v, offset=None):
-        if offset is not None: self.seek(offset)
-        if type(v) is int:
-            self.write(s.pack(v)) 
-        else:
-            self.write(s.pack(*v))
-    def write_uint8(self, v, offset=None):
-        self.write_struct(self.S_uint8, v, offset)
-    def write_sint8(self, v, offset=None): 
-        self.write_struct(self.S_sint8, v, offset)
-    def write_uint16(self,v,offset=None):
-        self.write_struct(self.S_uint16, v, offset)
-    def write_uint6_uint10(self,v1,v2,offset=None):
-        self.write_uint16((v1<<10)|(v2&0x3FF),offset)
-    def write_fo16(self, flags, roffset, offset=None):
-        self.write_uint16(((flags&0x0F)<<12)|roffset, offset)
-    def write_sint16(self,v,offset=None):
-        self.write_struct(self.S_sint16, v, offset)
-    def write_uint32(self,v,offset=None):
-        self.write_struct(self.S_uint32, v, offset)
-    def write_sint32(self,v,offset=None):
-        self.write_struct(self.S_sint32, v, offset)
-    def write_offlen(self,offs,length,offset=None):
-        self.write_struct(self.S_offlen, (offs,length), offset)
-    
-    def write_sint24(self,v,offset=None):
-        if offset is not None: self.seek(offset)
-        self.write_uint8((v&0xFF0000)>>16)
-        return self.write_uint16((v&0x00FFFF))
-
-    def write_uint24(self,v,offset=None):
-        if offset is not None: self.seek(offset)
-        self.write_uint8((v&0xFF0000)>>16)
-        return self.write_uint16((v&0x00FFFF))
-
-    def write_xy24(self,x,y,offset=None):
-        if offset is not None: self.seek(offset)
-        self.write_uint8((x&0xFF0)>>4)
-        self.write_uint8(((x&0x00F)<<4)|((y&0xF00)>>8))
-        return self.write_uint8(y&0x0FF)
-
-    def write_vm32(self, flags, v, offset=None):
-        if offset is not None: self.seek(offset)
-        self.write_uint8(flags)
-        return self.write_sint24(v)
-
-    def write_pstring(self, s, offset=None):
-        if offset is not None: self.seek(offset)
-        "Write a pascal string - 8 bit length followed by data."
-        assert len(s) < 256
-        self.write_uint8(len(s))
-        return self.write(s)
-    def write_str31(self, s, offset=None):
-        if offset is not None: self.seek(offset)
-        assert len(s) < 32
-        self.write_uint8(len(s))
-        self.write('\x00'%(31-len(s)))
-    def write_cstring(self, s, offset=None):
-        "Write a null-terminated string."
-        if offset is not None: self.seek(offset)
-        self.write(s)
-        return self.write('\x00')
-    def write_fixed16(self, s, offset=None):
-        "Write 8.8 fixed-point number."
-        if offset is not None: self.seek(offset)
-        self.write_uint8(int(s))
-        self.write_uint8(int(round(255*(s-int(s)))))
-
-    def read_struct(self, s, offset=None):
+    def read_struct(self, s: struct.Struct, offset: Optional[int] = None) -> tuple[int, int]:
         if offset is not None: self.seek(offset)
         return s.unpack(self.read(s.size))
-    def read_offlen(self, offset=None):
-        return self.read_struct(self.S_offlen, offset)
-    def read_uint8(self, offset=None):
+
+    def read_offlen(self, offset: Optional[int] = None) -> tuple[int, int]:
+        return self.read_struct(S_offlen, offset)
+
+    def read_uint8(self, offset: Optional[int] = None) -> int:
         "Read 8-bit unsigned integer"
-        return self.read_struct(self.S_uint8, offset)[0]
-    def read_sint8(self, offset=None):
-        return self.read_struct(self.S_sint8, offset)[0]
-    def read_uint16(self, offset=None):
+        return self.read_struct(S_uint8, offset)[0]
+
+    def read_sint8(self, offset: Optional[int] = None) -> int:
+        return self.read_struct(S_sint8, offset)[0]
+
+    def read_uint16(self, offset: Optional[int] = None) -> int:
         "Read 16-bit big endian unsigned integer."
-        return self.read_struct(self.S_uint16, offset)[0]
-    def read_uint6_uint10(self,offset=None):
+        return self.read_struct(S_uint16, offset)[0]
+
+    def read_uint6_uint10(
+        self,
+        offset: Optional[int] = None
+    ) -> tuple[int, int]:
         v = self.read_uint16(offset)
         return v>>10, v&0x3FF
-    def read_sint16(self, offset=None):
+
+    def read_sint16(self, offset: Optional[int] = None) -> int:
         "Read 16-bit big endian signed integer."
-        return self.read_struct(self.S_sint16, offset)[0]
-    def read_sint32(self, offset=None):
-        return self.read_struct(self.S_sint32, offset)[0]
-    def read_uint24(self, offset=None):
+        return self.read_struct(S_sint16, offset)[0]
+
+    def read_sint32(self, offset: Optional[int] = None) -> int:
+        return self.read_struct(S_sint32, offset)[0]
+
+    def read_uint24(self, offset: Optional[int] = None) -> int:
         first_part  = self.read_uint8(offset)
         return (first_part<<16) | self.read_uint16()
-    def read_atom(self, offset=None):
+
+    def read_atom(self, offset: Optional[int] = None) -> int|str|dref:
         "Read a simple delver scripting system value"
         ty = self.read_uint8(offset)
         if ty == 0x50:
             empty = self.read_uint8()
             assert not empty
             atom = self.read_uint16()
-            
             return {0xFFFF:None, 0: False, 1: True}[atom]
         elif ty&0x80 == 0x00:
             v = self.read_uint24()|((ty&0x0F)<<24)
@@ -336,11 +313,199 @@ class BinaryHandler(object):
         elif ty >= 0x80:
             resid = ((ty&~0x80)<<8)|self.read_uint8()
             offset = self.read_uint16()
-            return dref(resid,offset)
+            return dref(resid, offset)
         else:
             print(repr(self), "==0x%02X"%ty, repr(self.file), file=stderr)
             assert False
-    def write_atom(self, v, offset=None):
+
+    def read_sint24(self, offset: Optional[int] = None) -> int:
+        "Return a signed 24-bit integer."
+        first_part  = self.read_uint8(offset)
+        uvar = (first_part<<16) | self.read_uint16()
+        if uvar & 0x800000:
+            uvar = -((0xFFFFFF^uvar)+1)
+        return uvar
+
+    def read_fo16(self, offset: Optional[int] = None) -> tuple[int, int]:
+        v = self.read_uint16(offset)
+        return (v&0xF000)>>12,v&0x0FFF
+
+    def read_xy24(self, offset: Optional[int] = None) -> tuple[int, int]:
+        "Read packed 12-bit xy coordinates, as used in prop lists."
+        if offset is not None: self.seek(offset)
+        d = self.readb(3)
+        return (d[0]<<4)|(d[1]>>4), ((d[1]&0x0F)<<8)|d[2]
+
+    def read_uint32(self, offset: Optional[int] = None) -> int:
+        "Read 32-bit unsigned integer."
+        return self.read_struct(S_uint32, offset)[0]
+
+    def read_vm32(self, offset: Optional[int] = None) -> tuple[int, int]:
+        "Read 24-bit signed integer and 8-bit flags. (Flags returned first.)"
+        #FIXME, now known to use a 28 bit integer
+        return self.read_uint8(offset), self.read_sint24()
+
+    def read_pstring(self, offset: Optional[int] = None) -> str:
+        "Read a Pascal String (Length byte followed by that many data bytes)"
+        size = self.read_uint8(offset)
+        return self.read(size).decode("macroman")
+
+    def read_str31(self, offset: Optional[int] = None) -> str:
+        "Read a Str31."
+        size = self.read_uint8(offset)
+        return self.read(31)[:size].decode("macroman")
+
+    def read_fixed16(self, offset: Optional[int] = None) -> float:
+        "Read an 8.8 Fixed number."
+        units = self.read_uint8(offset)
+        fraction = self.read_uint8()
+        return units + fraction/256.0
+
+    def read_cstring(self, offset: Optional[int] = None) -> str:
+        if offset is not None: self.seek(offset)
+        buf = bytearray()
+        while True:
+            b = self.read(1)
+            if b == b'\0' or not b: break
+            buf += b
+        return buf.decode("macroman")
+
+class DelvWriter(object):
+    file: BufferedWriter|BytesIO
+    def __init__(
+        self,
+        file: BufferedWriter|BytesIO
+    ) -> None:
+        if isinstance(file, BufferedWriter) or isinstance(file, BytesIO):
+            self.file = file
+        else:
+            assert False, f"DelvWriter: unknown file type {type(file)}"
+
+    def write(self, *vargs, **kwargs) -> None:
+        self.file.write(*vargs, **kwargs)
+
+    def truncate(self, *vargs, **kwargs):
+        return self.file.truncate(*vargs,**kwargs)
+
+    def seek(self, *vargs, **kwargs) -> None:
+        self.file.seek(*vargs, **kwargs)
+
+    def tell(self, *vargs, **kwargs) -> int:
+        return self.file.tell(*vargs, **kwargs)
+
+    def write_struct(
+        self,
+        s: struct.Struct,
+        v: int|tuple[int, int],
+        offset: Optional[int] = None
+    ) -> None:
+        if offset is not None: self.seek(offset)
+        if type(v) is tuple:
+            self.write(s.pack(*v))
+        elif type(v) is int:
+            self.write(s.pack(v))
+        else:
+            assert False, f"write_struct: unknown value type {type(v)}"
+
+    def write_uint8(self, v: int, offset: Optional[int] = None) -> None:
+        self.write_struct(S_uint8, v, offset)
+
+    def write_sint8(self, v: int, offset: Optional[int] = None) -> None:
+        self.write_struct(S_sint8, v, offset)
+
+    def write_uint16(self, v: int, offset: Optional[int] = None) -> None:
+        self.write_struct(S_uint16, v, offset)
+
+    def write_uint6_uint10(
+        self,
+        v1: int,
+        v2: int,
+        offset: Optional[int] = None
+    ) -> None:
+        self.write_uint16((v1<<10)|(v2&0x3FF),offset)
+
+    def write_fo16(
+        self,
+        flags: int,
+        roffset: int,
+        offset: Optional[int] = None
+    ) -> None:
+        self.write_uint16(((flags&0x0F)<<12)|roffset, offset)
+
+    def write_sint16(self, v: int, offset: Optional[int] = None) -> None:
+        self.write_struct(S_sint16, v, offset)
+
+    def write_uint32(self, v: int, offset: Optional[int] = None) -> None:
+        self.write_struct(S_uint32, v, offset)
+
+    def write_sint32(self, v: int, offset: Optional[int] = None) -> None:
+        self.write_struct(S_sint32, v, offset)
+
+    def write_offlen(
+        self,
+        offs: int,
+        length: int,
+        offset: Optional[int] = None
+    ) -> None:
+        self.write_struct(S_offlen, (offs, length), offset)
+
+    def write_sint24(self, v: int, offset: Optional[int] = None) -> None:
+        if offset is not None: self.seek(offset)
+        self.write_uint8((v&0xFF0000)>>16)
+        self.write_uint16((v&0x00FFFF))
+
+    def write_uint24(self, v: int, offset: Optional[int] = None) -> None:
+        if offset is not None: self.seek(offset)
+        self.write_uint8((v&0xFF0000)>>16)
+        self.write_uint16((v&0x00FFFF))
+
+    def write_xy24(self, x: int, y: int, offset: Optional[int] = None) -> None:
+        if offset is not None: self.seek(offset)
+        self.write_uint8((x&0xFF0)>>4)
+        self.write_uint8(((x&0x00F)<<4)|((y&0xF00)>>8))
+        self.write_uint8(y&0x0FF)
+
+    def write_vm32(
+        self,
+        flags: int,
+        v: int,
+        offset: Optional[int] = None
+    ) -> None:
+        if offset is not None: self.seek(offset)
+        self.write_uint8(flags)
+        return self.write_sint24(v)
+
+    def write_pstring(self, s: str, offset: Optional[int] = None) -> None:
+        if offset is not None: self.seek(offset)
+        "Write a pascal string - 8 bit length followed by data."
+        assert len(s) < 256
+        self.write_uint8(len(s))
+        return self.write(s.encode("macroman"))
+
+    def write_str31(self, s: str, offset: Optional[int] = None) -> None:
+        if offset is not None: self.seek(offset)
+        assert len(s) < 32
+        self.write_uint8(len(s))
+        self.write(s.encode("macroman"))
+        self.write('\x00'*(31-len(s)))
+
+    def write_cstring(self, s: str, offset: Optional[int] = None) -> None:
+        "Write a null-terminated string."
+        if offset is not None: self.seek(offset)
+        self.write(s)
+        self.write('\x00')
+
+    def write_fixed16(self, s: float, offset: Optional[int] = None) -> None:
+        "Write 8.8 fixed-point number."
+        if offset is not None: self.seek(offset)
+        self.write_uint8(int(s))
+        self.write_uint8(int(round(255*(s-int(s)))))
+
+    def write_atom(
+        self,
+        v: Optional[int|dref],
+        offset: Optional[int] = None
+    ) -> None:
         if offset is not None: self.seek(offset)
         if v is None:
             self.write_uint32(0x5000FFFF)
@@ -351,56 +516,9 @@ class BinaryHandler(object):
             self.write_uint8(0x00)
             self.write_sint24(v)
         else:
-            assert False, "Can't write (%s) as a delver atom"%v
-        
-
-    def read_sint24(self, offset=None):
-        "Return a signed 24-bit integer."
-        first_part  = self.read_uint8(offset)
-        uvar = (first_part<<16) | self.read_uint16()
-        if uvar & 0x800000:
-            uvar = -((0xFFFFFF^uvar)+1)
-        return uvar
-    def read_fo16(self, offset=None):
-        v = self.read_uint16(offset)
-        return (v&0xF000)>>12,v&0x0FFF
-    def read_xy24(self, offset=None):
-        "Read packed 12-bit xy coordinates, as used in prop lists."
-        if offset is not None: self.seek(offset)
-        d = self.readb(3)
-        return (d[0]<<4)|(d[1]>>4), ((d[1]&0x0F)<<8)|d[2]
-    def read_uint32(self, offset=None):
-        "Read 32-bit unsigned integer."
-        return self.read_struct(self.S_uint32, offset)[0]
-    def read_vm32(self, offset=None):
-        "Read 24-bit signed integer and 8-bit flags. (Flags returned first.)"
-        #FIXME, now known to use a 28 bit integer
-        return self.read_uint8(offset), self.read_sint24()
-    def read_pstring(self, offset=None):
-        "Read a Pascal String (Length byte followed by that many data bytes)"
-        size = self.read_uint8(offset)
-        return self.read(size)
-    def read_str31(self, offset=None):
-        "Read a Str31."
-        size = self.read_uint8(offset)
-        return self.read(31)[:size]
-    def read_fixed16(self,offset=None):
-        "Read an 8.8 Fixed number."
-        units = self.read_uint8(offset)
-        fraction = self.read_uint8()
-        return units + fraction/256.0
-        
-    def read_cstring(self, offset=None):
-        if offset is not None: self.seek(offset)
-        buf = bytearray()
-        while True:
-            b = self.read(1)
-            if b == b'\0' or not b: break
-            buf += b
-        return buf.decode("macroman")
+            assert False, f"write_atom: unknown value ({v}) for delver atom"
 
 class UnimplementedFeature (Exception): pass
-
 
 DLI_MSG = """This archive must be underlayed with a Scenario."""
 class LibraryIncomplete(Exception): pass

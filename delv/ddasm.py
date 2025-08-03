@@ -44,7 +44,7 @@ class Disassembler(object):
         self.pseudo_ops = {}
         self.context_resource=context_resource
     def disassemble(self, code, force_classmode=False, preamble=None):
-        self.infile = util.BinaryHandler(code, coverage_map=True)
+        self.infile = util.DelvReader(code, coverage_map=True)
         if force_classmode:
             self.content = [DClass(self.infile)]
         else:
@@ -862,18 +862,18 @@ class DFunction(DVMObj):
                     print("    Couldn't identify the ending of the subroutine." )
                     self.dd.get_label(subroutinefound, "Subroutine")
                     self.near.seek(subroutinefound+1)
-            if opcode < 0x80 and mode is 'direct':
+            if opcode < 0x80 and mode == 'direct':
                 #print("staying direct")
                 if not textbuf: lastoffset = self.near.tell()-1
                 textbuf.append(opcode)
-            elif opcode >= 0x80 and mode is 'direct':
+            elif opcode >= 0x80 and mode == 'direct':
                 #print("changing to code",)
                 #print("ADDR", self.near.tell()-1)
                 mode = 'code'
                 self.code.append((''.join(map(chr,textbuf)),lastoffset))
                 self.ilevel.append(len(self.indent_segments)+1)
                 textbuf = []; lastoffset=-1
-            if mode is 'code':
+            if mode == 'code':
                 #print("code mode")
                 self.ilevel.append(len(self.indent_segments)+1)
                 if opcode < 0x80 and not self.expect_close: 

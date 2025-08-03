@@ -278,8 +278,10 @@ class Music(Sound):
         if src: self.load_from_file(src)
 
     def load_from_file(self, src):
-        self.src = util.BinaryHandler(src)
-        body_offset = self.src.read_uint32() # body_offset tells when the general commands stop and others begin; may not need it, just read through
+        self.src = util.DelvReader(src)
+        # body_offset tells when the general commands stop and others begin
+        # We may not need it, but read through and advance the read position.
+        body_offset = self.src.read_uint32()
         musi = self.src.read(4)
         if musi != MUSIC_COMPONENT_TYPE: 
             raise ValueError("%s is not a music resource"%src)

@@ -64,9 +64,10 @@ class Opcode(object):
     def __init__(self, ctx, **kwargs):
         self.ctx = ctx
         self.kwargs = kwargs
-    def generate(self, of, ctx):
+
+    def generate(self, of: util.DelvWriter, ctx):
         of.write_uint8(self.encoding)
-    def rule(self, name, rhs=''):
+    def rule(self, name: str, rhs: str = ''):
         base = "operation_%s = '%s'"%(name,name)
         if rhs:
             base += ' space '+rhs
@@ -91,19 +92,19 @@ class Opcode(object):
         p = ', '.join(['%s=%s'%(binding,binding) for binding,rule in zip(
                              argname[-len(argclass):],argclass)])
         return p
-    def finish(self, of, ctx, value):
+    def finish(self, of: util.DelvWriter, ctx, value):
         #print("value", value, self)
         of.write_uint16(value)
 
 ############################ OPCODE DEFINITIONS ###########################
 class Op_local(Opcode):
     mnemonic = 'loc'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(ctx.getfval(which))
 
 class Op_argument(Opcode):
     mnemonic = 'arg'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(ctx.getfval(which)|0x30)
 
 class Op_end_expression(Opcode):
@@ -112,24 +113,24 @@ class Op_end_expression(Opcode):
 
 class Op_then_go_to(Opcode):
     mnemonic = 'then'
-    def generate(self, of, ctx, label=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, label=INT_SYM):
         of.write_uint8(0x40)
         of.write_uint16(ctx.getlval(label, self, of.tell()))
 
 class Op_load_byte(Opcode):
     mnemonic = 'byte'
-    def generate(self, of, ctx, immediate=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, immediate=INT_SYM):
         of.write_uint8(0x41)
         if immediate < 0:
             of.write_sint8(ctx.getlval(immediate, self, of.tell()))
         else:
             of.write_uint8(ctx.getlval(immediate, self, of.tell())&0xFF)
-    def finish(self, of, ctx, value):
+    def finish(self, of: util.DelvWriter, ctx, value):
         of.write_sint8(value)
 
 class Op_load_short(Opcode):
     mnemonic = 'short'
-    def generate(self, of, ctx, immediate=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, immediate=INT_SYM):
         of.write_uint8(0x42)
         if immediate >= 0:
             of.write_uint16(ctx.getlval(immediate, self, of.tell())&0xFFFF)
@@ -138,7 +139,7 @@ class Op_load_short(Opcode):
 
 class Op_load_word(Opcode):
     mnemonic = 'word'
-    def generate(self, of, ctx, immediate='(atom|symbol):%s'):
+    def generate(self, of: util.DelvWriter, ctx, immediate='(atom|symbol):%s'):
         of.write_uint8(0x43)
         v = ctx.getlval(self.encod(immediate), self, of.tell())
         #print("Got value", v)
@@ -148,7 +149,7 @@ class Op_load_word(Opcode):
             of.write_uint32(0xBBBBBBBB)
         else:
             of.write_uint32(self.encod(v))
-    def finish(self, of, ctx, value):
+    def finish(self, of: util.DelvWriter, ctx, value):
         #print("Finishing", value)
         of.write_uint32(self.encod(value))
     def encod(self, v):
@@ -158,13 +159,13 @@ class Op_load_word(Opcode):
 
 class Op_load_cstring(Opcode):
     mnemonic = 'string'
-    def generate(self, of, ctx, immediate=STR_SYM):
+    def generate(self, of: util.DelvWriter, ctx, immediate=STR_SYM):
         of.write_uint8(0x44)
         of.write(ctx.getval(immediate))
 
 class Op_load_data(Opcode):
     mnemonic = 'data'
-    def generate(self, of, ctx, dval='(table|array):%s'):
+    def generate(self, of: util.DelvWriter, ctx, dval='(table|array):%s'):
         of.write_uint8(0x45)
         lenadr = of.tell()
         of.write_uint16(0xDEAD)
@@ -185,19 +186,19 @@ class Op_index(Opcode):
 
 class Op_load_near_word(Opcode):
     mnemonic = 'near'
-    def generate(self, of, ctx, lbl=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, lbl=INT_SYM):
         of.write_uint8(0x47)
         of.write_uint16(ctx.getlval(lbl, self, of.tell()))
     
 class Op_global(Opcode):
     mnemonic = 'glo'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(0x48)
         of.write_uint8(ctx.getval(which))
 
 class Op_load_far_word(Opcode):
     mnemonic = 'far'
-    def generate(self, of, ctx, resid=INT_SYM, offset=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, resid=INT_SYM, offset=INT_SYM):
         of.write_uint8(0x49)
         of.write_uint16(ctx.getval(resid))
         of.write_uint16(ctx.getval(offset))
@@ -292,39 +293,39 @@ class Op_get_length(Opcode):
 
 class Op_has_member(Opcode):
     mnemonic = 'has'
-    def generate(self, of, ctx, field=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, field=INT_SYM):
         of.write_uint8(0x60)
         of.write_uint8(ctx.getval(field))
 
 class Op_class_member(Opcode):
     mnemonic = 'member'
-    def generate(self, of, ctx, classfield=INT_SYM, tidx=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, classfield=INT_SYM, tidx=INT_SYM):
         of.write_uint8(0x61)
         of.write_uint8(ctx.getval(classfield))
         of.write_uint8(ctx.getval(tidx))
 
 class Op_get_field(Opcode):
     mnemonic = 'field'
-    def generate(self, of, ctx, field=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, field=INT_SYM):
         of.write_uint8(0x62)
         of.write_uint8(ctx.getval(field))
 
 
 class Op_cast_to(Opcode):
     mnemonic = 'cast'
-    def generate(self, of, ctx, field=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, field=INT_SYM):
         of.write_uint8(0x63)
         of.write_uint8(ctx.getval(field))
 
 class Op_is_type(Opcode):
     mnemonic = 'type'
-    def generate(self, of, ctx, field=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, field=INT_SYM):
         of.write_uint8(0x64)
         of.write_uint8(ctx.getval(field))
 
 class Op_set_local(Opcode):
     mnemonic = 'setl'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(0x82)
         of.write_uint8(ctx.getfval(which, warn_new=False))
 
@@ -332,7 +333,7 @@ class Op_set_local(Opcode):
 # that are spurious.
 class Op_var(Opcode):
     mnemonic = 'var'
-    def generate(self, of, ctx, which='symbol:%s'):
+    def generate(self, of: util.DelvWriter, ctx, which='symbol:%s'):
         ctx.getfval(which, warn_new=False)
 #class Op_class_field(Opcode):
 #    mnemonic = 'classfield'
@@ -340,12 +341,12 @@ class Op_var(Opcode):
 #        ctx.class_field(ctx.getval(field), ctx.getval(value))
 class Op_loopvar(Opcode):
     mnemonic = 'lvar'
-    def generate(self, of, ctx, which='symbol:%s'):
+    def generate(self, of: util.DelvWriter, ctx, which='symbol:%s'):
         ctx.getfval(which, warn_new=False, loopvar=3)
 
 class Op_write_near_word(Opcode):
     mnemonic = 'wnw'
-    def generate(self,of,ctx, addr=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, addr=INT_SYM):
         of.write_uint8(0x83)
         of.write_uint16(ctx.getlval(addr, self, of.tell()))
 
@@ -355,20 +356,20 @@ class Op_set_index(Opcode):
 
 class Op_write_far_word(Opcode):
     mnemonic = 'wfw'
-    def generate(self,of,ctx, resid=INT_SYM, offset=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, resid=INT_SYM, offset=INT_SYM):
         of.write_uint8(0x85)
         of.write_uint16(ctx.getval(resid))
         of.write_uint16(ctx.getlval(offset, self, of.tell()))
 
 class Op_set_field(Opcode):
     mnemonic = 'setf'
-    def generate(self,of,ctx, whichfield=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, whichfield=INT_SYM):
         of.write_uint8(0x86)
         of.write_uint8(ctx.getval(whichfield))
 
 class Op_subroutine(Opcode):
     mnemonic = 'subr'
-    def generate(self,of,ctx, argcount=INT_SYM, localsize=INT_SYM, position=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, argcount=INT_SYM, localsize=INT_SYM, position=INT_SYM):
         self.position = position
         ctx.define_symbol(position, of.tell())
         of.write_uint8(0x81)
@@ -377,13 +378,13 @@ class Op_subroutine(Opcode):
 
 class Op_set_global(Opcode):
     mnemonic = 'setg'
-    def generate(self,of,ctx, whichglobal=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, whichglobal=INT_SYM):
         of.write_uint8(0x87)
         of.write_uint8(ctx.getval(whichglobal))
 
 class Op_unconditional_branch(Opcode):
     mnemonic = 'branch'
-    def generate(self,of,ctx, lbl=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, lbl=INT_SYM):
         of.write_uint8(0x88)
         of.write_uint16(ctx.getlval(lbl, self, of.tell()))
 
@@ -393,12 +394,11 @@ class Op_switch(Opcode):
 
 class Op_cases(Opcode):
     mnemonic = 'cases'
-    def generate(self,of,ctx, lbls="'(' ws symlistitem*:%s ws ')' "):
+    def generate(self, of: util.DelvWriter, ctx, lbls="'(' ws symlistitem*:%s ws ')' "):
          of.write_uint8(0x40)
          of.write_uint16(len(lbls))
          for lbl in lbls:
               of.write_uint16(ctx.getlval(lbl,self,of.tell()))
-        
 
 class Op_print(Opcode):
     mnemonic = 'print'
@@ -423,13 +423,13 @@ class Op_exit_conversation(Opcode):
 class Op_conversation_prompt(Opcode):
     mnemonic = 'prompt'
     encoding = 0x8F
-    def generate(self, of,ctx,prompt=STR_SYM):
+    def generate(self, of: util.DelvWriter, ctx, prompt=STR_SYM):
         of.write_uint8(0x8F)
         of.write(ctx.getval(prompt))
 
 class Op_conversation_response(Opcode):
     mnemonic = 'response'
-    def generate(self,of,ctx, prompt=STR_SYM, label="(ws 'else' ws (integer|symbol))?:%s"):
+    def generate(self, of: util.DelvWriter, ctx, prompt=STR_SYM, label="(ws 'else' ws (integer|symbol))?:%s"):
         of.write_uint8(0x90)
         of.write(ctx.getval(prompt))
         if label is None:
@@ -441,7 +441,7 @@ class Op_conversation_response(Opcode):
 
 class Op_end_response(Opcode):
     mnemonic = 'endr'
-    def generate(self, of,ctx):
+    def generate(self, of: util.DelvWriter, ctx):
         p=ctx.finish_conversation_prompt(of.tell())
         endpoint = of.tell()
         of.seek(p)
@@ -450,7 +450,7 @@ class Op_end_response(Opcode):
 
 class Op_reset_ai_state(Opcode):
     mnemonic = 'ai_state'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(0x92)
         of.write_uint8(ctx.getval(which))
 
@@ -460,31 +460,31 @@ class Op_gui_close(Opcode):
 
 class Op_gui_call(Opcode):
     mnemonic = 'gui'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(0x9B)
         of.write_uint8(ctx.getval(which))
 
 class Op_call_index(Opcode):
     mnemonic = 'cidx'
-    def generate(self, of, ctx, baseres=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, baseres=INT_SYM):
         of.write_uint8(0x9C)
         of.write_uint16(ctx.getval(baseres))
 
 class Op_call_method(Opcode):
     mnemonic = 'method'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(0x9D)
         of.write_uint8(ctx.getval(which))
 
 class Op_call_subroutine(Opcode):
     mnemonic = 'csub'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(0x9E)
         of.write_uint16(ctx.getlval(which, self, of.tell()))
 
 class Op_call_resource(Opcode):
     mnemonic = 'cres'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(0x9F)
         of.write_uint16(ctx.getval(which))
 
@@ -494,7 +494,7 @@ class Op_call_resource(Opcode):
 
 class Op_system_call(Opcode):
     mnemonic = 'sys'
-    def generate(self, of, ctx, which=INT_SYM):
+    def generate(self, of: util.DelvWriter, ctx, which=INT_SYM):
         of.write_uint8(ctx.getval(which))
 
 
@@ -524,7 +524,7 @@ for item in globals():
 #        return f
 #    return real_decorator
 
-def dict_write_code(table, ofile, context, force_order = None):
+def dict_write_code(table, ofile: util.DelvWriter, context, force_order = None):
     if isinstance(table, DDict): 
         table.write_code(ofile, context, force_order)
         return
@@ -553,7 +553,7 @@ def dict_write_code(table, ofile, context, force_order = None):
     ofile.seek(t)  
 
 
-def write_array_item(ofile, item, context, callbacks):
+def write_array_item(ofile: util.DelvWriter, item, context, callbacks):
     item = context.getval(item)
     if item is None:
          ofile.write_uint32(0x5000FFFF)
@@ -593,27 +593,33 @@ def direct_hex_to_bytearray(text):
 class SymbolList(list): 
     def __hash__(self):
         return hash('.'.join(self))
+
 class VarRef(SymbolList):
     pass
 
 class TLL(object):
     def __init__(self, sym):
         self.sym = sym
-    def write_code(self, ofile, context):
+
+    def write_code(self, ofile: util.DelvWriter, context):
         context.define_symbol(self.sym, ofile.tell())
+
 class ClassData(object):
     def __init__(self, atom, label='ErrorClassData'):
         self.label=label
         self.atom = atom
-    def write_code(self,ofile,context):
+
+    def write_code(self, ofile: util.DelvWriter, context):
         context.define_symbol(self.label, ofile.tell())
         ofile.write_uint32(self.atom)
+
 class Array(list):
     def with_label(self, label=None):
         if label is not None:
             self.label= label
         return self
-    def write_code(self,ofile,context):
+
+    def write_code(self, ofile: util.DelvWriter, context):
         if hasattr(self, 'label'):
             context.define_symbol(self.label, ofile.tell())
         ofile.write_uint16(0x9000|len(self))
@@ -655,11 +661,13 @@ def arrayref(r,i,asm):
     r = asm.getval(r)
     assert 0 <= i <= 0xFFF
     return 0x30000000|(i<<16)|r
+
 def objref(c,o,asm):
     c = asm.getval(c)
     o = asm.getval(o)
     assert 0 <= c <= 0xFF
     return 0x40000000|(c<<16)|o
+
 def resref(r,o,asm):
     #print(r,o#,"%04X"%r, "%04X"%o)
     r = asm.getval(r)
@@ -671,11 +679,11 @@ def resref(r,o,asm):
     return 0x80000000|(r<<16)|o
 
 class Empty(object):
-    def write_code(self,ofile,context=None):
+    def write_code(self, ofile: util.DelvWriter, context=None):
         ofile.write_uint32(0x5000FFFE)
 
 class Function(object): 
-    def __init__(self,label=None, args=None, body=None, ctx=None):
+    def __init__(self, label=None, args=None, body=None, ctx=None):
         self.label = label
         self.args = args
         self.body = body
@@ -683,7 +691,8 @@ class Function(object):
         self.kwargs = {}
         self.conversation_prompts = []
         self.generate = self.write_code # why didn't I call these the same...
-    def write_code(self,ofile,context, **kwargs):
+
+    def write_code(self, ofile: util.DelvWriter, context, **kwargs):
         if self.label: context.define_symbol(self.label, ofile.tell())
         ofile.write_uint8(0x81)
         ofile.write_uint8(len(self.args))
@@ -725,7 +734,8 @@ class FItem(object):
         #print("FBODYITEM", lb, op)
         self.label = lb
         self.op = op
-    def write_code(self, of, ctx):
+
+    def write_code(self, of: util.DelvWriter, ctx):
         if self.label: ctx.define_local_label(self.label, of.tell())
         if isinstance(self.op, bytearray):
             of.write(self.op)
@@ -735,6 +745,7 @@ class FItem(object):
                 self.op.generate(of, ctx, **self.op.kwargs)
             except struct.error:
                 ctx.error("Bad struct format, op %s, args %s"%(self.op, self.op.kwargs))
+
 def get_op(sym):
     return "OP%s"%sym
 
@@ -759,7 +770,8 @@ class DDict(dict):
     def __init__(self, contents):
         for k,v in contents: self[k]=v
         self.contents = contents
-    def write_code(self, ofile, context, force_order=None):
+
+    def write_code(self, ofile: util.DelvWriter, context, force_order=None):
         assert force_order is None 
         #order = force_order or [k for k,v in self.contents]
         ofile.write_uint16(0xA000|len(self.contents))
@@ -894,10 +906,11 @@ class LateLabel(object):
     def __init__(self, label, asm):
         self.label = label
         self.asm = asm
-    def write_code(self,ofile,context, **kwargs):
+
+    def write_code(self, ofile: util.DelvWriter, context, **kwargs):
         lv = context.getlval(self.label, self, ofile.tell())
         ofile.write_uint32(self.form(lv))
-    def finish(self,ofile, context, labval):
+    def finish(self, ofile: util.DelvWriter, context, labval):
         ofile.write_uint32(self.form(labval))
 
 import parsley
@@ -905,8 +918,17 @@ from io import BytesIO
 import sys,os.path
 from . import util
 class Assembler(object):
-    def __init__(self,message_stream=sys.stderr,filename="<stream>",path=None):
-        if path is None: path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rdasm_include')
+    def __init__(
+        self,
+        message_stream=sys.stderr,
+        filename="<stream>",
+        path=None
+    ):
+        if path is None:
+            path = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                'rdasm_include'
+            )
         self.path = path
         p = globals()
         self.toplabels = []
@@ -914,7 +936,10 @@ class Assembler(object):
         self.class_fields = []
         self.symtab = {}
         p['asm'] = self
-        self.Parser = parsley.makeGrammar(RDASM_Opcodes+ '\n' +RDASM_Grammar_Preamble , p)
+        self.Parser = parsley.makeGrammar(
+            RDASM_Opcodes+ '\n' +RDASM_Grammar_Preamble,
+            p
+        )
         self.linenumber=0
         self.filename="<unknown>"
         self.mstream = message_stream
@@ -922,38 +947,48 @@ class Assembler(object):
         self.field_order = []
         self.function_contexts = []
         self.output_file = None
+
     def final_label(self, latelabel, offset):
         self.final_labels.append((latelabel,offset))
+
     def set_field_order(self, order): 
         self.field_order = order
+
     def class_field(self,value,field):
         #print("defining", SymbolList(["Field%04X"%field]), value)
         self.define_symbol(SymbolList(["Field%04X"%field]), value)
         self.class_fields.append((value,field))
-        
+
     def begin_function_context(self, func):
         context = {sym:n for n,sym in enumerate(func.args)}
         callbacks = []
         self.function_contexts.append((func, context, callbacks))
         return callbacks
+
     def get_function_context(self):
         return self.function_contexts[-1]
+
     def end_function_context(self):
         return self.function_contexts.pop()
+
     def toplevel_label(self, s):
         return TLL(s)
+
     def set_context_resource(self,v):
         self.context_resource = v
         self.define_symbol(SymbolList(['Here']), v)
         self.define_symbol(SymbolList(['here']), v)
+
     def include(self, ifil):
         pth = os.path.join(self.path, os.path.join(*ifil)+'.rdasm')
         f = self.assemble(open(pth).read())
+
     def use(self, usesym):
         for sym,val in list(self.symtab.items()):
             #print("*",sym, usesym)
             if sym[0] == usesym[0]:
                 self.define_symbol(SymbolList(sym[1:]), self.lookup_symbol(sym))
+
     def set_fieldnames(self, fn):
         if self.output_file.tell(): self.error("Code generation began before `class` was seen.")
         #self.output_file.write_uint16(0xFFFF)
@@ -964,34 +999,41 @@ class Assembler(object):
                 self.fieldnames[SymbolList(sym[1:])] = self.lookup_symbol(sym)
         #print(self.fieldnames)
         return bytearray(b'\xFF\xFF')
-        
+
     def define_symbols(self, base, syms):
         for k,v in syms:
             #print("dss",base,k,v)
             self.define_symbol(SymbolList(base+k), v)
+
     def define_symbol(self, sym, e):
         #print("DEFINE", sym, e, file=self.mstream)
         self.symtab[sym] = e
+
     def getval(self,thing,create=None):
         if isinstance(thing, SymbolList):
             return self.lookup_symbol(thing)
         else:
             return thing
+
     def getval_offs(self,thing):
         if isinstance(thing, SymbolList):
             return LateLabel(thing,self)
         else:
             return thing
+
     def register_conversation_prompt(self, loc):
         fn,fc,cb = self.get_function_context()
         fn.conversation_prompts.append(loc)
+
     def finish_conversation_prompt(self, offset):
         fn,fc,cb = self.get_function_context()
         p = fn.conversation_prompts.pop()
         return p
+
     def define_argument(self, argname, argop):
         fn,fc,cb = self.get_function_context()
         fc[SymbolList(argname)]=argop
+
     def getlval(self,thing, caller, loc, output=0xDEAD):
         #print("LVAL", thing, caller, loc)
         if not isinstance(thing, SymbolList): return thing
@@ -1006,11 +1048,12 @@ class Assembler(object):
         #print("-->", thing, "appended")
         cb.append((caller, thing, loc))
         return output
+
     def define_local_label(self, label, position):
         fn,fc,cb = self.get_function_context()
         if fn.label: self.define_symbol( SymbolList(fn.label + label), position)
         fc[label] = position
-            
+
     def getfval(self,thing,warn_new=True,loopvar=1):
         #print("getfval", thing, warn_new)
         if not isinstance(thing,SymbolList): return thing
@@ -1031,17 +1074,19 @@ class Assembler(object):
         fc[thing] = rv 
         fn.local_vars += loopvar
         return fc[thing] + (loopvar-1)
+
     def lookup_symbol(self, sym):
         try:
             return self.symtab[sym]
         except KeyError:
             self.error("undefined symbol %s"%'.'.join(sym))
             return 0x5000FFFF
+
     def error(self,msg,warn=False):
         print("%s %s:%d:"%("Warning:" if warn else "Error:",
             self.filename, self.linenumber), msg, file=self.mstream)
-    
-    def write_code(self, item, ofile):
+
+    def write_code(self, item, ofile: util.DelvWriter):
         if item is None:
             return None
         rv = None
@@ -1053,12 +1098,10 @@ class Assembler(object):
             rv = item.write_code(ofile, self)
         return rv
  
-    def write_class_table(self,of):
+    def write_class_table(self, of: util.DelvWriter):
         fieldnames = self.fieldnames
         table = {}
 
-        
-        
         for k,v in self.class_fields:
             table[k] = v
         for sym,field in self.fieldnames.items():
@@ -1088,17 +1131,18 @@ class Assembler(object):
                         else:
                             table[k] = sv
                     except KeyError:
-                        s= self.symtab.items()
+                        s = [kv for kv in self.symtab.items()]
                         s.sort()
                         for l,v in s: print(l,':',v)
                         print("---> Field%04X"%k)
                         assert False
         dict_write_code(table, of, self, force_order=order)
-         
+
     def assemble(self,source):
         source = source.strip()
 
-        binfile = util.BinaryHandler(BytesIO())
+        buf = BytesIO()
+        binfile = util.DelvWriter(buf)
         self.output_file = binfile
         callbacks = []
         parsed = self.Parser(source).program()
@@ -1129,5 +1173,5 @@ class Assembler(object):
             binfile.seek(offset)
             late.finish(binfile, self, self.symtab[late.label])
 
-        return binfile.file.getvalue()
+        return buf.getvalue()
 

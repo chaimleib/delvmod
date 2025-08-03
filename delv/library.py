@@ -27,8 +27,9 @@
 
 # from __future__ import absolute_import, division, print_function, unicode_literals
 
-from . import archive,hints,tile,prop,util,store
-import array
+from . import hints, tile, prop, util, store
+from .archive import Archive
+
 class Library(object):
     """This class is a wrapper around one or more Delver archives, and 
        facilitates retrieving various kinds of objects by their resource
@@ -46,32 +47,34 @@ class Library(object):
        i.e. if you are using it as part of an editor, you will need to tell
        the library the underlying archive has changed with .update(). This 
        will purge all caches."""
-    def __init__(self, *archives):
+    def __init__(self, *archives: Archive) -> None:
         """Create a new library, using the archives provided. The search path
            will be from last to first, i.e. if you say Library(A, B, C) and 
            archives B and C both contain a resource 0xFFFF, and you ask for
            0xFFFF, you will get the one from archive C."""
         self.cache = {}
-        self.archives = filter(None,archives[::-1])
+        self.archives = [a for a in reversed(archives)]
         self.code_store = None
         self.load()
+
     def get_code_store(self):
         if not self.code_store:
             res = self.archives[0].get(0xC0D3, create_new=True)
             self.code_store = store.JSONDictionary(src=res)
         return self.code_store
+
     def load(self):
         #self.load_tiles()
         #self.load_props()
         pass # lazy now
 
-        
-
     def load_props(self):
         self.props = []
         proptiles = self.get_object(0xF000,rw=False)
         xoffsets = self.get_object(0xF011,rw=False)
+        assert xoffsets, "load_props: failed to load xoffsets"
         yoffsets = self.get_object(0xF012,rw=False)
+        assert yoffsets, "load_props: failed to load yoffsets"
         if not proptiles: raise util.LibraryIncomplete(util.DLI_MSG)
         for pid,tile in enumerate(proptiles):
             self.props.append(prop.Prop(pid, tile, zip(
@@ -82,16 +85,18 @@ class Library(object):
     def load_tiles(self):
         tilenames = self.get_object(0xF004,rw=False)
         tileattrs = self.get_object(0xF002,rw=False)
+        assert tileattrs, "load_tiles: failed to load tileattrs"
         tilecompositions = self.get_object(0xF013,rw=False)
         tilefauxprops = self.get_object(0xF010,rw=False)
+        assert tilefauxprops, "load_tiles: failed to load tilefauxprops"
         tilesheets = self.objects(hints.GRAPHICS_TILESHEET, True,rw=False)
-        if not tilenames: raise util.DelverLibraryIncomplete(util.DLI_MSG)
+        assert tilesheets, "load_tiles: failed to load tilesheets"
+        if not tilenames: raise util.LibraryIncomplete(util.DLI_MSG)
         self.tiles = []
         tile_Nothing = tile.Tile(0,tilenames[0], tileattrs[0],
             tilefauxprops[0],
             tilesheets[0].get_tile(0))
 
-        
         for n,attr in enumerate(tileattrs):
             tileres_n = (n >> 4)&0xFF
             if not (tileattrs[n] or tilesheets[tileres_n]): 
@@ -107,45 +112,52 @@ class Library(object):
                     self,tilecompositions[n-0x1000]))
             else: 
                 assert 0, "Turns out there are more tiles than I thought."
-                
+
     def get_tile(self, tid):
         """Returns the specified Tile, or "Nothing" if there is none such."""
         self.load_tiles()
         self.get_tile = self._get_tile
         return self.get_tile(tid)
+
     def _get_tile(self, tid):
         return self.tiles[tid]
 
-    def get_prop(self,ptype):
+    def get_prop(self, ptype):
         """Returns the specified proptype."""
         self.load_props()
         self.get_prop = self._get_prop
         return self.get_prop(ptype)
+
     def _get_prop(self, ptype):
         return self.props[ptype]
 
-    def objects(self,si=None,dense=False,rw=True):
+    def objects(self, si=None, dense: bool = False, rw: bool = True):
         if dense:
             return [self.get_object((si,n),rw=rw
                 ) for n in range(256)]
         else:
             return [self.get_object(resid,rw=rw
                 ) for resid in self.resource_ids(si)]
-    def resources(self,si=None):
+
+    def resources(self, si=None):
         return [self.get_resource(resid) for resid in self.resource_ids(si)]
+
     def resource_ids(self, si=None):
         ids = set()
         for archive in self.archives:
             ids.update(archive.resource_ids(si))
         return list(ids)
-    def get_resource(self, resid):
+
+    def get_resource(self, resid: int):
         """Get a resource by its resource ID or subindex,n pair."""
         for archive in self.archives:
             r = archive.get(resid)
             if r: return r
         return None
+
     def get_dref(self, mdref):
         return self.get_resource(mdref.resid).get_dref(mdref) 
+
     def purge_cache(self, resid):
         r = self.get_resource(resid)
         if r in self.cache:
@@ -158,7 +170,8 @@ class Library(object):
             else:
                 print("purging", resid)
                 del self.cache[r]
-    def get_object(self, resid, rw=True):
+
+    def get_object(self, resid, rw: bool = True):
         """Get the appropriate kind of object for a specified resource."""
         r = self.get_resource(resid)
         if not r: return None
@@ -170,6 +183,7 @@ class Library(object):
         if rw: ob.check_out() 
         # Tell it to regenerate its data every time it's saved,
         return ob
+
     def return_object(self, res):
         self.cache[res.resid].return_to_library()
-    
+

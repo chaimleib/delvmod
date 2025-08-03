@@ -338,7 +338,7 @@ class DOPushData(DCVariableFieldOperation):
     def decode_length(self, data):
         return (data[1]<<8)|data[2]+3
     def decode(self):
-        s = util.BinaryHandler(BytesIO(self.data[3:]))
+        s = util.DelvReader(BytesIO(self.data[3:]))
         self.contents = TypeFactory(self.script_context, s, 
              library=FauxLibrary(self.script_context.res),
              organic_offset=self.true_offset+3,only_local=True)
@@ -602,7 +602,7 @@ def DCOperationFactory(data, i, code, script, mode = 'toplevel',
     DCOperation.code_context = code
     DCOperation.script_context = script
     opc = data[i]
-    if mode is 'toplevel':
+    if mode == 'toplevel':
         if opc < 0x80:
             op = DCStringConstant
         elif opc == 0x82:
@@ -669,7 +669,7 @@ def DCOperationFactory(data, i, code, script, mode = 'toplevel',
         op = op(data,i,organic_offset+i)
         i += len(op)
         return op, i
-    elif mode is 'expression':
+    elif mode == 'expression':
         if opc &0xF0 == 0x30:
             op = DOPushArg
         elif opc < 0x30:
@@ -729,11 +729,12 @@ def DCOperationFactory(data, i, code, script, mode = 'toplevel',
             i += 1
         else:
             op = DCBytes
-        
+
         if op:
             op = op(data,i,organic_offset+i) 
             i += len(op)
         return op,i
+
 class Code(list, _PrintOuter):
     def empty(self):
         self[:] = []

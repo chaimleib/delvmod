@@ -47,14 +47,14 @@ class Store(object):
         from . import archive
         #print("setsource", repr(src))
         self.src = None
-        if issubclass(src.__class__, util.BinaryHandler):
+        if issubclass(src.__class__, util.DelvReader):
             self.src = src
             self.res = None
         elif issubclass(src.__class__, archive.Resource):
             self.src = src.as_file()
             self.res = src
         elif src:
-            self.src = util.BinaryHandler(src)
+            self.src = util.DelvReader(src)
             self.res = None
         else:
             print(dir(src), hasattr(src, 'resid'))
@@ -75,7 +75,7 @@ class Store(object):
     def get_data(self):
         if self.checked_out or not self.data:
             buf = BytesIO()
-            bh = util.BinaryHandler(buf)
+            bh = util.DelvReader(buf)
             self.write_to_bfile(bh)
             # I wonder why StringIO doesn't have a method that does this:
             self.data = bytearray(buf.getvalue())
