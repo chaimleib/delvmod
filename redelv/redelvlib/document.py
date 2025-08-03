@@ -181,7 +181,7 @@ class Document(Gtk.WindowGroup):
             self.library = None
         except Exception as e:
             self.error_message(
-                f"{repr(self.fpath)} doesn't seem to be a valid archive: {repr(e)}"
+                f"load: {repr(self.fpath)} doesn't seem to be a valid archive: {repr(e)}"
             )
             return
         # if directory: self.set_open_directory(path)
@@ -265,7 +265,7 @@ class Document(Gtk.WindowGroup):
             doc.library = None
         except Exception as e:
             doc.error_message(
-                f"{repr(fpath)} doesn't seem to be a valid archive: {repr(e)}"
+                f"open_file: {repr(fpath)} doesn't seem to be a valid archive: {repr(e)}"
             )
             # Close the Document if we created a new one.
             if doc != self: doc.delete_event()
