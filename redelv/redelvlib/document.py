@@ -43,7 +43,7 @@ class Document(Gtk.WindowGroup):
         self.changed: bool = False
         # tree_data: model for the TreeView of the main window.
         self.tree_data = Gtk.TreeStore(str, str, str, int, int)
-        self.current_resource = None
+        self.current_resource: Optional[delv.archive.Resource] = None
         self.current_resource_id: int = 0
         self.current_subindex_id: int = 0
         # window: The main document window.
@@ -178,7 +178,7 @@ class Document(Gtk.WindowGroup):
         if self.cfg.debug: print("Document.load")
         try:
             self.archive = delv.archive.Scenario(
-                path,
+                self.fpath,
                 gui_treestore=self.tree_data
             )
             self.library = None
