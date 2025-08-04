@@ -52,6 +52,10 @@ class Document(Gtk.WindowGroup):
             cfg=self.cfg,
             tree_data=self.tree_data
         )
+        if not self.fpath:
+            refresh_all_titles(self.cfg)
+        else:
+            self.refresh_title()
 
         doc_actions = {
             "menu-close": self.menu_close,
@@ -86,9 +90,6 @@ class Document(Gtk.WindowGroup):
 
         window.tree_view.connect("cursor-changed", self.cursor_changed)
         window.tree_view.connect("row-activated", self.row_activated)
-        if not self.fpath:
-            self.refresh_titles()
-
         # self.window.connect("destroy", self.on_quit)
         self.add_window(window)
 
@@ -110,26 +111,21 @@ class Document(Gtk.WindowGroup):
             name = f"New Document {self.new_id}"
         return f"•  {name}" if self.changed else name
 
-    # refresh_titles finds the document with the first placeholder name and
-    # updates its window title, if needed.
-    def refresh_titles(self) -> None:
-        for doc in documents:
-            # The only window that would change is New Document number 1.
-            # That's only relevant before it gets saved to the FS.
-            # That's also only relevant after the window gets initialized.
-            if doc.new_id == 1 and not doc.fpath and hasattr(doc, 'window'):
-                old_title = doc.window.get_title()
-                new_title = doc.title()
-                if old_title != new_title:
-                    print(f'window {repr(old_title)} -> {repr(new_title)}')
-                    doc.window.set_title(new_title)
-                return
+    def refresh_title(self) -> None:
+        if self.cfg.debug: print("Document.refresh_title")
+        old_title = self.window.get_title()
+        new_title = self.title()
+        if old_title != new_title:
+            print(f'window {repr(old_title)} -> {repr(new_title)}')
+            self.window.set_title(new_title)
 
     def set_unsaved(self) -> None:
+        if self.cfg.debug: print(f"self.set_unsaved - {repr(self.title())}")
         self.window.set_title(self.title())
         self.changed = True
 
     def set_saved(self) -> None:
+        if self.cfg.debug: print(f"self.set_saved - {repr(self.title())}")
         self.window.set_title(self.title())
         self.changed = False
 
@@ -152,7 +148,7 @@ class Document(Gtk.WindowGroup):
             veto = self.warn_unsaved_changes()
         if not veto:
             documents.remove(self)
-            self.refresh_titles()
+            refresh_all_titles(self.cfg)
             self.remove_window(self.window)
         return veto
 
@@ -232,6 +228,8 @@ class Document(Gtk.WindowGroup):
         if self.cfg.debug: print("Document.get_library")
         if not self.library:
             try:
+                assert self.underlay, "get_library: self.underlay is None"
+                assert self.archive, "get_library: self.archive is None"
                 self.library = delv.library.Library(
                     self.underlay,
                     self.archive
@@ -256,8 +254,8 @@ class Document(Gtk.WindowGroup):
         doc = self if self.fresh_document() else Document(
             application=self.application,
             cfg=self.cfg,
-            fpath=fpath
         )
+        doc.fpath = fpath
         if self.cfg.debug:
             print(f"open_file: reusing fresh document: {self == doc}")
         try:
@@ -336,3 +334,11 @@ class Document(Gtk.WindowGroup):
 documents: list[Document] = []
 def max_new_id() -> int:
     return max(doc.new_id for doc in documents)
+
+# refresh_all_titles finds the document with the first placeholder name and
+# updates its window title, if needed.
+def refresh_all_titles(cfg: Config) -> None:
+    if cfg.debug: print("refresh_all_titles")
+    for doc in documents:
+        doc.refresh_title()
+
