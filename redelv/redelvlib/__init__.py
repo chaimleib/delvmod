@@ -90,9 +90,6 @@ class ReDelv(Gtk.Application):
         # self._unsaved: bool = False
         # self.opened_file = None
         # self.exported_directory = None
-        # self.current_resource = None
-        # self.current_resource_id = 0
-        # self.current_subindex_id = 0
         # self.file_metadata_window = None
         # self.file_get_info_window = None
 

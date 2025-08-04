@@ -43,6 +43,9 @@ class Document(Gtk.WindowGroup):
         self.changed: bool = False
         # tree_data: model for the TreeView of the main window.
         self.tree_data = Gtk.TreeStore(str, str, str, int, int)
+        self.current_resource = None
+        self.current_resource_id: int = 0
+        self.current_subindex_id: int = 0
         # window: The main document window.
         self.window: RedelvWindow = self.init_window(
             application=self.application,
