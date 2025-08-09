@@ -38,7 +38,7 @@ class Document(Gtk.WindowGroup):
         # it gets saved.
         self.new_id: int = 0
         if not self.fpath:
-            self.new_id = max_new_id() + 1
+            self.new_id = max_new_id(self.cfg) + 1
         # changed: Whether the document has changed since the last open or save.
         self.changed: bool = False
         # tree_data: model for the TreeView of the main window.
@@ -78,6 +78,7 @@ class Document(Gtk.WindowGroup):
         cfg: Config,
         tree_data: Gtk.TreeStore
     ) -> RedelvWindow:
+        if self.cfg.debug: print(f"Document.init_window - {repr(self.title())}")
         window = RedelvWindow(
             application=application,
             cfg=cfg,
@@ -102,37 +103,42 @@ class Document(Gtk.WindowGroup):
 
     # title returns the main window title for the document.
     def title(self) -> str:
+        if self.cfg.debug: print("Document.title")
         if self.fpath:
             name = path.basename(self.fpath)
-        elif max_new_id() == 1:
+        elif max_new_id(self.cfg) == 1:
             # There's no need to number the new document if there is only one.
             name = "New Document"
         else:
             name = f"New Document {self.new_id}"
-        return f"•  {name}" if self.changed else name
+        name = f"•  {name}" if self.changed else name
+        if self.cfg.debug: print(f"  -> {repr(name)}")
+        return name
 
     def refresh_title(self) -> None:
-        if self.cfg.debug: print("Document.refresh_title")
+        if self.cfg.debug: print(f"Document.refresh_title - {repr(self.window.get_title())}")
         old_title = self.window.get_title()
         new_title = self.title()
         if old_title != new_title:
-            print(f'window {repr(old_title)} -> {repr(new_title)}')
+            if self.cfg.debug: print(f'window {repr(old_title)} -> {repr(new_title)}')
             self.window.set_title(new_title)
 
     def set_unsaved(self) -> None:
-        if self.cfg.debug: print(f"self.set_unsaved - {repr(self.title())}")
+        if self.cfg.debug: print(f"Document.set_unsaved - {repr(self.window.get_title())}")
         self.window.set_title(self.title())
         self.changed = True
 
     def set_saved(self) -> None:
-        if self.cfg.debug: print(f"self.set_saved - {repr(self.title())}")
+        if self.cfg.debug: print(f"Document.set_saved - {repr(self.window.get_title())}")
         self.window.set_title(self.title())
         self.changed = False
 
     def present(self) -> None:
+        if self.cfg.debug: print(f"Document.present - {repr(self.window.get_title())}")
         self.window.present()
 
     def menu_close(self, widget: Gtk.Widget, data: Any = None) -> None:
+        if self.cfg.debug: print(f"Document.menu_close - {repr(self.window.get_title())}")
         if self.delete_event():
             return
         self.window.destroy()
@@ -142,7 +148,7 @@ class Document(Gtk.WindowGroup):
     # delete_event returns whether Document closure should be blocked.
     # If not, remove self from the documents list.
     def delete_event(self) -> bool:
-        if self.cfg.debug: print("Document.delete_event")
+        if self.cfg.debug: print(f"Document.delete_event - {repr(self.window.get_title())}")
         veto: bool = False
         if self.changed:
             veto = self.warn_unsaved_changes()
@@ -157,10 +163,10 @@ class Document(Gtk.WindowGroup):
     # returns whether Document closure should be blocked:
     # True if the user says No, and False if the user says Yes.
     def warn_unsaved_changes(self) -> bool:
-        if self.cfg.debug: print("Document.warn_unsaved_changes")
+        if self.cfg.debug: print(f"Document.warn_unsaved_changes - {repr(self.window.get_title())}")
         dialog = Gtk.MessageDialog(
-            parent=self.window, 
-            modal=True, 
+            parent=self.window,
+            modal=True,
             message_type=Gtk.MessageType.QUESTION,
             buttons=Gtk.ButtonsType.YES_NO,
             text="This action will lose unsaved changes; are you sure?",
@@ -170,22 +176,22 @@ class Document(Gtk.WindowGroup):
         return rv
 
     # load replaces open_file
-    def load(self) -> None:
-        if self.cfg.debug: print("Document.load")
-        try:
-            self.archive = delv.archive.Scenario(
-                self.fpath,
-                gui_treestore=self.tree_data
-            )
-            self.library = None
-        except Exception as e:
-            self.error_message(
-                f"load: {repr(self.fpath)} doesn't seem to be a valid archive: {repr(e)}"
-            )
-            return
-        # if directory: self.set_open_directory(path)
-        # else: self.set_open_file(path)
-        self.set_saved()
+    # def load(self) -> None:
+    #     if self.cfg.debug: print("Document.load")
+    #     try:
+    #         self.archive = delv.archive.Scenario(
+    #             self.fpath,
+    #             gui_treestore=self.tree_data
+    #         )
+    #         self.library = None
+    #     except Exception as e:
+    #         self.error_message(
+    #             f"load: {repr(self.fpath)} doesn't seem to be a valid archive: {repr(e)}"
+    #         )
+    #         return
+    #     # if directory: self.set_open_directory(path)
+    #     # else: self.set_open_file(path)
+    #     self.set_saved()
 
     def row_activated(
         self,
@@ -193,17 +199,17 @@ class Document(Gtk.WindowGroup):
         path: Gtk.TreePath,
         column: Gtk.TreeViewColumn
     ) -> None:
-        if self.cfg.debug: print("Document.row_activated")
+        if self.cfg.debug: print(f"Document.row_activated - {repr(self.window.get_title())}")
         self.cursor_changed(tree_view)
         # if self.current_resource: self.menu_resource_editor(None)
-        # elif tree_view.row_expanded(path): 
-        if tree_view.row_expanded(path): 
+        # elif tree_view.row_expanded(path):
+        if tree_view.row_expanded(path):
             tree_view.collapse_row(path)
         else:
             tree_view.expand_row(path, False)
 
     def cursor_changed(self, tree_view: Gtk.TreeView) -> None:
-        if self.cfg.debug: print("Document.cursor_changed")
+        if self.cfg.debug: print(f"Document.cursor_changed - {repr(self.window.get_title())}")
         model, rows = tree_view.get_selection().get_selected_rows()
         row = rows[-1]
         subindex = model.get_value(model.get_iter(row), 3)
@@ -225,19 +231,19 @@ class Document(Gtk.WindowGroup):
         # for recp in self.resourcechange: recp.signal_resourcechange()
 
     def get_library(self) -> Optional[delv.library.Library]:
-        if self.cfg.debug: print("Document.get_library")
-        if not self.library:
-            try:
-                assert self.underlay, "get_library: self.underlay is None"
-                assert self.archive, "get_library: self.archive is None"
-                self.library = delv.library.Library(
-                    self.underlay,
-                    self.archive
-                ) 
-            except Exception as e:
-                self.error_message(
-                    f"Couldn't create library; if you are editing a saved game, you need to underlay a scenario.\nException was: {repr(e)}"
-                )
+        if self.cfg.debug: print(f"Document.get_library - {repr(self.window.get_title())}")
+        if self.library: return self.library
+        try:
+            assert self.underlay, "get_library: self.underlay is None"
+            assert self.archive, "get_library: self.archive is None"
+            self.library = delv.library.Library(
+                self.underlay,
+                self.archive
+            )
+        except Exception as e:
+            self.error_message(
+                f"Couldn't create library; if you are editing a saved game, you need to underlay a scenario.\nException was: {repr(e)}"
+            )
         return self.library
 
     def menu_open(self, widget: Gtk.Widget, data: Any = None) -> None:
@@ -250,7 +256,7 @@ class Document(Gtk.WindowGroup):
     # the data is displayed in the current Document.
     # Otherwise, the data is loaded into a new Document.
     def open_file(self, fpath: str, directory: bool = False) -> None:
-        if self.cfg.debug: print("Document.open_file")
+        if self.cfg.debug: print(f"Document.open_file({repr(fpath)}, directory: {directory})")
         doc = self if self.fresh_document() else Document(
             application=self.application,
             cfg=self.cfg,
@@ -275,7 +281,7 @@ class Document(Gtk.WindowGroup):
         doc.set_saved()
 
     def set_open_directory(self, fpath: str) -> None:
-        if self.cfg.debug: print("Document.set_open_directory")
+        if self.cfg.debug: print(f"Document.set_open_directory({fpath})")
         self.exported_directory = fpath
 
         # for recp in self.filechange: recp.signal_filechange()
@@ -284,15 +290,16 @@ class Document(Gtk.WindowGroup):
 
     # An underlay scenario is required to edit a saved game.
     def menu_underlay(self, widget: Gtk.Widget, data: Any = None) -> None:
-        if self.cfg.debug: print("Document.menu_underlay")
+        if self.cfg.debug: print(f"Document.menu_underlay - {repr(self.window.get_title())}")
         fpath = self.ask_open_path("Select a scenario to underlay...")
         if fpath: self.underlay_archive(delv.archive.Scenario(fpath))
 
     def underlay_archive(self, archive: delv.archive.Archive) -> None:
-        if self.cfg.debug: print("Document.underlay_archive")
+        if self.cfg.debug: print(f"Document.underlay_archive - {repr(self.window.get_title())}")
         self.underlay = archive
 
     def menu_new(self, widget: Gtk.Widget, data: Any = None) -> None:
+        if self.cfg.debug: print(f"Document.menu_new - {repr(self.window.get_title())}")
         #for recp in self.filechange: recp.signal_filechange()
         #for recp in self.subindexchange: recp.signal_subindexchange()
         #for recp in self.resourcechange: recp.signal_resourcechange()
@@ -304,7 +311,7 @@ class Document(Gtk.WindowGroup):
         return None
 
     def ask_open_path(self, msg: str = "Select a file...") -> Optional[str]:
-        if self.cfg.debug: print("Document.ask_open_path")
+        if self.cfg.debug: print(f"Document.ask_open_path(msg = {repr(msg)}) - {repr(self.window.get_title())}")
         if self.changed and self.warn_unsaved_changes(): return
         chooser = Gtk.FileChooserDialog(
             title=msg,
@@ -319,9 +326,9 @@ class Document(Gtk.WindowGroup):
         return rv
 
     def error_message(self, message: str) -> None:
-        if self.cfg.debug: print("Document.error_message")
+        if self.cfg.debug: print(f"Document.error_message({repr(message)}) - {repr(self.window.get_title())}")
         dialog = Gtk.MessageDialog(
-            parent=self.window, 
+            parent=self.window,
             modal=True,
             buttons=Gtk.ButtonsType.OK,
             message_type=Gtk.MessageType.ERROR,
@@ -332,8 +339,10 @@ class Document(Gtk.WindowGroup):
         dialog.destroy()
 
 documents: list[Document] = []
-def max_new_id() -> int:
-    return max(doc.new_id for doc in documents)
+def max_new_id(cfg: Config) -> int:
+    rv = max(doc.new_id for doc in documents)
+    if cfg.debug: print(f"max_new_id -> {rv}")
+    return rv
 
 # refresh_all_titles finds the document with the first placeholder name and
 # updates its window title, if needed.

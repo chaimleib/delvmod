@@ -141,8 +141,7 @@ class ReDelv(Gtk.Application):
         options = command_line.get_options_dict().end().unpack()
         if 'debug' in options:
             self.cfg.debug = options['debug']
-        if self.cfg.debug:
-            print('Debug mode')
+        if self.cfg.debug: print('ReDelv.do_command_line: Debug mode')
         files = command_line.get_arguments()[1:]
         if len(files) > 2:
             command_line.printerr_literal(
